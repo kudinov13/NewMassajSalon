@@ -254,6 +254,8 @@ const reviews = [
 ];
 
 export const Frame = (): React.ReactElement => {
+  const DESIGN_WIDTH = 1440;
+  const DESIGN_HEIGHT = 4704;
   const nameId = useId();
   const phoneId = useId();
   const commentId = useId();
@@ -268,6 +270,7 @@ export const Frame = (): React.ReactElement => {
   const [editingAddress, setEditingAddress] = useState<boolean>(false);
   const [addressDraft, setAddressDraft] = useState<string>("");
   const [diagFlipped, setDiagFlipped] = useState<boolean>(false);
+  const [homeScale, setHomeScale] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -285,6 +288,16 @@ export const Frame = (): React.ReactElement => {
         }
       })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const updateScale = () => {
+      setHomeScale(Math.min(1, window.innerWidth / DESIGN_WIDTH));
+    };
+
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
   }, []);
 
   const handleLogout = async () => {
@@ -312,7 +325,18 @@ export const Frame = (): React.ReactElement => {
   };
 
   return (
-    <div className="bg-[#efdec5] min-h-screen w-full overflow-x-hidden relative">
+    <div
+      className="bg-[#efdec5] w-full overflow-hidden relative"
+      style={{ height: `${DESIGN_HEIGHT * homeScale}px` }}
+    >
+      <div
+        className="relative w-[1440px] h-[4704px]"
+        style={{
+          transform: `scale(${homeScale})`,
+          transformOrigin: "top left",
+          marginLeft: `calc((100vw - ${DESIGN_WIDTH * homeScale}px) / 2)`,
+        }}
+      >
       <div
         className="absolute top-[94px] left-0 w-full h-[687px] bg-[#a6856d]"
         aria-hidden="true"
@@ -873,6 +897,7 @@ export const Frame = (): React.ReactElement => {
         aria-hidden="true"
       />
     </main>
+      </div>
     </div>
   );
 };

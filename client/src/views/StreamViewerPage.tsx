@@ -107,6 +107,7 @@ const StreamViewerPage: React.FC = () => {
     try {
       const msg = await API.streamRoom.sendChat(id, chatInput.trim());
       setChatMessages(prev => [...prev, msg]);
+      lastChatIdRef.current = Math.max(lastChatIdRef.current, msg.id);
       setChatInput("");
     } catch {}
   };

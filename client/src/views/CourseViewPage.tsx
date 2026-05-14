@@ -41,7 +41,7 @@ const CourseViewPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#efdec5] px-6 py-8">
+    <div className="min-h-screen bg-[#efdec5] px-4 sm:px-6 py-6 sm:py-8">
       <div className="max-w-[1200px] mx-auto">
         <Link to="/courses" className="inline-flex items-center gap-2 text-[#6B5744] no-underline [font-family:'Vela_Sans',sans-serif] font-light text-sm mb-6 hover:text-[#a6856d]">
           ← Все курсы
@@ -49,16 +49,18 @@ const CourseViewPage: React.FC = () => {
 
         <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl mb-6">{course.title}</h1>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
           {/* Video Player */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {activeVideo ? (
               <div className="bg-black rounded-[20px] overflow-hidden aspect-video">
                 <video
                   key={activeVideo.id}
                   src={`${BASE_URL}${activeVideo.videoUrl}`}
                   controls
-                  className="w-full h-full"
+                  preload="metadata"
+                  className="w-full h-full object-contain"
+                  style={{ display: 'block' }}
                 />
               </div>
             ) : (
@@ -72,7 +74,7 @@ const CourseViewPage: React.FC = () => {
           </div>
 
           {/* Video List */}
-          <div className="w-[300px] flex-shrink-0">
+          <div className="w-full lg:w-[300px] flex-shrink-0">
             <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-base mb-3">
               Уроки ({course.videos.length})
             </h3>

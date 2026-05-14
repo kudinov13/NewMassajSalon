@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API } from "../services/api";
+import Header from "../components/Header";
 
 interface Lab {
   id: number;
@@ -8,23 +9,6 @@ interface Lab {
   organization: string;
   url: string;
 }
-
-const navItems = [
-  "Диагностика",
-  "Анализы",
-  "Самомассаж",
-  "Прямые трансляции",
-  "Тибетские чаши",
-  "Психология",
-];
-
-const diagOptions = [
-  { label: "Диагностика ногтей", slug: "nails" },
-  { label: "Диагностика языка", slug: "tongue" },
-  { label: "Диагностика глаз", slug: "eyes" },
-  { label: "Диагностика кожи", slug: "skin" },
-  { label: "Диагностика тела и осанки", slug: "body" },
-];
 
 const doctors = [
   { title: "Терапевт", desc: "Первичная диагностика, общее обследование" },
@@ -52,7 +36,6 @@ const AnalysesPage: React.FC = () => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [diagDropdown, setDiagDropdown] = useState(false);
   const [labs, setLabs] = useState<Lab[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingLab, setEditingLab] = useState<Lab | null>(null);
@@ -123,90 +106,12 @@ const AnalysesPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#efdec5] min-h-screen w-full">
-      {/* Header */}
-      <header className="w-full px-10 py-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 no-underline">
-          <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
-          <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">
-            Harmony Spa
-          </span>
-        </Link>
-        <nav className="flex items-center gap-1">
-          {navItems.map((item) => (
-            <div
-              key={item}
-              className="relative"
-              onMouseEnter={() => item === "Диагностика" && setDiagDropdown(true)}
-              onMouseLeave={() => item === "Диагностика" && setDiagDropdown(false)}
-            >
-              <span
-                onClick={() => {
-                  if (item === "Тибетские чаши") navigate("/tibetan-bowls");
-                  if (item === "Самомассаж") navigate("/shop?category=self-massage");
-                  if (item === "Диагностика") navigate("/diagnostics/nails");
-                  if (item === "Анализы") navigate("/analyses");
-                  if (item === "Прямые трансляции") navigate("/streams");
-                  if (item === "Психология") navigate("/psychology");
-                }}
-                className={`px-4 py-1.5 rounded-full border [font-family:'Vela_Sans',sans-serif] font-light text-sm cursor-pointer transition-colors inline-block ${
-                  item === "Анализы"
-                    ? "bg-[#a6856d] text-white border-transparent"
-                    : "border-[#00000033] text-[#000000b2] hover:bg-[#a6856d] hover:text-white hover:border-transparent"
-                }`}
-              >
-                {item}
-              </span>
-              {item === "Диагностика" && diagDropdown && (
-                <div className="absolute top-full left-0 mt-2 bg-white rounded-[15px] shadow-lg py-3 px-2 min-w-[200px] z-50">
-                  {diagOptions.map((d) => (
-                    <button
-                      key={d.slug}
-                      onClick={() => { navigate(`/diagnostics/${d.slug}`); setDiagDropdown(false); }}
-                      className="block w-full text-left px-4 py-2 rounded-[10px] bg-transparent text-[#6B5744] hover:bg-[#f5e6d3] border-0 cursor-pointer [font-family:'Vela_Sans',sans-serif] font-light text-sm transition-colors"
-                    >
-                      {d.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-        <div className="flex items-center gap-3">
-          {isAuthenticated ? (
-            <>
-              <Link
-                to="/cart"
-                className="relative flex items-center justify-center w-10 h-10 rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
-                title="Корзина"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B5744" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                </svg>
-              </Link>
-              <Link
-                to="/profile"
-                className="flex items-center justify-center w-10 h-10 rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
-                title="Профиль"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B5744" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-              </Link>
-            </>
-          ) : (
-            <Link to="/login" className="flex h-[34px] items-center justify-center px-6 bg-[#a6856d] rounded-[25px] hover:bg-[#8d6e58] transition-colors no-underline">
-              <span className="[font-family:'Vela_Sans',sans-serif] font-light text-white text-base">Вход</span>
-            </Link>
-          )}
-        </div>
-      </header>
+    <div className="bg-[#efdec5] min-h-screen w-full overflow-x-hidden">
+      <Header activeItem="Анализы" />
 
       {/* Hero */}
       <section className="max-w-[900px] mx-auto text-center pt-16 pb-6 px-4">
-        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-[48px] tracking-[-2px] leading-tight mb-4">
+        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl sm:text-4xl md:text-[48px] tracking-[-2px] leading-tight mb-4">
           Какие анализы можно сдать
         </h1>
         <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-base max-w-[600px] mx-auto">
@@ -215,7 +120,7 @@ const AnalysesPage: React.FC = () => {
       </section>
 
       {/* Labs section */}
-      <section className="max-w-[1100px] mx-auto px-10 py-10">
+      <section className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-10 py-10">
         <div className="flex items-center justify-between mb-6">
           <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl">
             Лаборатории для сдачи анализов

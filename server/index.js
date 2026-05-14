@@ -53,7 +53,39 @@ app.use("/stream-room", streamRoomRouter);
 app.use("/bowls", bowlsRouter);
 app.use("/bowls-schedule", bowlsScheduleRouter);
 app.use("/courses", coursesRouter);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Video streaming with Range support
+const fs = require('fs');
+app.get('/uploads/:filename', (req, res) => {
+    const filePath = path.join(__dirname, 'uploads', req.params.filename);
+    if (!fs.existsSync(filePath)) return res.status(404).end();
+    const stat = fs.statSync(filePath);
+    const fileSize = stat.size;
+    const ext = path.extname(req.params.filename).toLowerCase();
+    const mimeTypes = { '.mp4': 'video/mp4', '.webm': 'video/webm', '.ogg': 'video/ogg', '.mov': 'video/quicktime', '.avi': 'video/x-msvideo', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp' };
+    const contentType = mimeTypes[ext] || 'application/octet-stream';
+    const range = req.headers.range;
+    if (range) {
+        const parts = range.replace(/bytes=/, '').split('-');
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+        const chunkSize = end - start + 1;
+        const file = fs.createReadStream(filePath, { start, end });
+        res.writeHead(206, {
+            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunkSize,
+            'Content-Type': contentType,
+        });
+        file.pipe(res);
+    } else {
+        res.writeHead(200, {
+            'Content-Length': fileSize,
+            'Content-Type': contentType,
+            'Accept-Ranges': 'bytes',
+        });
+        fs.createReadStream(filePath).pipe(res);
+    }
+});
 
 const port = process.env.PORT || 3001;
 (async () => {

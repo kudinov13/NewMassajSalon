@@ -261,6 +261,9 @@ const initDb = async () => {
             FOREIGN KEY(productId) REFERENCES products(id)
         )`);
 
+    // миграция: products.courseId
+    try { await db.exec(`ALTER TABLE products ADD COLUMN courseId INTEGER DEFAULT NULL`); } catch(e) {}
+
     // тестовая трансляция
     const streamExists = await db.get(`SELECT id FROM streams LIMIT 1`);
     if (!streamExists) {

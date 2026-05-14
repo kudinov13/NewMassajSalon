@@ -74,7 +74,7 @@ const CartPage = () => {
   return (
     <div className="bg-[#efdec5] min-h-screen w-full">
       {/* Header */}
-      <header className="w-full px-10 py-6 flex items-center justify-between">
+      <header className="w-full px-4 sm:px-6 md:px-10 py-4 md:py-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 no-underline">
           <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
           <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">
@@ -103,8 +103,8 @@ const CartPage = () => {
         </div>
       </header>
 
-      <div className="px-10 pb-16">
-        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000e6] text-4xl tracking-[-1px] mb-8">
+      <div className="px-4 sm:px-6 md:px-10 pb-16">
+        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000e6] text-2xl sm:text-3xl md:text-4xl tracking-[-1px] mb-8">
           Корзина
         </h1>
 
@@ -121,7 +121,7 @@ const CartPage = () => {
             </Link>
           </div>
         ) : (
-          <div className="flex gap-8">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
             {/* Items list */}
             <div className="flex-1 flex flex-col gap-4">
               {items.map((item) => (

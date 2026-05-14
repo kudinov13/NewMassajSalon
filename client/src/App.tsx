@@ -27,6 +27,8 @@ import SchedulePage from "./views/SchedulePage";
 import BowlsBookingPage from "./views/BowlsBookingPage";
 import CoursesPage from "./views/CoursesPage";
 import CourseViewPage from "./views/CourseViewPage";
+import MyCoursesPage from "./views/MyCoursesPage";
+import PurchaseHistoryPage from "./views/PurchaseHistoryPage";
 
 function App() {
   return <>
@@ -43,6 +45,8 @@ function App() {
         <Route path='/tibetan-bowls/booking' element={<BowlsBookingPage/>} />
         <Route path='/courses' element={<CoursesPage/>} />
         <Route path='/courses/:id' element={<CourseViewPage/>} />
+        <Route path='/my-courses' element={<MyCoursesPage/>} />
+        <Route path='/purchase-history' element={<PurchaseHistoryPage/>} />
         <Route path='/diagnostics/:type' element={<DiagnosticsPage/>} />
         <Route path='/diagnostics/:type/details' element={<DiagnosticsDetailPage/>} />
         <Route path='/analyses' element={<AnalysesPage/>} />

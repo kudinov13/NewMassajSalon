@@ -12,13 +12,6 @@ type User = {
   phone?: string;
 };
 
-type Order = {
-  id: number;
-  total: number;
-  createdAt: string;
-  items: { name: string; price: number; quantity: number }[];
-};
-
 type Appointment = {
   id: number;
   date: string;
@@ -46,7 +39,6 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [myStreams, setMyStreams] = useState<any[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
     API.user.getCurrentUser()
@@ -58,7 +50,6 @@ const ProfilePage = () => {
       .finally(() => setLoading(false));
     API.appointments.getMy().then(setAppointments).catch(() => {});
     API.streamRoom.getMy().then(setMyStreams).catch(() => {});
-    API.cart.getOrders().then(setOrders).catch(() => {});
   }, [navigate]);
 
   const handleLogout = async () => {
@@ -79,7 +70,7 @@ const ProfilePage = () => {
   return (
     <div className="bg-[#efdec5] min-h-screen w-full">
       {/* Header */}
-      <header className="w-full px-10 py-6 flex items-center justify-between">
+      <header className="w-full px-4 sm:px-6 md:px-10 py-4 md:py-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 no-underline">
           <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
           <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">
@@ -108,8 +99,8 @@ const ProfilePage = () => {
         </div>
       </header>
 
-      <div className="px-10 pb-16 max-w-[600px] mx-auto">
-        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000e6] text-4xl tracking-[-1px] mb-8">
+      <div className="px-4 sm:px-6 md:px-10 pb-16 max-w-[600px] mx-auto">
+        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000e6] text-2xl sm:text-3xl md:text-4xl tracking-[-1px] mb-8">
           Личный кабинет
         </h1>
 
@@ -157,6 +148,31 @@ const ProfilePage = () => {
               </svg>
               <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-base">
                 Магазин
+              </span>
+            </Link>
+            <Link
+              to="/my-courses"
+              className="flex items-center gap-3 px-5 py-3 bg-[#f5efe8] rounded-[15px] no-underline hover:bg-[#ece3d5] transition-colors"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000b2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-base">
+                Мои курсы
+              </span>
+            </Link>
+            <Link
+              to="/purchase-history"
+              className="flex items-center gap-3 px-5 py-3 bg-[#f5efe8] rounded-[15px] no-underline hover:bg-[#ece3d5] transition-colors"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000b2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-base">
+                История покупок
               </span>
             </Link>
             {user?.isAdmin ? (
@@ -237,34 +253,6 @@ const ProfilePage = () => {
                         {s.status === 'completed' ? 'Завершена' : 'Ожидание'}
                       </span>
                     )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Purchase History */}
-          {orders.length > 0 && (
-            <div className="mt-6">
-              <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000e6] text-lg mb-3">История покупок</h3>
-              <div className="flex flex-col gap-3">
-                {orders.map(order => (
-                  <div key={order.id} className="px-4 py-3 bg-[#f5efe8] rounded-[12px]">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs">
-                        {new Date(order.createdAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}
-                      </span>
-                      <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">
-                        {order.total} ₽
-                      </span>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      {order.items.map((item, i) => (
-                        <span key={i} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm">
-                          {item.name} × {item.quantity} — {item.price * item.quantity} ₽
-                        </span>
-                      ))}
-                    </div>
                   </div>
                 ))}
               </div>

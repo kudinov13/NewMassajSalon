@@ -77,7 +77,7 @@ const BookingPage: React.FC = () => {
   if (success) {
     return (
       <div className="bg-[#efdec5] min-h-screen w-full flex flex-col">
-        <header className="w-full px-10 py-6">
+        <header className="w-full px-4 sm:px-6 md:px-10 py-4 md:py-6">
           <Link to="/" className="flex items-center gap-2 no-underline w-fit">
             <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
             <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">Harmony Spa</span>
@@ -108,7 +108,7 @@ const BookingPage: React.FC = () => {
 
   return (
     <div className="bg-[#efdec5] min-h-screen w-full">
-      <header className="w-full px-10 py-6 flex items-center justify-between">
+      <header className="w-full px-4 sm:px-6 md:px-10 py-4 md:py-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 no-underline">
           <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
           <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">Harmony Spa</span>
@@ -118,8 +118,8 @@ const BookingPage: React.FC = () => {
         </button>
       </header>
 
-      <div className="max-w-[800px] mx-auto px-10 pb-16">
-        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-3xl tracking-[-1px] mb-2">
+      <div className="max-w-[800px] mx-auto px-4 sm:px-6 md:px-10 pb-16">
+        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl sm:text-3xl tracking-[-1px] mb-2">
           Запись на консультацию
         </h1>
         <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-base mb-8">

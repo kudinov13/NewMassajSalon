@@ -1,20 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API, BASE_URL } from "../services/api";
-
-const navItems = [
-  { label: "Диагностика", path: "/diagnostics/nails" },
-  { label: "Анализы", path: "/analyses" },
-  { label: "Самомассаж", path: "/shop?category=self-massage" },
-  { label: "Прямые трансляции", path: "/streams" },
-  { label: "Тибетские чаши", path: "/tibetan-bowls" },
-  { label: "Психология", path: "/psychology" },
-];
+import Header from "../components/Header";
 
 const TibetanBowlsPage = () => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [diagDropdown, setDiagDropdown] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
   const [audioUrl, setAudioUrl] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -41,74 +32,10 @@ const TibetanBowlsPage = () => {
 
   return (
     <div className="bg-[#efdec5] min-h-screen w-full overflow-x-hidden">
-      {/* Header */}
-      <header className="w-full px-10 py-6 flex items-center justify-between relative z-20">
-        <Link to="/" className="flex items-center gap-2 no-underline">
-          <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
-          <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">
-            Harmony Spa
-          </span>
-        </Link>
-        <nav className="flex items-center gap-1">
-          {navItems.map((item) => (
-            <div
-              key={item.label}
-              className="relative"
-              onMouseEnter={() => item.label === "Диагностика" && setDiagDropdown(true)}
-              onMouseLeave={() => item.label === "Диагностика" && setDiagDropdown(false)}
-            >
-              <span
-                onClick={() => { if (item.path) navigate(item.path); }}
-                className={`px-4 py-1.5 rounded-full border [font-family:'Vela_Sans',sans-serif] font-light text-sm cursor-pointer transition-colors inline-block ${
-                  item.label === "Тибетские чаши"
-                    ? "bg-[#a6856d] text-white border-[#a6856d]"
-                    : "border-[#00000033] text-[#000000b2] hover:bg-[#a6856d] hover:text-white hover:border-transparent"
-                }`}
-              >
-                {item.label}
-              </span>
-              {item.label === "Диагностика" && diagDropdown && (
-                <div className="absolute top-full left-0 mt-2 bg-white rounded-[15px] shadow-lg py-3 px-2 min-w-[200px] z-50">
-                  {[
-                    { label: "Диагностика ногтей", slug: "nails" },
-                    { label: "Диагностика языка", slug: "tongue" },
-                    { label: "Диагностика глаз", slug: "eyes" },
-                    { label: "Диагностика кожи", slug: "skin" },
-                    { label: "Диагностика тела и осанки", slug: "body" },
-                  ].map((d) => (
-                    <button
-                      key={d.slug}
-                      onClick={() => { navigate(`/diagnostics/${d.slug}`); setDiagDropdown(false); }}
-                      className="block w-full text-left px-4 py-2 rounded-[10px] bg-transparent text-[#6B5744] hover:bg-[#f5e6d3] border-0 cursor-pointer [font-family:'Vela_Sans',sans-serif] font-light text-sm transition-colors"
-                    >
-                      {d.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-        <div className="flex items-center gap-3">
-          {isAuthenticated ? (
-            <>
-              <Link to="/cart" className="flex items-center justify-center w-10 h-10 rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline" title="Корзина">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000b2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-              </Link>
-              <Link to="/profile" className="flex items-center justify-center w-10 h-10 rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline" title="Личный кабинет">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000b2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </Link>
-            </>
-          ) : (
-            <Link to="/login" className="flex h-[34px] items-center justify-center px-6 bg-[#a6856d] rounded-[25px] hover:bg-[#8d6e58] transition-colors no-underline">
-              <span className="[font-family:'Vela_Sans',sans-serif] font-light text-white text-base">Вход</span>
-            </Link>
-          )}
-        </div>
-      </header>
+      <Header activeItem="Тибетские чаши" />
 
       {/* Hero */}
-      <section className="relative w-full h-[520px] overflow-hidden rounded-b-[40px]">
+      <section className="relative w-full h-[250px] sm:h-[400px] md:h-[520px] overflow-hidden rounded-b-[30px] sm:rounded-b-[40px]">
         <img
           src="/bowls-hero.png"
           alt="Тибетские чаши"

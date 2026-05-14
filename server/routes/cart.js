@@ -62,6 +62,11 @@ cartRouter.post('/checkout', requireAuth, async (req, res) => {
             'INSERT INTO order_items (orderId, productId, name, price, quantity) VALUES (?, ?, ?, ?, ?)',
             orderId, item.productId, item.name, item.price, item.quantity
         );
+        // Grant course access if product has courseId
+        const product = await db.get('SELECT courseId FROM products WHERE id = ?', item.productId);
+        if (product && product.courseId) {
+            await db.run('INSERT OR IGNORE INTO user_courses (userId, courseId) VALUES (?, ?)', req.userId, product.courseId);
+        }
     }
     await clearCart(req.userId);
     res.json({ orderId, total });

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { API, BASE_URL } from "../../services/api";
+import Header from "../../components/Header";
 
 type Product = {
   id: number;
@@ -10,6 +11,15 @@ type Product = {
   oldPrice: number | null;
   category: string;
   image: string | null;
+  courseId?: number | null;
+};
+
+type CourseVideo = {
+  id: number;
+  courseId: number;
+  title: string;
+  videoUrl: string;
+  sortOrder: number;
 };
 
 const CATEGORIES = [
@@ -20,14 +30,6 @@ const CATEGORIES = [
   { key: "nutrition", label: "Рецепты питания" },
 ];
 
-const navItems = [
-  "Диагностика",
-  "Анализы",
-  "Самомассаж",
-  "Прямые трансляции",
-  "Тибетские чаши",
-  "Психология",
-];
 
 const ProductCard = ({
   product,
@@ -58,15 +60,15 @@ const ProductCard = ({
         {/* Front */}
         <div style={{ backfaceVisibility: "hidden" }}>
           <div className="bg-white rounded-[20px] overflow-hidden">
-            <div className="relative w-full aspect-square p-3">
+            <div className="relative w-full aspect-square">
               {product.image ? (
                 <img
                   src={`${BASE_URL}${product.image}`}
                   alt={product.name}
-                  className="w-full h-full object-contain rounded-[15px]"
+                  className="w-full h-full object-cover rounded-t-[20px]"
                 />
               ) : (
-                <div className="w-full h-full bg-[#f5efe8] rounded-[15px] flex items-center justify-center">
+                <div className="w-full h-full bg-[#f5efe8] rounded-t-[20px] flex items-center justify-center">
                   <span className="text-[#00000033] text-4xl">📦</span>
                 </div>
               )}
@@ -200,7 +202,6 @@ const ShopPage = () => {
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [diagDropdown, setDiagDropdown] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -213,6 +214,14 @@ const ShopPage = () => {
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Video management for courses
+  const [courseVideos, setCourseVideos] = useState<CourseVideo[]>([]);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoTitle, setVideoTitle] = useState("");
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [editingVideoId, setEditingVideoId] = useState<number | null>(null);
+  const [editingVideoTitle, setEditingVideoTitle] = useState("");
 
   useEffect(() => {
     API.user.getCurrentUser()
@@ -284,6 +293,51 @@ const ShopPage = () => {
     setFormImage(null);
     setFormError("");
     setShowModal(true);
+    // Load videos if it's a course product
+    if (p.category === 'self-massage' && p.id) {
+      API.products.getVideos(p.id).then(setCourseVideos).catch(() => setCourseVideos([]));
+    } else {
+      setCourseVideos([]);
+    }
+  };
+
+  const handleUploadVideo = async () => {
+    if (!videoFile || !editingProduct) return;
+    setUploadingVideo(true);
+    try {
+      const fd = new FormData();
+      fd.append('video', videoFile);
+      fd.append('title', videoTitle || 'Урок');
+      const newVideo = await API.products.uploadVideo(editingProduct.id, fd);
+      setCourseVideos(prev => [...prev, newVideo]);
+      setVideoFile(null);
+      setVideoTitle('');
+    } catch {} finally { setUploadingVideo(false); }
+  };
+
+  const handleDeleteVideo = async (videoId: number) => {
+    if (!editingProduct || !window.confirm('Удалить видео?')) return;
+    await API.products.deleteVideo(editingProduct.id, videoId);
+    setCourseVideos(prev => prev.filter(v => v.id !== videoId));
+  };
+
+  const handleMoveVideo = async (index: number, direction: -1 | 1) => {
+    if (!editingProduct) return;
+    const newList = [...courseVideos];
+    const swapIdx = index + direction;
+    if (swapIdx < 0 || swapIdx >= newList.length) return;
+    [newList[index], newList[swapIdx]] = [newList[swapIdx], newList[index]];
+    setCourseVideos(newList);
+    const videoIds = newList.map(v => v.id);
+    await API.products.reorderVideos(editingProduct.id, videoIds);
+  };
+
+  const handleSaveVideoTitle = async (videoId: number) => {
+    if (!editingProduct || !editingVideoTitle.trim()) return;
+    await API.products.updateVideoTitle(editingProduct.id, videoId, editingVideoTitle.trim());
+    setCourseVideos(prev => prev.map(v => v.id === videoId ? { ...v, title: editingVideoTitle.trim() } : v));
+    setEditingVideoId(null);
+    setEditingVideoTitle('');
   };
 
   const handleSave = async () => {
@@ -328,105 +382,15 @@ const ShopPage = () => {
   };
 
   return (
-    <div className="bg-[#efdec5] min-h-screen w-full">
-      {/* Header */}
-      <header className="w-full px-10 py-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 no-underline">
-          <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
-          <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">
-            Harmony Spa
-          </span>
-        </Link>
-        <nav className="flex items-center gap-1">
-          {navItems.map((item) => (
-            <div key={item} className="relative"
-              onMouseEnter={() => item === "Диагностика" && setDiagDropdown(true)}
-              onMouseLeave={() => item === "Диагностика" && setDiagDropdown(false)}
-            >
-              <span
-                onClick={() => {
-                  if (item === "Тибетские чаши") navigate("/tibetan-bowls");
-                  if (item === "Самомассаж") navigate("/shop?category=self-massage");
-                  if (item === "Диагностика") navigate("/diagnostics/nails");
-                  if (item === "Анализы") navigate("/analyses");
-                  if (item === "Прямые трансляции") navigate("/streams");
-                  if (item === "Психология") navigate("/psychology");
-                }}
-                className="px-4 py-1.5 rounded-full border border-[#00000033] [font-family:'Vela_Sans',sans-serif] font-light text-[#000000b2] text-sm cursor-pointer hover:bg-[#a6856d] hover:text-white hover:border-transparent transition-colors inline-block"
-              >
-                {item}
-              </span>
-              {item === "Диагностика" && diagDropdown && (
-                <div className="absolute top-full left-0 mt-2 bg-white rounded-[15px] shadow-lg py-3 px-2 min-w-[200px] z-50">
-                  {[
-                    { label: "Диагностика ногтей", slug: "nails" },
-                    { label: "Диагностика языка", slug: "tongue" },
-                    { label: "Диагностика глаз", slug: "eyes" },
-                    { label: "Диагностика кожи", slug: "skin" },
-                    { label: "Диагностика тела и осанки", slug: "body" },
-                  ].map((d) => (
-                    <button
-                      key={d.slug}
-                      onClick={() => { navigate(`/diagnostics/${d.slug}`); setDiagDropdown(false); }}
-                      className="block w-full text-left px-4 py-2 rounded-[10px] bg-transparent text-[#6B5744] hover:bg-[#f5e6d3] border-0 cursor-pointer [font-family:'Vela_Sans',sans-serif] font-light text-sm transition-colors"
-                    >
-                      {d.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-        <div className="flex items-center gap-3">
-          {isAuthenticated && (
-            <>
-              <Link
-                to="/cart"
-                className="relative flex items-center justify-center w-10 h-10 rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
-                title="Корзина"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000b2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                </svg>
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#a6856d] text-white text-xs rounded-full flex items-center justify-center [font-family:'Vela_Sans',sans-serif]">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-              <Link
-                to="/profile"
-                className="flex items-center justify-center w-10 h-10 rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
-                title="Личный кабинет"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000b2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-              </Link>
-            </>
-          )}
-          {!isAuthenticated && (
-            <Link
-              to="/login"
-              className="flex h-[34px] items-center justify-center px-6 bg-[#a6856d] rounded-[25px] hover:bg-[#8d6e58] transition-colors no-underline"
-            >
-              <span className="[font-family:'Vela_Sans',sans-serif] font-light text-white text-base">
-                Вход
-              </span>
-            </Link>
-          )}
-        </div>
-      </header>
+    <div className="bg-[#efdec5] min-h-screen w-full overflow-x-hidden">
+      <Header cartCount={cartCount} />
 
       {/* Hero banner */}
-      <div className="px-10 pb-8">
-        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-[48px] tracking-[-1.4px] leading-tight mb-6">
+      <div className="px-4 sm:px-6 md:px-10 pb-8">
+        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-2xl sm:text-4xl md:text-[48px] tracking-[-1.4px] leading-tight mb-6">
           Создайте идеальный баланс<br />тела и духа
         </h1>
-        <div className="w-full h-[600px] rounded-[25px] overflow-hidden">
+        <div className="w-full h-[200px] sm:h-[400px] md:h-[600px] rounded-[20px] sm:rounded-[25px] overflow-hidden">
           <img
             src="/shop-banner.png"
             alt="Баннер магазина"
@@ -440,9 +404,9 @@ const ShopPage = () => {
       </div>
 
       {/* Catalog */}
-      <div className="px-10 pb-16">
+      <div className="px-4 sm:px-6 md:px-10 pb-16">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000e6] text-4xl tracking-[-1px]">
+          <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000e6] text-2xl sm:text-3xl md:text-4xl tracking-[-1px]">
             Каталог
           </h2>
           {isAdmin && (
@@ -480,7 +444,7 @@ const ShopPage = () => {
             Товаров пока нет
           </p>
         ) : (
-          <div className="grid grid-cols-5 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
             {products.map((product) => (
               <ProductCard
                 key={product.id}
@@ -569,6 +533,78 @@ const ShopPage = () => {
                   <span className="text-xs text-[#00000066]">Текущее фото сохранится, если не выбрать новое</span>
                 )}
               </label>
+
+              {/* Video management for course products */}
+              {formCategory === 'self-massage' && editingProduct && (
+                <div className="border-2 border-[#e3cbb1] rounded-[15px] p-4">
+                  <h4 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000e6] text-base mb-3">Видеоуроки</h4>
+                  
+                  {/* Video list */}
+                  {courseVideos.length > 0 && (
+                    <div className="flex flex-col gap-2 mb-4 max-h-[200px] overflow-y-auto">
+                      {courseVideos.map((v, i) => (
+                        <div key={v.id} className="flex items-center gap-2 bg-[#f5efe8] rounded-[10px] px-3 py-2">
+                          <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-xs w-5">{i + 1}.</span>
+                          {editingVideoId === v.id ? (
+                            <input
+                              value={editingVideoTitle}
+                              onChange={e => setEditingVideoTitle(e.target.value)}
+                              onBlur={() => handleSaveVideoTitle(v.id)}
+                              onKeyDown={e => e.key === 'Enter' && handleSaveVideoTitle(v.id)}
+                              className="flex-1 h-7 px-2 rounded border border-[#e3cbb1] [font-family:'Vela_Sans',sans-serif] text-xs outline-none"
+                              autoFocus
+                            />
+                          ) : (
+                            <span
+                              className="flex-1 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs cursor-pointer hover:text-[#a6856d]"
+                              onClick={() => { setEditingVideoId(v.id); setEditingVideoTitle(v.title); }}
+                              title="Нажмите чтобы переименовать"
+                            >
+                              {v.title}
+                            </span>
+                          )}
+                          <button type="button" onClick={() => handleMoveVideo(i, -1)} disabled={i === 0} className="w-6 h-6 rounded bg-white border border-[#e3cbb1] text-[#6B5744] text-xs cursor-pointer disabled:opacity-30 flex items-center justify-center">↑</button>
+                          <button type="button" onClick={() => handleMoveVideo(i, 1)} disabled={i === courseVideos.length - 1} className="w-6 h-6 rounded bg-white border border-[#e3cbb1] text-[#6B5744] text-xs cursor-pointer disabled:opacity-30 flex items-center justify-center">↓</button>
+                          <button type="button" onClick={() => handleDeleteVideo(v.id)} className="w-6 h-6 rounded bg-white border border-red-300 text-red-500 text-xs cursor-pointer hover:bg-red-50 flex items-center justify-center">×</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Upload new video */}
+                  <div className="flex flex-col gap-2">
+                    <input
+                      type="text"
+                      value={videoTitle}
+                      onChange={e => setVideoTitle(e.target.value)}
+                      placeholder="Название урока"
+                      className="h-9 px-3 bg-white border border-[#e3cbb1] rounded-[10px] [font-family:'Vela_Sans',sans-serif] text-sm outline-none focus:border-[#a6856d]"
+                    />
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={e => setVideoFile(e.target.files?.[0] || null)}
+                      className="[font-family:'Vela_Sans',sans-serif] text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleUploadVideo}
+                      disabled={!videoFile || uploadingVideo}
+                      className="h-8 px-4 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] text-xs border-0 cursor-pointer transition-colors disabled:opacity-40"
+                    >
+                      {uploadingVideo ? 'Загрузка...' : 'Загрузить видео'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {formCategory === 'self-massage' && !editingProduct && (
+                <div className="bg-[#f5efe8] rounded-[15px] px-4 py-3">
+                  <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#00000099] text-xs">
+                    Сохраните товар, затем откройте его для редактирования, чтобы добавить видеоуроки.
+                  </p>
+                </div>
+              )}
 
               {formError && (
                 <div className="[font-family:'Vela_Sans',sans-serif] text-red-700 text-sm bg-red-50 border border-red-200 rounded-[15px] px-4 py-2">

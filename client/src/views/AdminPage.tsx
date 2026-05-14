@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { API, BASE_URL } from "../services/api";
 
-type Tab = "dashboard" | "products" | "labs" | "streams" | "live" | "users" | "courses";
+type Tab = "dashboard" | "products" | "labs" | "streams" | "live" | "users";
 
 interface Stream {
   id: number;
@@ -113,15 +113,6 @@ const sidebarItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
-      </svg>
-    ),
-  },
-  {
-    key: "courses",
-    label: "Курсы",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="5 3 19 12 5 21 5 3" />
       </svg>
     ),
   },
@@ -883,10 +874,6 @@ const AdminPage: React.FC = () => {
               </table>
             </div>
           </div>
-        )}
-        {/* COURSES TAB */}
-        {tab === "courses" && (
-          <CoursesAdminTab />
         )}
       </main>
 

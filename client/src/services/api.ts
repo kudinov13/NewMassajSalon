@@ -103,6 +103,39 @@ export const API = {
       });
       await errorHandler(response);
     },
+    getVideos: async (productId: number) => {
+      const response = await fetch(`${BASE_URL}/products/${productId}/videos`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    uploadVideo: async (productId: number, formData: FormData) => {
+      const response = await fetch(`${BASE_URL}/products/${productId}/videos`, { method: "POST", credentials: "include", body: formData });
+      await errorHandler(response);
+      return response.json();
+    },
+    deleteVideo: async (productId: number, videoId: number) => {
+      const response = await fetch(`${BASE_URL}/products/${productId}/videos/${videoId}`, { method: "DELETE", credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    reorderVideos: async (productId: number, videoIds: number[]) => {
+      const response = await fetch(`${BASE_URL}/products/${productId}/videos/reorder`, {
+        method: "PUT", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoIds }),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    updateVideoTitle: async (productId: number, videoId: number, title: string) => {
+      const response = await fetch(`${BASE_URL}/products/${productId}/videos/${videoId}`, {
+        method: "PUT", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
   },
   cart: {
     get: async () => {

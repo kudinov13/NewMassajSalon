@@ -77,13 +77,13 @@ const BowlsBookingPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#efdec5] px-10 py-10">
+    <div className="min-h-screen bg-[#efdec5] px-4 sm:px-6 md:px-10 py-8 sm:py-10">
       <div className="max-w-[700px] mx-auto">
         <Link to="/tibetan-bowls" className="inline-flex items-center gap-2 text-[#6B5744] no-underline [font-family:'Vela_Sans',sans-serif] font-light text-sm mb-8 hover:text-[#a6856d]">
           ← Тибетские чаши
         </Link>
 
-        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-[36px] tracking-[-1px] mb-2">
+        <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl sm:text-3xl md:text-[36px] tracking-[-1px] mb-2">
           Запись на сеанс
         </h1>
         <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-sm mb-8">
