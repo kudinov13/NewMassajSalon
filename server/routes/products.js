@@ -63,7 +63,7 @@ productsRouter.get('/', async (req, res) => {
 
 // POST create product (admin only)
 productsRouter.post('/', requireAdmin, upload.single('image'), async (req, res) => {
-    const { name, description, price, oldPrice, category } = req.body;
+    const { name, description, price, oldPrice, category, partnerUrl } = req.body;
     if (!name || !price || !category) {
         return res.status(400).json({ message: 'Заполните все обязательные поля' });
     }
@@ -74,7 +74,8 @@ productsRouter.post('/', requireAdmin, upload.single('image'), async (req, res) 
         price: parseFloat(price),
         oldPrice: oldPrice ? parseFloat(oldPrice) : null,
         category,
-        image
+        image,
+        partnerUrl: category === 'bady' ? (partnerUrl || null) : null
     });
     // Auto-create course for self-massage category
     if (category === 'self-massage') {
@@ -86,7 +87,7 @@ productsRouter.post('/', requireAdmin, upload.single('image'), async (req, res) 
 
 // PUT update product (admin only)
 productsRouter.put('/:id', requireAdmin, upload.single('image'), async (req, res) => {
-    const { name, description, price, oldPrice, category } = req.body;
+    const { name, description, price, oldPrice, category, partnerUrl } = req.body;
     if (!name || !price || !category) {
         return res.status(400).json({ message: 'Заполните все обязательные поля' });
     }
@@ -99,7 +100,8 @@ productsRouter.put('/:id', requireAdmin, upload.single('image'), async (req, res
         price: parseFloat(price),
         oldPrice: oldPrice ? parseFloat(oldPrice) : null,
         category,
-        image
+        image,
+        partnerUrl: category === 'bady' ? (partnerUrl || null) : null
     });
     // Auto-create course for self-massage category
     if (category === 'self-massage') {

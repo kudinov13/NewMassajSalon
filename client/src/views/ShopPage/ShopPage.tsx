@@ -12,6 +12,7 @@ type Product = {
   category: string;
   image: string | null;
   courseId?: number | null;
+  partnerUrl?: string | null;
 };
 
 type CourseVideo = {
@@ -28,6 +29,7 @@ const CATEGORIES = [
   { key: "spa", label: "SPA рецепты" },
   { key: "self-massage", label: "Курсы самомассажа" },
   { key: "nutrition", label: "Рецепты питания" },
+  { key: "bady", label: "БАДы" },
 ];
 
 
@@ -91,20 +93,36 @@ const ProductCard = ({
                     <span className="[font-family:'Vela_Sans',sans-serif] font-light text-xs">Описание</span>
                   </button>
                 )}
-                {/* Add to cart button */}
-                {isAuthenticated && (
-                  <button
-                    type="button"
-                    onClick={() => onAddToCart(product.id)}
-                    className="w-10 h-10 flex items-center justify-center bg-white/90 rounded-full border-0 cursor-pointer text-[#00000099] hover:text-[#a6856d] hover:bg-white transition-colors shadow-sm"
-                    aria-label="В корзину"
-                    title="В корзину"
+                {/* Add to cart or Partner link */}
+                {product.category === 'bady' && product.partnerUrl ? (
+                  <a
+                    href={product.partnerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 flex items-center justify-center bg-white/90 rounded-full border-0 cursor-pointer text-[#00000099] hover:text-[#a6856d] hover:bg-white transition-colors shadow-sm no-underline"
+                    title="Купить у партнёра"
                   >
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                      <path d="M15 3h6v6"/>
+                      <path d="M10 14L21 3"/>
                     </svg>
-                  </button>
+                  </a>
+                ) : (
+                  isAuthenticated && (
+                    <button
+                      type="button"
+                      onClick={() => onAddToCart(product.id)}
+                      className="w-10 h-10 flex items-center justify-center bg-white/90 rounded-full border-0 cursor-pointer text-[#00000099] hover:text-[#a6856d] hover:bg-white transition-colors shadow-sm"
+                      aria-label="В корзину"
+                      title="В корзину"
+                    >
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                      </svg>
+                    </button>
+                  )
                 )}
                 {/* Heart */}
                 <button
@@ -211,6 +229,7 @@ const ShopPage = () => {
   const [formOldPrice, setFormOldPrice] = useState("");
   const [formCategory, setFormCategory] = useState("aromatherapy");
   const [formImage, setFormImage] = useState<File | null>(null);
+  const [formPartnerUrl, setFormPartnerUrl] = useState("");
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -279,6 +298,7 @@ const ShopPage = () => {
     setFormOldPrice("");
     setFormCategory("aromatherapy");
     setFormImage(null);
+    setFormPartnerUrl("");
     setFormError("");
     setShowModal(true);
   };
@@ -291,6 +311,7 @@ const ShopPage = () => {
     setFormOldPrice(p.oldPrice ? String(p.oldPrice) : "");
     setFormCategory(p.category);
     setFormImage(null);
+    setFormPartnerUrl(p.partnerUrl || "");
     setFormError("");
     setShowModal(true);
     // Load videos if it's a course product
@@ -345,6 +366,10 @@ const ShopPage = () => {
       setFormError("Заполните название и цену");
       return;
     }
+    if (formCategory === 'bady' && !formPartnerUrl.trim()) {
+      setFormError("Укажите ссылку на товар у партнёра для категории БАДы");
+      return;
+    }
     setSubmitting(true);
     setFormError("");
     const fd = new FormData();
@@ -353,6 +378,9 @@ const ShopPage = () => {
     fd.append("price", formPrice);
     if (formOldPrice) fd.append("oldPrice", formOldPrice);
     fd.append("category", formCategory);
+    if (formCategory === 'bady') {
+      fd.append("partnerUrl", formPartnerUrl.trim());
+    }
     if (formImage) {
       fd.append("image", formImage);
     } else if (editingProduct?.image) {
@@ -520,6 +548,18 @@ const ShopPage = () => {
                   ))}
                 </select>
               </label>
+              {formCategory === 'bady' && (
+                <label className="flex flex-col gap-1">
+                  <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#00000099] text-sm">Ссылка на товар у партнёра</span>
+                  <input
+                    type="url"
+                    placeholder="https://partner-shop.com/product/123"
+                    value={formPartnerUrl}
+                    onChange={(e) => setFormPartnerUrl(e.target.value)}
+                    className="h-10 px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela_Sans',sans-serif] text-sm focus:outline-none focus:border-[#a6856d]"
+                  />
+                </label>
+              )}
               <label className="flex flex-col gap-1">
                 <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#00000099] text-sm">Фото товара</span>
                 <input

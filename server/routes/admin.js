@@ -18,7 +18,7 @@ const adminRouter = express.Router();
 // GET all users (admin only)
 adminRouter.get('/users', requireAdmin, async (req, res) => {
     const db = getDb();
-    const users = await db.all('SELECT id, login, isAdmin, isPsychologist, isBowlsSpecialist, fullName, phone, createdAt FROM users ORDER BY id');
+    const users = await db.all('SELECT id, login, isAdmin, isPsychologist, isBowlsSpecialist, fullName, phone, email, createdAt FROM users ORDER BY id');
     res.json(users);
 });
 
@@ -33,7 +33,7 @@ adminRouter.put('/users/:id/role', requireAdmin, async (req, res) => {
     if (role === 'psychologist') isPsychologist = 1;
     if (role === 'bowls') isBowlsSpecialist = 1;
     await db.run('UPDATE users SET isAdmin = ?, isPsychologist = ?, isBowlsSpecialist = ? WHERE id = ?', isAdmin, isPsychologist, isBowlsSpecialist, userId);
-    const user = await db.get('SELECT id, login, isAdmin, isPsychologist, isBowlsSpecialist, fullName, phone, createdAt FROM users WHERE id = ?', userId);
+    const user = await db.get('SELECT id, login, isAdmin, isPsychologist, isBowlsSpecialist, fullName, phone, email, createdAt FROM users WHERE id = ?', userId);
     res.json(user);
 });
 

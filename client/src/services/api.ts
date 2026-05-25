@@ -1,4 +1,6 @@
-export const BASE_URL = "http://localhost:3001";
+// In development, CRA proxy forwards API requests to localhost:3001 (see package.json "proxy").
+// In production, the API is served from the same origin.
+export const BASE_URL = "";
 
 type LoginData = {
   login: string;
@@ -10,6 +12,7 @@ type RegistrationData = {
   password: string;
   fullName?: string;
   phone?: string;
+  email?: string;
 };
 
 const errorHandler = async (response: Response) => {
@@ -59,7 +62,7 @@ export const API = {
       await errorHandler(response);
       return await response.json();
     },
-    updateProfile: async (data: { fullName: string; phone: string }) => {
+    updateProfile: async (data: { fullName: string; phone: string; email?: string }) => {
       const response = await fetch(`${BASE_URL}/user/profile`, {
         method: "PUT", credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -199,7 +202,7 @@ export const API = {
       await errorHandler(response);
       return await response.json();
     },
-    create: async (data: { title: string; description: string; date: string; time: string; speaker?: string; status?: string }) => {
+    create: async (data: { title: string; description: string; date: string; time: string; speaker?: string; status?: string; price?: number; previewUrl?: string | null }) => {
       const response = await fetch(`${BASE_URL}/streams`, {
         method: "POST",
         credentials: "include",
@@ -209,7 +212,7 @@ export const API = {
       await errorHandler(response);
       return await response.json();
     },
-    update: async (id: number, data: { title: string; description: string; date: string; time: string; speaker?: string; status?: string }) => {
+    update: async (id: number, data: { title: string; description: string; date: string; time: string; speaker?: string; status?: string; price?: number; previewUrl?: string | null }) => {
       const response = await fetch(`${BASE_URL}/streams/${id}`, {
         method: "PUT",
         credentials: "include",
@@ -218,6 +221,29 @@ export const API = {
       });
       await errorHandler(response);
       return await response.json();
+    },
+    uploadPreview: (id: number, file: File, onProgress?: (pct: number) => void): Promise<any> => {
+      return new Promise((resolve, reject) => {
+        const fd = new FormData();
+        fd.append('video', file);
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${BASE_URL}/streams/${id}/preview`);
+        xhr.withCredentials = true;
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable && onProgress) {
+            onProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error('Ошибка загрузки видео'));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Сетевая ошибка'));
+        xhr.send(fd);
+      });
     },
     delete: async (id: number) => {
       const response = await fetch(`${BASE_URL}/streams/${id}`, {
@@ -510,8 +536,9 @@ export const API = {
     },
   },
   bowlsSchedule: {
-    getAvailable: async () => {
-      const response = await fetch(`${BASE_URL}/bowls-schedule`, { credentials: "include" });
+    getAvailable: async (city?: string) => {
+      const url = city ? `${BASE_URL}/bowls-schedule?city=${city}` : `${BASE_URL}/bowls-schedule`;
+      const response = await fetch(url, { credentials: "include" });
       await errorHandler(response);
       return response.json();
     },
@@ -520,11 +547,11 @@ export const API = {
       await errorHandler(response);
       return response.json();
     },
-    create: async (date: string, times: string[]) => {
+    create: async (date: string, times: string[], city?: string) => {
       const response = await fetch(`${BASE_URL}/bowls-schedule`, {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, times }),
+        body: JSON.stringify({ date, times, city: city || 'novosibirsk' }),
       });
       await errorHandler(response);
       return response.json();
@@ -545,6 +572,164 @@ export const API = {
     },
     getMyAppointments: async () => {
       const response = await fetch(`${BASE_URL}/bowls-schedule/my-appointments`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    getSpecialistAppointments: async () => {
+      const response = await fetch(`${BASE_URL}/bowls-schedule/appointments`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+  },
+  diagnostics: {
+    getAvailableSlots: async () => {
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    create: async (date: string, times: string[]) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, times }),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    deleteSlot: async (id: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    bookSlot: async (data: { slotId: number; fullName: string; phone: string }) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule/book`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    getMyAppointments: async () => {
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule/my-appointments`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    getAllAppointments: async () => {
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule/all-appointments`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    joinRoom: async (appointmentId: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule/join-room/${appointmentId}`, {
+        method: "POST",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    leaveRoom: async (appointmentId: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule/leave-room/${appointmentId}`, {
+        method: "POST",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    getRoomStatus: async (appointmentId: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule/room-status/${appointmentId}`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+  },
+  guide: {
+    getAll: async () => {
+      const response = await fetch(`${BASE_URL}/guide`);
+      await errorHandler(response);
+      return response.json();
+    },
+    create: async (data: { title: string; body: string }) => {
+      const response = await fetch(`${BASE_URL}/guide`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    update: async (id: number, data: { title: string; body: string; sortOrder?: number }) => {
+      const response = await fetch(`${BASE_URL}/guide/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    delete: async (id: number) => {
+      const response = await fetch(`${BASE_URL}/guide/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+  },
+  activity: {
+    log: async (action: string, details?: string) => {
+      try {
+        await fetch(`${BASE_URL}/activity`, {
+          method: "POST", credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action, details: details || '' }),
+        });
+      } catch {}
+    },
+    getLog: async (search?: string, limit?: number) => {
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (limit) params.set('limit', String(limit));
+      const response = await fetch(`${BASE_URL}/activity?${params}`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    getUsers: async (search?: string) => {
+      const params = search ? `?search=${encodeURIComponent(search)}` : '';
+      const response = await fetch(`${BASE_URL}/activity/users${params}`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+  },
+  bowlsMedia: {
+    getAll: async () => {
+      const response = await fetch(`${BASE_URL}/bowls-media`);
+      await errorHandler(response);
+      return response.json();
+    },
+    upload: async (file: File, title: string) => {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("title", title);
+      const response = await fetch(`${BASE_URL}/bowls-media`, {
+        method: "POST",
+        credentials: "include",
+        body: fd,
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    delete: async (id: number) => {
+      const response = await fetch(`${BASE_URL}/bowls-media/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       await errorHandler(response);
       return response.json();
     },

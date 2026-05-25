@@ -3,6 +3,7 @@ const md5 = require('md5');
 const authRouter = express.Router();
 const {getUserByLogin} = require("../db/users");
 const {addToken, getUserIdByToken, deleteByToken} = require("../db/tokens");
+const { logActivity } = require("../db/activity");
 
 const COOKIE_NAME = "token";
 
@@ -30,6 +31,7 @@ authRouter.post("/", async (req, res) => {
         secure: process.env.NODE_ENV === 'production'
     });
 
+    logActivity(user.id, user.login, user.fullName, 'Вход в систему', '');
     res.status(200).json({ok: true});
 });
 

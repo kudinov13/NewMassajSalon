@@ -125,9 +125,9 @@ const CartPage = () => {
             {/* Items list */}
             <div className="flex-1 flex flex-col gap-4">
               {items.map((item) => (
-                <div key={item.productId} className="flex items-center gap-5 bg-white rounded-[20px] p-4">
+                <div key={item.productId} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 bg-white rounded-[20px] p-4">
                   {/* Image */}
-                  <div className="w-24 h-24 flex-shrink-0 rounded-[15px] overflow-hidden bg-[#f5efe8]">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-[15px] overflow-hidden bg-[#f5efe8]">
                     {item.image ? (
                       <img src={`${BASE_URL}${item.image}`} alt={item.name} className="w-full h-full object-contain" />
                     ) : (
@@ -200,7 +200,7 @@ const CartPage = () => {
             </div>
 
             {/* Summary */}
-            <div className="w-[320px] flex-shrink-0">
+            <div className="w-full lg:w-[320px] flex-shrink-0">
               <div className="bg-white rounded-[20px] p-6 sticky top-6">
                 <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000e6] text-xl mb-4">
                   Итого

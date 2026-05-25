@@ -39,6 +39,8 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [myStreams, setMyStreams] = useState<any[]>([]);
+  const [diagAppointments, setDiagAppointments] = useState<any[]>([]);
+  const [diagRoomStatus, setDiagRoomStatus] = useState<Record<number, {roomActive: boolean; adminInRoom: boolean}>>({});
 
   useEffect(() => {
     API.user.getCurrentUser()
@@ -50,7 +52,25 @@ const ProfilePage = () => {
       .finally(() => setLoading(false));
     API.appointments.getMy().then(setAppointments).catch(() => {});
     API.streamRoom.getMy().then(setMyStreams).catch(() => {});
+    API.diagnostics.getMyAppointments().then(setDiagAppointments).catch(() => {});
   }, [navigate]);
+
+  // Check room status for diagnostics appointments
+  useEffect(() => {
+    const checkRoomStatuses = async () => {
+      const statuses: Record<number, {roomActive: boolean; adminInRoom: boolean}> = {};
+      for (const a of diagAppointments) {
+        try {
+          const status = await API.diagnostics.getRoomStatus(a.id);
+          statuses[a.id] = status;
+        } catch {}
+      }
+      setDiagRoomStatus(statuses);
+    };
+    checkRoomStatuses();
+    const interval = setInterval(checkRoomStatuses, 10000); // Check every 10 seconds
+    return () => clearInterval(interval);
+  }, [diagAppointments]);
 
   const handleLogout = async () => {
     try {
@@ -195,10 +215,20 @@ const ProfilePage = () => {
                 </span>
               </Link>
             ) : null}
+            {user?.isBowlsSpecialist ? (
+              <Link to="/bowls-specialist" className="flex items-center gap-3 px-5 py-3 bg-[#a6856d1a] rounded-[15px] no-underline cursor-pointer hover:bg-[#a6856d33] transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a6856d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                </svg>
+                <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#a6856d] text-base">
+                  Панель тибетских чаш
+                </span>
+              </Link>
+            ) : null}
           </div>
 
           {/* Appointments */}
-          {appointments.filter(a => a.status !== 'cancelled').length > 0 && (
+          {(appointments.filter(a => a.status !== 'cancelled').length > 0 || diagAppointments.length > 0) && (
             <div className="mt-6">
               <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000e6] text-lg mb-3">Мои записи</h3>
               <div className="flex flex-col gap-2">
@@ -213,11 +243,39 @@ const ProfilePage = () => {
                     <div key={a.id} className="flex items-center justify-between px-4 py-3 bg-[#f5efe8] rounded-[12px]">
                       <div>
                         <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">
-                          {formatDate(a.date)} в {a.time}
+                          Психолог: {formatDate(a.date)} в {a.time}
                         </span>
                         <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs ml-2">
                           {statusLabels[a.status] || a.status}
                         </span>
+                      </div>
+                      {canJoin && (
+                        <Link to={`/room/${a.roomId}`} className="h-8 px-4 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs flex items-center no-underline transition-colors">
+                          Зайти на приём
+                        </Link>
+                      )}
+                    </div>
+                  );
+                })}
+                {diagAppointments.map(a => {
+                  const now = new Date();
+                  const [h, m] = a.time.split(':').map(Number);
+                  const apptTime = new Date(a.date + 'T00:00:00');
+                  apptTime.setHours(h, m, 0, 0);
+                  const diffMin = (apptTime.getTime() - now.getTime()) / 60000;
+                  const status = diagRoomStatus[a.id] || { roomActive: false, adminInRoom: false };
+                  const canJoin = status.roomActive && status.adminInRoom && a.roomId;
+                  return (
+                    <div key={a.id} className="flex items-center justify-between px-4 py-3 bg-[#f5efe8] rounded-[12px]">
+                      <div>
+                        <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">
+                          Диагностика: {formatDate(a.date)} в {a.time}
+                        </span>
+                        {!canJoin && diffMin <= 5 && (
+                          <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs ml-2">
+                            {status.roomActive ? "админ вышел из комнаты" : "ожидание админа"}
+                          </span>
+                        )}
                       </div>
                       {canJoin && (
                         <Link to={`/room/${a.roomId}`} className="h-8 px-4 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs flex items-center no-underline transition-colors">

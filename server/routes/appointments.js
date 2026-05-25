@@ -12,6 +12,7 @@ const requireAuth = async (req, res, next) => {
     next();
 };
 
+const { logActivity } = require('../db/activity');
 const appointmentsRouter = express.Router();
 
 // GET my appointments (user or psychologist)
@@ -79,6 +80,7 @@ appointmentsRouter.post('/', requireAuth, async (req, res) => {
     // Update user profile too
     await db.run('UPDATE users SET fullName = ?, phone = ? WHERE id = ?', fullName, phone, req.user.id);
 
+    logActivity(req.user.id, req.user.login, fullName, 'Запись к психологу', `${slot.date} ${slot.time}`);
     res.json({ id: result.lastID, date: slot.date, time: slot.time, roomId, status: 'booked' });
 });
 

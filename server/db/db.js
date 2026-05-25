@@ -92,6 +92,8 @@ const initDb = async () => {
     try { await db.exec(`ALTER TABLE streams ADD COLUMN price REAL DEFAULT 0`); } catch(e) {}
     try { await db.exec(`ALTER TABLE streams ADD COLUMN isLive INTEGER DEFAULT 0`); } catch(e) {}
     try { await db.exec(`ALTER TABLE streams ADD COLUMN streamRoomId TEXT DEFAULT ''`); } catch(e) {}
+    // превью-видео у трансляции
+    try { await db.exec(`ALTER TABLE streams ADD COLUMN previewUrl TEXT`); } catch(e) {}
 
     await db.exec(`
         CREATE TABLE IF NOT EXISTS user_streams (
@@ -142,6 +144,7 @@ const initDb = async () => {
     try { await db.exec(`ALTER TABLE users ADD COLUMN isBowlsSpecialist INTEGER NOT NULL DEFAULT 0`); } catch(e) {}
     try { await db.exec(`ALTER TABLE users ADD COLUMN phone TEXT DEFAULT ''`); } catch(e) {}
     try { await db.exec(`ALTER TABLE users ADD COLUMN fullName TEXT DEFAULT ''`); } catch(e) {}
+    try { await db.exec(`ALTER TABLE users ADD COLUMN email TEXT DEFAULT ''`); } catch(e) {}
 
     await db.exec(`
         CREATE TABLE IF NOT EXISTS schedule_slots (
@@ -261,8 +264,81 @@ const initDb = async () => {
             FOREIGN KEY(productId) REFERENCES products(id)
         )`);
 
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS diagnostics_schedule_slots (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            specialistId INTEGER NOT NULL,
+            date TEXT NOT NULL,
+            time TEXT NOT NULL,
+            isBooked INTEGER NOT NULL DEFAULT 0,
+            FOREIGN KEY(specialistId) REFERENCES users(id)
+        )`);
+
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS diagnostics_appointments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            slotId INTEGER NOT NULL,
+            userId INTEGER NOT NULL,
+            fullName TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            roomId TEXT NOT NULL,
+            roomActive INTEGER NOT NULL DEFAULT 0,
+            adminInRoom INTEGER NOT NULL DEFAULT 0,
+            adminLastSeen TEXT,
+            roomClosedAt TEXT,
+            createdAt TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY(slotId) REFERENCES diagnostics_schedule_slots(id),
+            FOREIGN KEY(userId) REFERENCES users(id)
+        )`);
+
     // миграция: products.courseId
     try { await db.exec(`ALTER TABLE products ADD COLUMN courseId INTEGER DEFAULT NULL`); } catch(e) {}
+    // миграция: products.partnerUrl (ссылка на товар у партнёра)
+    try { await db.exec(`ALTER TABLE products ADD COLUMN partnerUrl TEXT`); } catch(e) {}
+
+    // миграция: diagnostics_appointments room state fields
+    try { await db.exec(`ALTER TABLE diagnostics_appointments ADD COLUMN roomActive INTEGER DEFAULT 0`); } catch(e) {}
+    try { await db.exec(`ALTER TABLE diagnostics_appointments ADD COLUMN adminInRoom INTEGER DEFAULT 0`); } catch(e) {}
+    try { await db.exec(`ALTER TABLE diagnostics_appointments ADD COLUMN adminLastSeen TEXT`); } catch(e) {}
+    try { await db.exec(`ALTER TABLE diagnostics_appointments ADD COLUMN roomClosedAt TEXT`); } catch(e) {}
+
+    // город для расписания тибетских чаш
+    try { await db.exec(`ALTER TABLE bowls_schedule_slots ADD COLUMN city TEXT DEFAULT 'novosibirsk'`); } catch(e) {}
+    try { await db.exec(`ALTER TABLE bowls_appointments ADD COLUMN city TEXT DEFAULT ''`); } catch(e) {}
+    try { await db.exec(`ALTER TABLE bowls_appointments ADD COLUMN userEmail TEXT DEFAULT ''`); } catch(e) {}
+
+    // журнал активности пользователей
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS user_activity_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId INTEGER,
+            userLogin TEXT DEFAULT '',
+            userFullName TEXT DEFAULT '',
+            action TEXT NOT NULL,
+            details TEXT DEFAULT '',
+            createdAt TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY(userId) REFERENCES users(id)
+        )`);
+
+    // Инструкция / навигация по сайту
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS guide_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            body TEXT NOT NULL,
+            sortOrder INTEGER DEFAULT 0,
+            createdAt TEXT DEFAULT (datetime('now'))
+        )`);
+
+    // Медиа тибетских чаш (видео + аудио)
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS bowls_media (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type TEXT NOT NULL DEFAULT 'audio',
+            title TEXT NOT NULL DEFAULT '',
+            url TEXT NOT NULL,
+            createdAt TEXT DEFAULT (datetime('now'))
+        )`);
 
     // тестовая трансляция
     const streamExists = await db.get(`SELECT id FROM streams LIMIT 1`);
@@ -273,6 +349,26 @@ const initDb = async () => {
             'Присоединяйтесь к утренней медитации для гармонизации тела и разума.',
             '2026-06-10', '09:00', 'Мастер Иванова', 'planned'
         );
+    }
+
+    // начальные пункты инструкции
+    const guideExists = await db.get(`SELECT id FROM guide_items LIMIT 1`);
+    if (!guideExists) {
+        const items = [
+            { t: 'Регистрация и вход', b: 'Нажмите кнопку «Вход» в правом верхнем углу. Если у вас ещё нет аккаунта, нажмите «Регистрация», заполните логин, пароль, имя и телефон. После регистрации войдите с помощью логина и пароля.', o: 1 },
+            { t: 'Магазин — как купить продукт', b: 'Перейдите в раздел «Магазин» через меню или главную страницу. Выберите категорию, найдите нужный товар и нажмите «В корзину». Затем перейдите в корзину (иконка в шапке сайта) и оформите заказ. Товары из категории «БАДы» приобретаются на сайте партнёра — нажмите «Купить у партнёра».', o: 2 },
+            { t: 'Курсы — просмотр купленных курсов', b: 'После покупки курса в магазине, перейдите в личный кабинет (иконка профиля). Нажмите «Мои курсы» — здесь отображаются все приобретённые видеокурсы. Нажмите на курс, чтобы начать просмотр видеоуроков.', o: 3 },
+            { t: 'Запись на приём к психологу', b: 'Перейдите в раздел «Психология» → «Записаться на приём». Выберите свободную дату и время из расписания, заполните имя и телефон, подтвердите запись. Когда подойдёт время, в личном кабинете появится кнопка для входа в видеоконференцию.', o: 4 },
+            { t: 'Видеоконференция — как зайти', b: 'Когда специалист начнёт приём, в вашем личном кабинете рядом с записью появится кнопка «Войти в комнату». Нажмите её — откроется страница видеозвонка. Разрешите доступ к камере и микрофону в браузере.', o: 5 },
+            { t: 'Тибетские чаши — запись на массаж в 4 руки', b: 'Перейдите в раздел «Тибетские чаши» через меню. Нажмите «Записаться на сеанс». Перед выбором даты выберите город — Бийск или Новосибирск. Каждый город имеет своё расписание. Это уникальный массаж тибетскими чашами в 4 руки — два мастера одновременно работают с вашим телом. Также на странице можно послушать записи звучания чаш — нажмите кнопку «Послушать записи».', o: 6 },
+            { t: 'Диагностика', b: 'В разделе «Диагностика» выберите тип диагностики (ногти, язык, глаза, кожа, тело). Запишитесь на удобное время. Диагностика проходит по видеосвязи — когда подойдёт время, зайдите в личный кабинет и нажмите «Войти в комнату».', o: 7 },
+            { t: 'Трансляции — прямые эфиры', b: 'В разделе «Трансляции» отображаются предстоящие прямые эфиры. У каждой трансляции указана дата, время и цена. Бесплатные — нажмите «Записаться», платные — «Купить». Если у трансляции есть видеообзор, нажмите кнопку «Обзор» чтобы посмотреть превью. Когда эфир начнётся, нажмите «Смотреть».', o: 8 },
+            { t: 'Анализы', b: 'В разделе «Анализы» вы можете ознакомиться с доступными обследованиями, их описанием и стоимостью. Следуйте инструкциям на странице для записи.', o: 9 },
+            { t: 'Личный кабинет', b: 'В личном кабинете (иконка профиля в шапке) вы найдёте: ваши записи на приём, купленные курсы, историю заказов, предстоящие трансляции. Здесь же вы можете войти в видеоконференцию, когда придёт время.', o: 10 },
+        ];
+        for (const it of items) {
+            await db.run('INSERT INTO guide_items (title, body, sortOrder) VALUES (?, ?, ?)', it.t, it.b, it.o);
+        }
     }
 
     // дефолтный адрес

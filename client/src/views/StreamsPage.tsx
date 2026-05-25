@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API } from "../services/api";
+import { API, BASE_URL } from "../services/api";
 import Header from "../components/Header";
 
 interface Stream {
@@ -13,6 +13,7 @@ interface Stream {
   isLive: number;
   status: string;
   speaker: string;
+  previewUrl?: string | null;
 }
 
 
@@ -34,6 +35,12 @@ const StreamsPage: React.FC = () => {
   const [formTime, setFormTime] = useState("");
   const [formError, setFormError] = useState("");
   const [joinedIds, setJoinedIds] = useState<number[]>([]);
+  const [formPrice, setFormPrice] = useState<string>("0");
+  const [formPreviewUrl, setFormPreviewUrl] = useState<string>("");
+  const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [showPreview, setShowPreview] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   useEffect(() => {
     API.user.getCurrentUser()
@@ -60,6 +67,9 @@ const StreamsPage: React.FC = () => {
     setFormDate("");
     setFormTime("");
     setFormError("");
+    setFormPrice("0");
+    setFormPreviewUrl("");
+    setPreviewFile(null);
     setShowModal(true);
   };
 
@@ -70,6 +80,9 @@ const StreamsPage: React.FC = () => {
     setFormDate(stream.date);
     setFormTime(stream.time);
     setFormError("");
+    setFormPrice(String(stream.price || 0));
+    setFormPreviewUrl(stream.previewUrl || "");
+    setPreviewFile(null);
     setShowModal(true);
   };
 
@@ -78,16 +91,29 @@ const StreamsPage: React.FC = () => {
       setFormError("Заполните обязательные поля");
       return;
     }
+    if (isSaving) return;
+    setIsSaving(true);
+    setUploadProgress(null);
     try {
+      let saved: any;
+      const payload = { title: formTitle.trim(), description: formDesc.trim(), date: formDate, time: formTime, price: Number(formPrice) || 0, previewUrl: formPreviewUrl || null };
       if (editingStream) {
-        await API.streams.update(editingStream.id, { title: formTitle.trim(), description: formDesc.trim(), date: formDate, time: formTime });
+        saved = await API.streams.update(editingStream.id, payload);
       } else {
-        await API.streams.create({ title: formTitle.trim(), description: formDesc.trim(), date: formDate, time: formTime });
+        saved = await API.streams.create(payload);
+      }
+      if (previewFile && (saved?.id || editingStream?.id)) {
+        const targetId = saved?.id || (editingStream as Stream).id;
+        setUploadProgress(0);
+        await API.streams.uploadPreview(targetId, previewFile, (pct) => setUploadProgress(pct));
       }
       setShowModal(false);
       loadStreams();
     } catch (e: any) {
       setFormError(e.message || "Ошибка");
+    } finally {
+      setIsSaving(false);
+      setUploadProgress(null);
     }
   };
 
@@ -145,8 +171,8 @@ const StreamsPage: React.FC = () => {
         ) : (
           <div className="flex flex-col gap-4">
             {streams.map((stream) => (
-              <div key={stream.id} className="bg-[#efdec5] rounded-[20px] p-6 border border-[#C9A882]">
-                <div className="flex items-start justify-between">
+              <div key={stream.id} className="bg-[#efdec5] rounded-[20px] p-4 sm:p-6 border border-[#C9A882]">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#a6856d]/10">
@@ -181,10 +207,19 @@ const StreamsPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     {/* Price badge */}
                     <span className={`inline-block px-3 py-1 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs ${
-                      stream.price > 0 ? "bg-[#a6856d]/10 text-[#a6856d]" : "bg-[#d4edda] text-[#155724]"
+                      stream.price > 0 ? "bg-[#a6856d] text-white" : "bg-[#d4edda] text-[#155724]"
                     }`}>
                       {stream.price > 0 ? `${stream.price} ₽` : "Бесплатно"}
                     </span>
+                    {stream.previewUrl ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowPreview(stream.previewUrl!)}
+                        className="h-9 px-4 bg-transparent border border-[#C9A882] text-[#6B5744] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm cursor-pointer hover:bg-[#f5e6d3] transition-colors"
+                      >
+                        Обзор
+                      </button>
+                    ) : null}
                     {stream.isLive ? (
                       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 text-red-600 [font-family:'Vela_Sans',sans-serif] font-light text-xs">
                         <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> LIVE
@@ -241,8 +276,8 @@ const StreamsPage: React.FC = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowModal(false)} />
-          <div className="relative bg-[#f5e6d3] rounded-[25px] p-8 w-[420px] shadow-2xl">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => { if (!isSaving) setShowModal(false); }} />
+          <div className="relative bg-[#f5e6d3] rounded-[25px] p-6 sm:p-8 w-[90vw] max-w-[420px] shadow-2xl">
             <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-xl mb-6">
               {editingStream ? "Редактировать трансляцию" : "Новая трансляция"}
             </h3>
@@ -275,26 +310,92 @@ const StreamsPage: React.FC = () => {
                   className="w-[120px] h-11 px-4 rounded-[12px] border border-[#C9A882] bg-white/70 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]"
                 />
               </div>
+              <div className="flex gap-3">
+                <label className="flex-1">
+                  <span className="block mb-1 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm">Цена (₽, 0 — бесплатно)</span>
+                  <input
+                    type="number"
+                    value={formPrice}
+                    onChange={(e) => setFormPrice(e.target.value)}
+                    className="w-full h-11 px-4 rounded-[12px] border border-[#C9A882] bg-white/70 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]"
+                  />
+                </label>
+              </div>
+              <div className="flex flex-col gap-2">
+                <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm">Видео-обзор (URL или загрузка файла)</span>
+                <input
+                  type="url"
+                  placeholder="https://... (необязательно)"
+                  value={formPreviewUrl}
+                  onChange={(e) => setFormPreviewUrl(e.target.value)}
+                  className="h-10 px-4 rounded-[12px] border border-[#C9A882] bg-white/70 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]"
+                />
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => setPreviewFile(e.target.files?.[0] || null)}
+                  className="[font-family:'Vela_Sans',sans-serif] text-xs"
+                />
+              </div>
             </div>
             {formError && (
               <p className="[font-family:'Vela_Sans',sans-serif] font-light text-red-600 text-sm mb-4">{formError}</p>
+            )}
+            {uploadProgress !== null && (
+              <div className="w-full mb-4">
+                <div className="flex justify-between mb-1">
+                  <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs">Загрузка видео...</span>
+                  <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs">{uploadProgress}%</span>
+                </div>
+                <div className="w-full h-2 bg-[#C9A882]/30 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#a6856d] rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+                </div>
+                {uploadProgress === 100 && (
+                  <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs mt-1 block">Конвертация видео на сервере...</span>
+                )}
+              </div>
             )}
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="flex-1 h-11 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors"
+                disabled={isSaving}
+                className={`flex-1 h-11 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors ${
+                  isSaving ? 'bg-[#a6856d]/50 text-white/70 cursor-not-allowed' : 'bg-[#a6856d] hover:bg-[#8d6e58] text-white'
+                }`}
               >
-                {editingStream ? "Сохранить" : "Создать"}
+                {isSaving ? (uploadProgress !== null ? 'Загрузка...' : 'Сохранение...') : (editingStream ? "Сохранить" : "Создать")}
               </button>
               <button
                 type="button"
-                onClick={() => setShowModal(false)}
-                className="flex-1 h-11 bg-transparent border border-[#C9A882] text-[#6B5744] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm cursor-pointer hover:bg-[#f5e6d3] transition-colors"
+                onClick={() => { if (!isSaving) setShowModal(false); }}
+                disabled={isSaving}
+                className={`flex-1 h-11 bg-transparent border border-[#C9A882] text-[#6B5744] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm cursor-pointer transition-colors ${
+                  isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#f5e6d3]'
+                }`}
               >
                 Отмена
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {showPreview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowPreview(null)} />
+          <div className="relative bg-black rounded-xl overflow-hidden w-[90vw] max-w-[900px] aspect-video shadow-2xl">
+            {showPreview.endsWith('.mp4') || showPreview.includes('/uploads/') ? (
+              <video
+                src={showPreview.startsWith('http') ? showPreview : `${BASE_URL}${showPreview}`}
+                controls
+                autoPlay
+                playsInline
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <iframe src={showPreview} title="Обзор" allow="autoplay; encrypted-media" className="w-full h-full"></iframe>
+            )}
+            <button onClick={() => setShowPreview(null)} className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 text-[#6B5744]">✕</button>
           </div>
         </div>
       )}

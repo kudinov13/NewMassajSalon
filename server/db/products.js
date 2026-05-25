@@ -15,20 +15,20 @@ const getProductById = async (id) => {
     return await db.get('SELECT * FROM products WHERE id = ?', id);
 };
 
-const addProduct = async ({ name, description, price, oldPrice, category, image }) => {
+const addProduct = async ({ name, description, price, oldPrice, category, image, partnerUrl }) => {
     const db = getDb();
     const result = await db.run(
-        'INSERT INTO products (name, description, price, oldPrice, category, image) VALUES (?, ?, ?, ?, ?, ?)',
-        name, description || null, price, oldPrice || null, category, image || null
+        'INSERT INTO products (name, description, price, oldPrice, category, image, partnerUrl) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        name, description || null, price, oldPrice || null, category, image || null, partnerUrl || null
     );
     return await getProductById(result.lastID);
 };
 
-const updateProduct = async (id, { name, description, price, oldPrice, category, image }) => {
+const updateProduct = async (id, { name, description, price, oldPrice, category, image, partnerUrl }) => {
     const db = getDb();
     await db.run(
-        'UPDATE products SET name = ?, description = ?, price = ?, oldPrice = ?, category = ?, image = ? WHERE id = ?',
-        name, description || null, price, oldPrice || null, category, image || null, id
+        'UPDATE products SET name = ?, description = ?, price = ?, oldPrice = ?, category = ?, image = ?, partnerUrl = ? WHERE id = ?',
+        name, description || null, price, oldPrice || null, category, image || null, partnerUrl || null, id
     );
     return await getProductById(id);
 };

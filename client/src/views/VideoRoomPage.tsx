@@ -14,6 +14,9 @@ const VideoRoomPage: React.FC = () => {
   const [connected, setConnected] = useState(false);
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
+  const [screenSharing, setScreenSharing] = useState(false);
+  const screenStreamRef = useRef<MediaStream | null>(null);
+  const screenSenderRef = useRef<RTCRtpSender | null>(null);
 
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -128,6 +131,43 @@ const VideoRoomPage: React.FC = () => {
     setCamOn((v) => !v);
   }, []);
 
+  const toggleScreenShare = useCallback(async () => {
+    const pc = pcRef.current;
+    if (!pc) return;
+    if (screenSharing) {
+      // Stop screen share, revert to camera
+      screenStreamRef.current?.getTracks().forEach(t => t.stop());
+      screenStreamRef.current = null;
+      const camTrack = localStreamRef.current?.getVideoTracks()[0];
+      if (camTrack && screenSenderRef.current) {
+        await screenSenderRef.current.replaceTrack(camTrack);
+      }
+      setScreenSharing(false);
+    } else {
+      try {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+        screenStreamRef.current = screenStream;
+        const screenTrack = screenStream.getVideoTracks()[0];
+        const videoSender = pc.getSenders().find(s => s.track?.kind === 'video');
+        if (videoSender) {
+          screenSenderRef.current = videoSender;
+          await videoSender.replaceTrack(screenTrack);
+        }
+        screenTrack.onended = () => {
+          const camTrack = localStreamRef.current?.getVideoTracks()[0];
+          if (camTrack && screenSenderRef.current) {
+            screenSenderRef.current.replaceTrack(camTrack);
+          }
+          screenStreamRef.current = null;
+          setScreenSharing(false);
+        };
+        setScreenSharing(true);
+      } catch {
+        // User cancelled or error
+      }
+    }
+  }, [screenSharing]);
+
   const handleLeave = () => {
     pcRef.current?.close();
     localStreamRef.current?.getTracks().forEach((t) => t.stop());
@@ -209,6 +249,15 @@ const VideoRoomPage: React.FC = () => {
             ) : (
               <><path d="M16.5 7.5L23 7v10l-6.5-.5"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/><line x1="1" y1="1" x2="23" y2="23"/></>
             )}
+          </svg>
+        </button>
+        <button
+          onClick={toggleScreenShare}
+          className={`w-12 h-12 rounded-full border-0 flex items-center justify-center cursor-pointer transition-colors ${screenSharing ? "bg-blue-500 hover:bg-blue-600" : "bg-white/10 hover:bg-white/20"}`}
+          title={screenSharing ? "Остановить демонстрацию" : "Демонстрация экрана"}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
           </svg>
         </button>
         <button

@@ -6,7 +6,7 @@ const TABLE_NAME = "users";
 
 module.exports = {
     TABLE_NAME,
-    addUser: async (login, password, fullName, phone) => {
+    addUser: async (login, password, fullName, phone, email) => {
         // первый зарегистрированный пользователь становится админом
         const countRow = await getDb().get(`SELECT COUNT(*) AS cnt FROM ${TABLE_NAME}`);
         const isAdmin = countRow && countRow.cnt === 0 ? 1 : 0;
@@ -15,11 +15,12 @@ module.exports = {
             password: md5(password),
             isAdmin,
             fullName: fullName || '',
-            phone: phone || ''
+            phone: phone || '',
+            email: email || ''
         };
         const result = await getDb().run(
-            `INSERT INTO ${TABLE_NAME} (login, password, isAdmin, fullName, phone) VALUES (?, ?, ?, ?, ?)`,
-            newUser.login, newUser.password, newUser.isAdmin, newUser.fullName, newUser.phone
+            `INSERT INTO ${TABLE_NAME} (login, password, isAdmin, fullName, phone, email) VALUES (?, ?, ?, ?, ?, ?)`,
+            newUser.login, newUser.password, newUser.isAdmin, newUser.fullName, newUser.phone, newUser.email
         );
         newUser.id = result.lastID;
         return newUser;

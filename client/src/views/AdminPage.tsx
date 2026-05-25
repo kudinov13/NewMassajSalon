@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { API, BASE_URL } from "../services/api";
 
-type Tab = "dashboard" | "products" | "labs" | "streams" | "live" | "users";
+type Tab = "dashboard" | "products" | "labs" | "streams" | "live" | "users" | "diagnostics-schedule" | "activity" | "admin-guide";
 
 interface Stream {
   id: number;
@@ -32,6 +32,7 @@ interface UserItem {
   isBowlsSpecialist: number;
   fullName: string;
   phone: string;
+  email: string;
   createdAt: string;
 }
 
@@ -126,7 +127,72 @@ const sidebarItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
       </svg>
     ),
   },
+  {
+    key: "diagnostics-schedule",
+    label: "Расписание диагностики",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+      </svg>
+    ),
+  },
+  {
+    key: "activity",
+    label: "Журнал действий",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="12 8 12 12 14 14" /><circle cx="12" cy="12" r="10" />
+      </svg>
+    ),
+  },
+  {
+    key: "admin-guide",
+    label: "Инструкция",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+      </svg>
+    ),
+  },
 ];
+
+const AdminActivityTab: React.FC = () => {
+  const [log, setLog] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+  const load = (q?: string) => API.activity.getLog(q || "", 200).then(setLog).catch(() => {});
+  useEffect(() => { load(); }, []);
+  return (
+    <div>
+      <div className="flex gap-3 mb-4">
+        <input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && load(search)} placeholder="Поиск по действию, пользователю..." className="flex-1 h-10 px-4 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]" />
+        <button onClick={() => load(search)} className="h-10 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">Найти</button>
+      </div>
+      <div className="bg-white/70 rounded-[20px] overflow-hidden max-h-[600px] overflow-y-auto">
+        <table className="w-full border-collapse">
+          <thead className="sticky top-0 bg-white/90">
+            <tr className="border-b border-[#e3cbb1]/40">
+              <th className="text-left px-4 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-xs">Время</th>
+              <th className="text-left px-4 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-xs">Пользователь</th>
+              <th className="text-left px-4 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-xs">Действие</th>
+              <th className="text-left px-4 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-xs">Детали</th>
+            </tr>
+          </thead>
+          <tbody>
+            {log.map((a: any) => (
+              <tr key={a.id} className="border-b border-[#e3cbb1]/20 last:border-0">
+                <td className="px-4 py-2 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs whitespace-nowrap">{a.createdAt?.replace('T',' ').slice(0,16)}</td>
+                <td className="px-4 py-2 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-xs">{a.userFullName || a.userLogin || "—"}</td>
+                <td className="px-4 py-2 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs">{a.action}</td>
+                <td className="px-4 py-2 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs">{a.details || "—"}</td>
+              </tr>
+            ))}
+            {log.length === 0 && (<tr><td colSpan={4} className="px-4 py-8 text-center [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-sm">Нет записей</td></tr>)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 
 const CoursesAdminTab: React.FC = () => {
   const [courses, setCourses] = useState<any[]>([]);
@@ -241,6 +307,14 @@ const AdminPage: React.FC = () => {
   const [labs, setLabs] = useState<Lab[]>([]);
   const [users, setUsers] = useState<UserItem[]>([]);
   const [adminLogin, setAdminLogin] = useState("");
+
+  // Diagnostics schedule
+  const [diagSlots, setDiagSlots] = useState<any[]>([]);
+  const [diagAppointments, setDiagAppointments] = useState<any[]>([]);
+  const [diagTab, setDiagTab] = useState<"slots" | "appointments">("slots");
+  const [diagNewDate, setDiagNewDate] = useState("");
+  const [diagNewTimes, setDiagNewTimes] = useState<string[]>([]);
+  const [diagError, setDiagError] = useState("");
 
   // Stream modal
   const [showStreamModal, setShowStreamModal] = useState(false);
@@ -399,7 +473,11 @@ const AdminPage: React.FC = () => {
     if (tab === "streams" || tab === "live") API.streams.getAll().then(setStreams).catch(() => {});
     if (tab === "labs") API.labs.getAll().then(setLabs).catch(() => {});
     if (tab === "users") API.admin.getUsers().then(setUsers).catch(() => {});
-  }, [tab]);
+    if (tab === "diagnostics-schedule") {
+      if (diagTab === "slots") API.diagnostics.getAvailableSlots().then(setDiagSlots).catch(() => {});
+      if (diagTab === "appointments") API.diagnostics.getAllAppointments().then(setDiagAppointments).catch(() => {});
+    }
+  }, [tab, diagTab]);
 
   // Stream handlers
   const [sPrice, setSPrice] = useState("0");
@@ -470,22 +548,91 @@ const AdminPage: React.FC = () => {
     API.labs.getAll().then(setLabs);
   };
 
+  // Diagnostics schedule handlers
+  const diagTimeOptions = [
+    "09:00","09:30","10:00","10:30","11:00","11:30",
+    "12:00","12:30","13:00","13:30","14:00","14:30",
+    "15:00","15:30","16:00","16:30","17:00","17:30","18:00",
+  ];
+
+  const diagToggleTime = (t: string) => {
+    setDiagNewTimes((prev) => prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]);
+  };
+
+  const handleDiagAddSlots = async () => {
+    if (!diagNewDate || !diagNewTimes.length) { setDiagError("Выберите дату и время"); return; }
+    try {
+      setDiagError("");
+      await API.diagnostics.create(diagNewDate, diagNewTimes);
+      setDiagNewTimes([]);
+      API.diagnostics.getAvailableSlots().then(setDiagSlots);
+    } catch (e: any) { setDiagError(e.message || "Ошибка"); }
+  };
+
+  const handleDiagDeleteSlot = async (id: number) => {
+    try { await API.diagnostics.deleteSlot(id); API.diagnostics.getAvailableSlots().then(setDiagSlots); }
+    catch (e: any) { alert(e.message); }
+  };
+
+  const handleDiagStartAppointment = async (a: any) => {
+    try {
+      const result = await API.diagnostics.joinRoom(a.id);
+      navigate(`/room/${result.roomId}`);
+    } catch (e: any) {
+      alert(e.message || "Ошибка");
+    }
+  };
+
+  // Date limits for diagnostics
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const isLastWeek = now.getDate() > lastDay - 7;
+  const diagMinDate = now.toISOString().split("T")[0];
+  let diagMaxDate: string;
+  if (isLastWeek) {
+    const nextMonthEnd = new Date(currentYear, currentMonth + 2, 0);
+    diagMaxDate = nextMonthEnd.toISOString().split("T")[0];
+  } else {
+    const thisMonthEnd = new Date(currentYear, currentMonth + 1, 0);
+    diagMaxDate = thisMonthEnd.toISOString().split("T")[0];
+  }
+
+  const diagGroupedSlots: Record<string, any[]> = {};
+  diagSlots.forEach((s) => {
+    if (!diagGroupedSlots[s.date]) diagGroupedSlots[s.date] = [];
+    diagGroupedSlots[s.date].push(s);
+  });
+
   const inputClass = "h-11 px-4 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]";
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-[#faf6f1]">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div className="md:hidden fixed inset-0 bg-black/20 z-40" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-[200px] bg-[#faf6f1] border-r border-[#e3cbb1]/50 flex flex-col justify-between py-6 px-4 flex-shrink-0">
+      <aside className={`fixed md:static top-0 left-0 h-full z-50 w-[220px] md:w-[200px] bg-[#faf6f1] border-r border-[#e3cbb1]/50 flex flex-col justify-between py-6 px-4 flex-shrink-0 transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div>
-          <a href="/" className="flex items-center gap-2 mb-8 px-2 no-underline">
-            <img src="/logo.svg" alt="" className="h-6 w-auto" />
-            <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">Harmony Spa</span>
-          </a>
+          <div className="flex items-center justify-between mb-8 px-2">
+            <a href="/" className="flex items-center gap-2 no-underline">
+              <img src="/logo.svg" alt="" className="h-6 w-auto" />
+              <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">Harmony Spa</span>
+            </a>
+            <button onClick={() => setSidebarOpen(false)} className="md:hidden w-7 h-7 rounded-full bg-[#e3cbb1]/30 border-0 flex items-center justify-center cursor-pointer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B5744" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
           <nav className="flex flex-col gap-1">
             {sidebarItems.map((item) => (
               <button
                 key={item.key}
-                onClick={() => setTab(item.key)}
+                onClick={() => { setTab(item.key); setSidebarOpen(false); }}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-[12px] border-0 cursor-pointer [font-family:'Vela_Sans',sans-serif] font-light text-sm transition-colors w-full text-left ${
                   tab === item.key
                     ? "bg-[#a6856d] text-white"
@@ -510,12 +657,23 @@ const AdminPage: React.FC = () => {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 w-full min-w-0">
         {/* Top bar */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl">
-            {sidebarItems.find((i) => i.key === tab)?.label}
-          </h1>
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden w-10 h-10 rounded-full border border-[#e3cbb1] bg-transparent flex items-center justify-center cursor-pointer hover:bg-[#f5e6d3] transition-colors"
+              aria-label="Открыть меню"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B5744" strokeWidth="2" strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
+            <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-xl sm:text-2xl">
+              {sidebarItems.find((i) => i.key === tab)?.label}
+            </h1>
+          </div>
           <div className="flex items-center gap-3">
             {tab === "streams" && (
               <button onClick={openNewStream} className="h-10 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">
@@ -820,13 +978,14 @@ const AdminPage: React.FC = () => {
                 className="w-full max-w-[400px] h-10 px-4 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]"
               />
             </div>
-            <div className="bg-white rounded-[20px] border border-[#e3cbb1]/40 overflow-hidden">
-              <table className="w-full border-collapse">
+            <div className="bg-white rounded-[20px] border border-[#e3cbb1]/40 overflow-x-auto">
+              <table className="w-full border-collapse min-w-[700px]">
                 <thead>
                   <tr className="border-b border-[#e3cbb1]/30">
                     <th className="text-left px-5 py-4 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">ID</th>
                     <th className="text-left px-5 py-4 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Логин / ФИО</th>
                     <th className="text-left px-5 py-4 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Телефон</th>
+                    <th className="text-left px-5 py-4 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Email</th>
                     <th className="text-left px-5 py-4 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Роль</th>
                     <th className="text-left px-5 py-4 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Действия</th>
                   </tr>
@@ -848,6 +1007,7 @@ const AdminPage: React.FC = () => {
                         {u.fullName && <div className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs">{u.fullName}</div>}
                       </td>
                       <td className="px-5 py-4 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-sm">{u.phone || "—"}</td>
+                      <td className="px-5 py-4 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-sm">{u.email || "—"}</td>
                       <td className="px-5 py-4">
                         <span className={`inline-block px-3 py-1 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs ${
                           u.isAdmin ? "bg-[#e8ddd3] text-[#6B5744]" : u.isPsychologist ? "bg-[#d4edda] text-[#155724]" : u.isBowlsSpecialist ? "bg-[#e3f2fd] text-[#0d47a1]" : "bg-[#f5e6d3] text-[#a6856d]"
@@ -872,6 +1032,182 @@ const AdminPage: React.FC = () => {
                   })}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* === DIAGNOSTICS SCHEDULE === */}
+        {tab === "diagnostics-schedule" && (
+          <div>
+            {/* Tabs */}
+            <div className="flex gap-2 mb-6">
+              {(["slots", "appointments"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setDiagTab(t)}
+                  className={`h-10 px-6 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border cursor-pointer transition-colors ${
+                    diagTab === t ? "bg-[#a6856d] text-white border-[#a6856d]" : "bg-white/70 text-[#6B5744] border-[#e3cbb1] hover:border-[#a6856d]"
+                  }`}
+                >
+                  {t === "slots" ? "Слоты" : "Записи клиентов"}
+                </button>
+              ))}
+            </div>
+
+            {diagTab === "slots" && (
+              <>
+                {/* Add slots */}
+                <div className="bg-white/70 rounded-[20px] p-6 mb-6">
+                  <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg mb-4">Добавить слоты диагностики</h3>
+                  <div className="flex items-end gap-4 mb-4">
+                    <div>
+                      <label className="block [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-sm mb-1">Дата</label>
+                      <input
+                        type="date"
+                        value={diagNewDate}
+                        min={diagMinDate}
+                        max={diagMaxDate}
+                        onChange={(e) => { setDiagNewDate(e.target.value); setDiagNewTimes([]); }}
+                        className="h-10 px-4 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {diagTimeOptions.map((t) => {
+                      const isBooked = diagNewDate && diagSlots.some(s => s.date === diagNewDate && s.time === t && s.isBooked);
+                      const isExisting = diagNewDate && diagSlots.some(s => s.date === diagNewDate && s.time === t);
+                      return (
+                        <button
+                          key={t}
+                          onClick={() => !isBooked && diagToggleTime(t)}
+                          disabled={isBooked ? true : undefined}
+                          className={`h-9 px-4 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border cursor-pointer transition-colors ${
+                            isBooked
+                              ? "bg-[#f5e6d3] text-[#a6856d] border-[#e3cbb1] opacity-60 cursor-not-allowed"
+                              : diagNewTimes.includes(t)
+                              ? "bg-[#a6856d] text-white border-[#a6856d]"
+                              : "bg-white text-[#6B5744] border-[#e3cbb1] hover:border-[#a6856d]"
+                          }`}
+                        >
+                          {t}
+                          {isExisting && !isBooked && <span className="text-xs opacity-60 ml-1">создан</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {diagError && <p className="[font-family:'Vela_Sans',sans-serif] font-light text-red-600 text-sm mb-3">{diagError}</p>}
+                  <button
+                    onClick={handleDiagAddSlots}
+                    className="h-10 px-6 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors"
+                  >
+                    Добавить
+                  </button>
+                  <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-xs mt-3">
+                    {isLastWeek
+                      ? "Сейчас последняя неделя месяца — можно выставлять расписание на следующий месяц"
+                      : "Расписание можно выставлять только на текущий месяц. На следующий — в последнюю неделю"}
+                  </p>
+                </div>
+
+                {/* Current slots */}
+                <div className="bg-white/70 rounded-[20px] p-6">
+                  <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg mb-4">Текущее расписание диагностики</h3>
+                  {Object.keys(diagGroupedSlots).length === 0 ? (
+                    <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-sm">Слотов нет</p>
+                  ) : (
+                    Object.entries(diagGroupedSlots).map(([date, daySlots]) => (
+                      <div key={date} className="mb-4 last:mb-0">
+                        <h4 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-base mb-2 capitalize">{formatDate(date)}</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {daySlots.map((s) => (
+                            <div
+                              key={s.id}
+                              className={`h-9 px-4 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm flex items-center gap-2 ${
+                                s.isBooked ? "bg-[#f5e6d3] text-[#a6856d]" : "bg-white border border-[#e3cbb1] text-[#6B5744]"
+                              }`}
+                            >
+                              {s.time}
+                              {s.isBooked ? (
+                                <span className="text-xs opacity-60">занят</span>
+                              ) : (
+                                <button
+                                  onClick={() => handleDiagDeleteSlot(s.id)}
+                                  className="w-5 h-5 rounded-full bg-red-100 border-0 cursor-pointer flex items-center justify-center hover:bg-red-200 transition-colors text-red-500 text-xs"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </>
+            )}
+
+            {diagTab === "appointments" && (
+              <div className="bg-white/70 rounded-[20px] overflow-hidden">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#e3cbb1]/30">
+                      <th className="text-left px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Дата и время</th>
+                      <th className="text-left px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Клиент</th>
+                      <th className="text-left px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Телефон</th>
+                      <th className="text-left px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {diagAppointments.map((a) => (
+                      <tr key={a.id} className="border-b border-[#e3cbb1]/20 last:border-0">
+                        <td className="px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm">
+                          {formatDate(a.date)}, {a.time}
+                        </td>
+                        <td className="px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">{a.fullName || "—"}</td>
+                        <td className="px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-sm">{a.phone || "—"}</td>
+                        <td className="px-5 py-3">
+                          <button
+                            onClick={() => handleDiagStartAppointment(a)}
+                            className="h-8 px-4 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs border-0 cursor-pointer transition-colors"
+                          >
+                            Начать приём
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {diagAppointments.length === 0 && (
+                      <tr><td colSpan={4} className="px-5 py-8 text-center [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-sm">Записей нет</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+        {/* === ACTIVITY LOG === */}
+        {tab === "activity" && <AdminActivityTab />}
+
+        {/* === ADMIN GUIDE === */}
+        {tab === "admin-guide" && (
+          <div className="bg-white/70 rounded-[20px] p-6">
+            <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-xl mb-5">Инструкция для администратора</h3>
+            <div className="flex flex-col gap-4">
+              {[
+                { t: "Дашборд", b: "На главной вкладке отображается статистика: количество пользователей, товаров, трансляций и лабораторий." },
+                { t: "Товары и курсы", b: "Добавляйте товары через вкладку «Товары». Для курсов — создайте курс, затем загрузите видеоуроки. Каждый товар можно привязать к курсу." },
+                { t: "Трансляции", b: "Создавайте и управляйте трансляциями. Загружайте видеообзоры. Запускайте прямой эфир через вкладку «Прямой эфир»." },
+                { t: "Пользователи", b: "Управляйте ролями пользователей (админ, психолог, специалист по чашам). Ищите по имени, логину или телефону." },
+                { t: "Расписание диагностики", b: "Выставляйте слоты для диагностики по видеосвязи. Начинайте приём через видеоконференцию." },
+                { t: "Видеоконференция", b: "В комнате видеозвонка используйте микрофон, камеру и демонстрацию экрана (кнопка с иконкой монитора)." },
+                { t: "Журнал действий", b: "Отслеживайте все действия пользователей: записи, покупки, регистрации. Поиск по имени или действию." },
+                { t: "Навигация (инструкция для пользователей)", b: "Редактируйте инструкцию для пользователей через /guide — добавляйте, изменяйте или удаляйте пункты." },
+              ].map((item, i) => (
+                <div key={i} className="bg-[#f7ead8] rounded-[14px] p-4 border border-[#C9A882]/30">
+                  <h4 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm mb-1">{item.t}</h4>
+                  <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm leading-relaxed">{item.b}</p>
+                </div>
+              ))}
             </div>
           </div>
         )}

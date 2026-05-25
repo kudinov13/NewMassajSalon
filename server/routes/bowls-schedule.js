@@ -13,17 +13,26 @@ const requireAuth = async (req, res, next) => {
 
 const requireBowls = async (req, res, next) => {
     await requireAuth(req, res, () => {
-        if (!req.user || !req.user.isBowlsSpecialist) return res.status(403).json({ message: 'Доступ запрещён' });
+        if (!req.user || (!req.user.isBowlsSpecialist && !req.user.isAdmin)) return res.status(403).json({ message: 'Доступ запрещён' });
         next();
     });
 };
 
+const { logActivity } = require('../db/activity');
 const bowlsScheduleRouter = express.Router();
 
-// GET available slots (for users)
+// GET available slots (for users) — optional ?city=biysk|novosibirsk
 bowlsScheduleRouter.get('/', async (req, res) => {
     const db = getDb();
     const today = new Date().toISOString().split('T')[0];
+    const city = req.query.city;
+    if (city) {
+        const slots = await db.all(
+            'SELECT * FROM bowls_schedule_slots WHERE date >= ? AND isBooked = 0 AND city = ? ORDER BY date, time',
+            today, city
+        );
+        return res.json(slots);
+    }
     const slots = await db.all(
         'SELECT * FROM bowls_schedule_slots WHERE date >= ? AND isBooked = 0 ORDER BY date, time',
         today
@@ -43,23 +52,24 @@ bowlsScheduleRouter.get('/all', requireBowls, async (req, res) => {
 
 // POST create slot(s)
 bowlsScheduleRouter.post('/', requireBowls, async (req, res) => {
-    const { date, times } = req.body;
+    const { date, times, city } = req.body;
     if (!date || !times || !times.length) {
         return res.status(400).json({ message: 'Укажите дату и время' });
     }
+    const slotCity = city || 'novosibirsk';
     const db = getDb();
     const created = [];
     for (const time of times) {
         const exists = await db.get(
-            'SELECT id FROM bowls_schedule_slots WHERE specialistId = ? AND date = ? AND time = ?',
-            req.user.id, date, time
+            'SELECT id FROM bowls_schedule_slots WHERE specialistId = ? AND date = ? AND time = ? AND city = ?',
+            req.user.id, date, time, slotCity
         );
         if (!exists) {
             const r = await db.run(
-                'INSERT INTO bowls_schedule_slots (specialistId, date, time) VALUES (?, ?, ?)',
-                req.user.id, date, time
+                'INSERT INTO bowls_schedule_slots (specialistId, date, time, city) VALUES (?, ?, ?, ?)',
+                req.user.id, date, time, slotCity
             );
-            created.push({ id: r.lastID, date, time, isBooked: 0 });
+            created.push({ id: r.lastID, date, time, isBooked: 0, city: slotCity });
         }
     }
     res.json(created);
@@ -83,21 +93,25 @@ bowlsScheduleRouter.post('/book', requireAuth, async (req, res) => {
     const slot = await db.get('SELECT * FROM bowls_schedule_slots WHERE id = ? AND isBooked = 0', slotId);
     if (!slot) return res.status(400).json({ message: 'Слот недоступен' });
     await db.run('UPDATE bowls_schedule_slots SET isBooked = 1 WHERE id = ?', slotId);
+    const userEmail = req.user.email || '';
     const r = await db.run(
-        'INSERT INTO bowls_appointments (userId, specialistId, slotId, date, time, userFullName, userPhone) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        req.user.id, slot.specialistId, slotId, slot.date, slot.time, fullName || '', phone || ''
+        'INSERT INTO bowls_appointments (userId, specialistId, slotId, date, time, userFullName, userPhone, userEmail, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        req.user.id, slot.specialistId, slotId, slot.date, slot.time, fullName || '', phone || '', userEmail, slot.city || ''
     );
-    res.json({ id: r.lastID, date: slot.date, time: slot.time, status: 'booked' });
+    logActivity(req.user.id, req.user.login, req.user.fullName, 'Запись на тибетские чаши', `${slot.city || ''} ${slot.date} ${slot.time}`);
+    res.json({ id: r.lastID, date: slot.date, time: slot.time, status: 'booked', city: slot.city || '' });
 });
 
 // GET my appointments (specialist)
 bowlsScheduleRouter.get('/appointments', requireBowls, async (req, res) => {
     const db = getDb();
     const appts = await db.all(
-        'SELECT * FROM bowls_appointments WHERE specialistId = ? ORDER BY date, time',
+        `SELECT ba.*, u.email as userEmailFromProfile FROM bowls_appointments ba LEFT JOIN users u ON ba.userId = u.id WHERE ba.specialistId = ? ORDER BY ba.date, ba.time`,
         req.user.id
     );
-    res.json(appts);
+    // Merge email: prefer stored userEmail, fallback to profile email
+    const result = appts.map(a => ({ ...a, userEmail: a.userEmail || a.userEmailFromProfile || '' }));
+    res.json(result);
 });
 
 // GET user's appointments

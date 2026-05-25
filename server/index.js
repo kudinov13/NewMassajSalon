@@ -16,7 +16,11 @@ const roomRouter = require("./routes/room");
 const streamRoomRouter = require("./routes/stream-room");
 const bowlsRouter = require("./routes/bowls");
 const bowlsScheduleRouter = require("./routes/bowls-schedule");
+const diagnosticsScheduleRouter = require("./routes/diagnostics-schedule");
 const coursesRouter = require("./routes/courses");
+const guideRouter = require("./routes/guide");
+const bowlsMediaRouter = require("./routes/bowls-media");
+const activityRouter = require("./routes/activity");
 const {initDb} = require("./db/db");
 
 const app = express();
@@ -52,7 +56,11 @@ app.use("/room", roomRouter);
 app.use("/stream-room", streamRoomRouter);
 app.use("/bowls", bowlsRouter);
 app.use("/bowls-schedule", bowlsScheduleRouter);
+app.use("/diagnostics-schedule", diagnosticsScheduleRouter);
 app.use("/courses", coursesRouter);
+app.use("/guide", guideRouter);
+app.use("/bowls-media", bowlsMediaRouter);
+app.use("/activity", activityRouter);
 // Video streaming with Range support
 const fs = require('fs');
 app.get('/uploads/:filename', (req, res) => {
@@ -61,7 +69,7 @@ app.get('/uploads/:filename', (req, res) => {
     const stat = fs.statSync(filePath);
     const fileSize = stat.size;
     const ext = path.extname(req.params.filename).toLowerCase();
-    const mimeTypes = { '.mp4': 'video/mp4', '.webm': 'video/webm', '.ogg': 'video/ogg', '.mov': 'video/quicktime', '.avi': 'video/x-msvideo', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp' };
+    const mimeTypes = { '.mp4': 'video/mp4', '.webm': 'video/webm', '.ogg': 'video/ogg', '.mov': 'video/quicktime', '.avi': 'video/x-msvideo', '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.aac': 'audio/aac', '.flac': 'audio/flac', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp' };
     const contentType = mimeTypes[ext] || 'application/octet-stream';
     const range = req.headers.range;
     if (range) {

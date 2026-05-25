@@ -5,22 +5,22 @@ const getAllStreams = async () => {
     return db.all('SELECT * FROM streams ORDER BY date DESC');
 };
 
-const addStream = async ({ title, description, date, time, speaker, status, price }) => {
+const addStream = async ({ title, description, date, time, speaker, status, price, previewUrl }) => {
     const db = getDb();
     const result = await db.run(
-        'INSERT INTO streams (title, description, date, time, speaker, status, price) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        title, description, date, time, speaker || '', status || 'planned', price || 0
+        'INSERT INTO streams (title, description, date, time, speaker, status, price, previewUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        title, description, date, time, speaker || '', status || 'planned', price || 0, previewUrl || null
     );
-    return { id: result.lastID, title, description, date, time, speaker, status, price: price || 0 };
+    return { id: result.lastID, title, description, date, time, speaker, status, price: price || 0, previewUrl: previewUrl || null };
 };
 
-const updateStream = async (id, { title, description, date, time, speaker, status, price }) => {
+const updateStream = async (id, { title, description, date, time, speaker, status, price, previewUrl }) => {
     const db = getDb();
     await db.run(
-        'UPDATE streams SET title = ?, description = ?, date = ?, time = ?, speaker = ?, status = ?, price = ? WHERE id = ?',
-        title, description, date, time, speaker || '', status || 'planned', price || 0, id
+        'UPDATE streams SET title = ?, description = ?, date = ?, time = ?, speaker = ?, status = ?, price = ?, previewUrl = ? WHERE id = ?',
+        title, description, date, time, speaker || '', status || 'planned', price || 0, previewUrl || null, id
     );
-    return { id, title, description, date, time, speaker, status, price: price || 0 };
+    return { id, title, description, date, time, speaker, status, price: price || 0, previewUrl: previewUrl || null };
 };
 
 const deleteStream = async (id) => {

@@ -22,7 +22,24 @@ interface Appointment {
   userLogin?: string;
 }
 
-type Tab = "schedule" | "appointments";
+interface ActivityItem {
+  id: number;
+  userId: number;
+  userLogin: string;
+  userFullName: string;
+  action: string;
+  details: string;
+  createdAt: string;
+}
+
+interface UserItem {
+  id: number;
+  login: string;
+  fullName: string;
+  phone: string;
+}
+
+type Tab = "schedule" | "appointments" | "users" | "activity" | "guide";
 
 const formatDate = (d: string) => {
   const date = new Date(d + "T00:00:00");
@@ -57,6 +74,10 @@ const PsychologistPanel: React.FC = () => {
   const [newTimes, setNewTimes] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [user, setUser] = useState<any>(null);
+  const [users, setUsers] = useState<UserItem[]>([]);
+  const [userSearch, setUserSearch] = useState("");
+  const [activityLog, setActivityLog] = useState<ActivityItem[]>([]);
+  const [activitySearch, setActivitySearch] = useState("");
 
   useEffect(() => {
     API.user.getCurrentUser()
@@ -70,7 +91,12 @@ const PsychologistPanel: React.FC = () => {
   useEffect(() => {
     if (tab === "schedule") API.schedule.getAll().then(setSlots).catch(() => {});
     if (tab === "appointments") API.appointments.getMy().then(setAppointments).catch(() => {});
+    if (tab === "users") API.activity.getUsers().then(setUsers).catch(() => {});
+    if (tab === "activity") API.activity.getLog("", 200).then(setActivityLog).catch(() => {});
   }, [tab]);
+
+  const handleUserSearch = () => API.activity.getUsers(userSearch).then(setUsers).catch(() => {});
+  const handleActivitySearch = () => API.activity.getLog(activitySearch, 200).then(setActivityLog).catch(() => {});
 
   const handleAddSlots = async () => {
     if (!newDate || !newTimes.length) { setError("Выберите дату и время"); return; }
@@ -128,7 +154,7 @@ const PsychologistPanel: React.FC = () => {
 
   return (
     <div className="bg-[#efdec5] min-h-screen w-full">
-      <header className="w-full px-10 py-6 flex items-center justify-between">
+      <header className="w-full px-4 sm:px-6 md:px-10 py-4 md:py-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 no-underline">
           <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
           <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">Harmony Spa</span>
@@ -141,22 +167,22 @@ const PsychologistPanel: React.FC = () => {
         </div>
       </header>
 
-      <div className="max-w-[1000px] mx-auto px-10 pb-16">
+      <div className="max-w-[1000px] mx-auto px-4 sm:px-6 md:px-10 pb-16">
         <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-3xl tracking-[-1px] mb-6">
           Панель психолога
         </h1>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8">
-          {(["schedule", "appointments"] as Tab[]).map((t) => (
+        <div className="flex flex-wrap gap-2 mb-8">
+          {(["schedule", "appointments", "users", "activity", "guide"] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`h-10 px-6 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border cursor-pointer transition-colors ${
+              className={`h-10 px-4 sm:px-5 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs sm:text-sm border cursor-pointer transition-colors whitespace-nowrap ${
                 tab === t ? "bg-[#a6856d] text-white border-[#a6856d]" : "bg-white/70 text-[#6B5744] border-[#e3cbb1] hover:border-[#a6856d]"
               }`}
             >
-              {t === "schedule" ? "Расписание" : "Записи клиентов"}
+              {t === "schedule" ? "Расписание" : t === "appointments" ? "Записи клиентов" : t === "users" ? "Пользователи" : t === "activity" ? "Журнал действий" : "Инструкция"}
             </button>
           ))}
         </div>
@@ -247,8 +273,8 @@ const PsychologistPanel: React.FC = () => {
 
         {/* APPOINTMENTS TAB */}
         {tab === "appointments" && (
-          <div className="bg-white/70 rounded-[20px] overflow-hidden">
-            <table className="w-full border-collapse">
+          <div className="bg-white/70 rounded-[20px] overflow-x-auto">
+            <table className="w-full border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-[#e3cbb1]/40">
                   <th className="text-left px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Дата и время</th>
@@ -306,6 +332,92 @@ const PsychologistPanel: React.FC = () => {
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+        {/* USERS */}
+        {tab === "users" && (
+          <div>
+            <div className="flex gap-3 mb-4">
+              <input value={userSearch} onChange={(e) => setUserSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleUserSearch()} placeholder="Поиск по имени, логину или телефону..." className="flex-1 h-10 px-4 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]" />
+              <button onClick={handleUserSearch} className="h-10 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">Найти</button>
+            </div>
+            <div className="bg-white/70 rounded-[20px] overflow-hidden">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-[#e3cbb1]/40">
+                    <th className="text-left px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">ID</th>
+                    <th className="text-left px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Логин</th>
+                    <th className="text-left px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">ФИО</th>
+                    <th className="text-left px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-sm">Телефон</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((u) => (
+                    <tr key={u.id} className="border-b border-[#e3cbb1]/20 last:border-0">
+                      <td className="px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-sm">#{u.id}</td>
+                      <td className="px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">{u.login}</td>
+                      <td className="px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm">{u.fullName || "—"}</td>
+                      <td className="px-5 py-3 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm">{u.phone || "—"}</td>
+                    </tr>
+                  ))}
+                  {users.length === 0 && (<tr><td colSpan={4} className="px-5 py-8 text-center [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-sm">Пользователи не найдены</td></tr>)}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ACTIVITY */}
+        {tab === "activity" && (
+          <div>
+            <div className="flex gap-3 mb-4">
+              <input value={activitySearch} onChange={(e) => setActivitySearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleActivitySearch()} placeholder="Поиск по действию, пользователю..." className="flex-1 h-10 px-4 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]" />
+              <button onClick={handleActivitySearch} className="h-10 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">Найти</button>
+            </div>
+            <div className="bg-white/70 rounded-[20px] overflow-hidden max-h-[600px] overflow-y-auto">
+              <table className="w-full border-collapse">
+                <thead className="sticky top-0 bg-white/90">
+                  <tr className="border-b border-[#e3cbb1]/40">
+                    <th className="text-left px-4 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-xs">Время</th>
+                    <th className="text-left px-4 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-xs">Пользователь</th>
+                    <th className="text-left px-4 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-xs">Действие</th>
+                    <th className="text-left px-4 py-3 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744]/60 text-xs">Детали</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activityLog.map((a) => (
+                    <tr key={a.id} className="border-b border-[#e3cbb1]/20 last:border-0">
+                      <td className="px-4 py-2 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs whitespace-nowrap">{a.createdAt?.replace('T',' ').slice(0,16)}</td>
+                      <td className="px-4 py-2 [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-xs">{a.userFullName || a.userLogin || "—"}</td>
+                      <td className="px-4 py-2 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs">{a.action}</td>
+                      <td className="px-4 py-2 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs">{a.details || "—"}</td>
+                    </tr>
+                  ))}
+                  {activityLog.length === 0 && (<tr><td colSpan={4} className="px-4 py-8 text-center [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-sm">Нет записей</td></tr>)}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* GUIDE */}
+        {tab === "guide" && (
+          <div className="bg-white/70 rounded-[20px] p-6">
+            <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-xl mb-5">Инструкция для психолога</h3>
+            <div className="flex flex-col gap-4">
+              {[
+                { t: "Управление расписанием", b: "Во вкладке «Расписание» выберите дату и отметьте доступное время. Нажмите «Добавить» — слоты появятся для записи клиентов. Удалить можно только незабронированные слоты." },
+                { t: "Записи клиентов", b: "Во вкладке «Записи клиентов» отображаются все бронирования. Нажмите «Начать приём» когда подойдёт время — откроется видеоконференция. По завершении нажмите «Завершить»." },
+                { t: "Видеоконференция", b: "В комнате видеозвонка доступны: включение/выключение микрофона и камеры, а также демонстрация экрана — нажмите кнопку с иконкой монитора." },
+                { t: "Поиск пользователей", b: "Во вкладке «Пользователи» найдите любого зарегистрированного пользователя по имени, логину или телефону для связи." },
+                { t: "Журнал действий", b: "Во вкладке «Журнал действий» отслеживайте все действия пользователей на сайте: записи, покупки, регистрации и т.д." },
+              ].map((item, i) => (
+                <div key={i} className="bg-[#f7ead8] rounded-[14px] p-4 border border-[#C9A882]/30">
+                  <h4 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm mb-1">{item.t}</h4>
+                  <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm leading-relaxed">{item.b}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

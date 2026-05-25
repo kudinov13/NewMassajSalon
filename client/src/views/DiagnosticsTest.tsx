@@ -93,22 +93,22 @@ const DiagnosticsTest: React.FC<DiagnosticsTestProps> = ({ type, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-[#6B5744]/40 backdrop-blur-sm" onClick={onClose} />
 
       {/* Decorative cards behind */}
       <div
-        className="absolute w-[420px] h-[480px] rounded-[25px] bg-[#6B5744]/30"
+        className="absolute hidden sm:block w-[420px] h-[480px] rounded-[25px] bg-[#6B5744]/30"
         style={{ transform: "rotate(-6deg) translateY(20px) translateX(-15px)" }}
       />
       <div
-        className="absolute w-[420px] h-[480px] rounded-[25px] bg-[#6B5744]/20"
+        className="absolute hidden sm:block w-[420px] h-[480px] rounded-[25px] bg-[#6B5744]/20"
         style={{ transform: "rotate(4deg) translateY(25px) translateX(10px)" }}
       />
 
       {/* Main card */}
-      <div className="relative w-[420px] bg-[#f5e6d3] rounded-[25px] p-8 shadow-2xl z-10">
+      <div className="relative w-full max-w-[420px] bg-[#f5e6d3] rounded-[25px] p-5 sm:p-8 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
         {/* Progress bar */}
         <div className="flex items-center gap-2 mb-6">
           {Array.from({ length: totalQuestions }).map((_, i) => (

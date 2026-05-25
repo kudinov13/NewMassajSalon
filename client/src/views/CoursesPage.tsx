@@ -41,9 +41,9 @@ const CoursesPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#efdec5] px-10 py-10">
+    <div className="min-h-screen bg-[#efdec5] px-4 sm:px-6 md:px-10 py-6 sm:py-10">
       <div className="max-w-[1100px] mx-auto">
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center justify-between mb-8 sm:mb-10">
           <Link to="/" className="inline-flex items-center gap-2 text-[#6B5744] no-underline [font-family:'Vela_Sans',sans-serif] font-light text-sm hover:text-[#a6856d]">
             ← На главную
           </Link>
@@ -54,8 +54,8 @@ const CoursesPage: React.FC = () => {
           )}
         </div>
 
-        <section className="text-center mb-12">
-          <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-[42px] tracking-[-1.5px] mb-3">
+        <section className="text-center mb-10 sm:mb-12">
+          <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-3xl sm:text-[42px] tracking-[-1.5px] mb-3">
             Видео-курсы
           </h1>
           <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-base max-w-[600px] mx-auto">

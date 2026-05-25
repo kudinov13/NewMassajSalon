@@ -44,40 +44,40 @@ const TibetanBowlsPage = () => {
       </section>
 
       {/* Title block */}
-      <section className="max-w-[900px] mx-auto text-center pt-10 pb-8 px-4">
+      <section className="max-w-[900px] mx-auto text-center pt-8 sm:pt-10 pb-6 sm:pb-8 px-4">
         <div className="flex items-center justify-center gap-3 mb-1">
-          <img src="/stars_1.svg" alt="" className="w-8 h-8" />
-          <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-[64px] tracking-[-2px] leading-tight">
+          <img src="/stars_1.svg" alt="" className="w-6 h-6 sm:w-8 sm:h-8" />
+          <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-3xl sm:text-5xl md:text-[64px] tracking-[-1px] sm:tracking-[-2px] leading-tight">
             Услышь себя
           </h1>
         </div>
         <div className="flex justify-center">
-          <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-base ml-60">В прямом смысле</span>
+          <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm sm:text-base ml-0 sm:ml-60">В прямом смысле</span>
         </div>
-        <div className="flex items-center justify-center gap-8 mt-8 mb-4">
-          <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-lg">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-8 mt-6 sm:mt-8 mb-4">
+          <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-base sm:text-lg">
             • Глубокое расслабление
           </span>
-          <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-lg">
+          <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-base sm:text-lg">
             • Очищение ума
           </span>
-          <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-lg">
+          <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-base sm:text-lg">
             • Контакт со своим Высшим «Я»
           </span>
         </div>
-        <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-base mt-4">
+        <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm sm:text-base mt-4">
           Ты уходишь не просто отдохнувшим — Ты уходишь другим.
         </p>
       </section>
 
       {/* Что это такое */}
-      <section className="max-w-[1100px] mx-auto px-10 py-12">
-        <div className="flex items-start gap-12">
-          <div className="w-[420px] flex-shrink-0">
+      <section className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-10 py-8 sm:py-12">
+        <div className="flex flex-col md:flex-row items-start gap-6 md:gap-12">
+          <div className="w-full md:w-[420px] flex-shrink-0">
             <img
               src="/bowls-about.png"
               alt="Тибетские чаши в природе"
-              className="w-full h-[320px] object-cover rounded-[25px]"
+              className="w-full h-[200px] sm:h-[280px] md:h-[320px] object-cover rounded-[20px] sm:rounded-[25px]"
             />
           </div>
           <div className="flex-1 pt-2">
@@ -101,15 +101,15 @@ const TibetanBowlsPage = () => {
       </section>
 
       {/* Что вы получите */}
-      <section className="max-w-[1100px] mx-auto px-10 py-12">
-        <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-3xl tracking-[-0.8px] text-center mb-3">
+      <section className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-10 py-8 sm:py-12">
+        <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl sm:text-3xl tracking-[-0.8px] text-center mb-3">
           Что вы получите
         </h2>
-        <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm text-center mb-10">
+        <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm text-center mb-8 sm:mb-10">
           Каждый сеанс — это уникальное путешествие в глубины вашего сознания
         </p>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Card 1 */}
           <div className="bg-[#efdec5] rounded-[25px] p-7 text-center border-2 border-[#C9A882]">
             <div className="w-16 h-16 mx-auto mb-5 rounded-full border-2 border-[#C9A882] flex items-center justify-center">
@@ -159,12 +159,12 @@ const TibetanBowlsPage = () => {
       </section>
 
       {/* Как проходит сеанс */}
-      <section className="max-w-[1100px] mx-auto px-10 py-12">
-        <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-3xl tracking-[-0.8px] mb-10">
+      <section className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-10 py-8 sm:py-12">
+        <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl sm:text-3xl tracking-[-0.8px] mb-8 sm:mb-10">
           Как проходит сеанс
         </h2>
 
-        <div className="flex items-start gap-12">
+        <div className="flex flex-col-reverse md:flex-row items-start gap-8 md:gap-12">
           <div className="flex-1">
             {[
               { num: "1", title: "Подготовка", text: "Вы располагаетесь в комфортном положении на специальном массажном столе.", numBottom: "-4px", numRight: "14px" },
@@ -191,11 +191,11 @@ const TibetanBowlsPage = () => {
             ))}
           </div>
 
-          <div className="w-[440px] flex-shrink-0">
+          <div className="w-full md:w-[440px] flex-shrink-0">
             <img
               src="/bowls-session.png"
               alt="Сеанс тибетских чаш"
-              className="w-full h-[380px] object-cover rounded-[25px]"
+              className="w-full h-[240px] sm:h-[320px] md:h-[380px] object-cover rounded-[20px] sm:rounded-[25px]"
             />
           </div>
         </div>
@@ -290,12 +290,20 @@ const TibetanBowlsPage = () => {
           Запишитесь на сеанс и откройте для себя новое измерение<br />
           расслабления и самопознания.
         </p>
-        <Link
-          to="/tibetan-bowls/booking"
-          className="inline-flex h-12 px-10 items-center bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] text-base no-underline transition-colors mb-4"
-        >
-          Записаться на сеанс
-        </Link>
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <Link
+            to="/tibetan-bowls/booking"
+            className="inline-flex h-12 px-10 items-center bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] text-base no-underline transition-colors"
+          >
+            Записаться на сеанс
+          </Link>
+          <Link
+            to="/tibetan-bowls/media"
+            className="inline-flex h-12 px-10 items-center bg-transparent border-2 border-[#a6856d] text-[#6B5744] hover:bg-[#a6856d] hover:text-white rounded-full [font-family:'Vela_Sans',sans-serif] text-base no-underline transition-colors"
+          >
+            Послушать записи
+          </Link>
+        </div>
         <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm mt-4">
           Длительность: 60 минут · Стоимость: 5000 ₽
         </p>

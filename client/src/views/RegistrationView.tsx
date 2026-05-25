@@ -7,6 +7,9 @@ const RegistrationView = () => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -20,6 +23,14 @@ const RegistrationView = () => {
       setError("Заполните логин и пароль");
       return;
     }
+    if (!fullName.trim()) {
+      setError("Укажите ваше ФИО");
+      return;
+    }
+    if (!phone.trim()) {
+      setError("Укажите номер телефона");
+      return;
+    }
     if (password.length < 6) {
       setError("Пароль должен содержать минимум 6 символов");
       return;
@@ -31,7 +42,7 @@ const RegistrationView = () => {
 
     setSubmitting(true);
     try {
-      await API.user.register({ login: login.trim(), password });
+      await API.user.register({ login: login.trim(), password, fullName: fullName.trim(), phone: phone.trim(), email: email.trim() });
       setSuccess("Аккаунт создан! Перенаправляем на страницу входа...");
       setTimeout(() => navigate("/login"), 1500);
     } catch (e) {
@@ -62,7 +73,46 @@ const RegistrationView = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <label className="flex flex-col gap-2">
             <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
-              Логин
+              ФИО <span className="text-red-400">*</span>
+            </span>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              autoComplete="name"
+              placeholder="Иванов Иван Иванович"
+              className="h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors"
+            />
+          </label>
+          <label className="flex flex-col gap-2">
+            <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
+              Телефон <span className="text-red-400">*</span>
+            </span>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              autoComplete="tel"
+              placeholder="+7 (999) 123-45-67"
+              className="h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors"
+            />
+          </label>
+          <label className="flex flex-col gap-2">
+            <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
+              Email
+            </span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              placeholder="example@mail.ru"
+              className="h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors"
+            />
+          </label>
+          <label className="flex flex-col gap-2">
+            <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
+              Логин <span className="text-red-400">*</span>
             </span>
             <input
               type="text"
@@ -74,7 +124,7 @@ const RegistrationView = () => {
           </label>
           <label className="flex flex-col gap-2">
             <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
-              Пароль
+              Пароль <span className="text-red-400">*</span>
             </span>
             <input
               type="password"
@@ -86,7 +136,7 @@ const RegistrationView = () => {
           </label>
           <label className="flex flex-col gap-2">
             <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
-              Подтвердите пароль
+              Подтвердите пароль <span className="text-red-400">*</span>
             </span>
             <input
               type="password"

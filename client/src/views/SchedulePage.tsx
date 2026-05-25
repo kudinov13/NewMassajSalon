@@ -21,35 +21,54 @@ const SchedulePage: React.FC = () => {
           </p>
         </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Link to="/psychology/booking" className="group bg-[#f7ead8] rounded-[28px] p-8 border border-[#C9A882] no-underline hover:shadow-xl hover:-translate-y-1 transition-all">
-            <div className="w-14 h-14 rounded-full bg-[#a6856d] flex items-center justify-center mb-6">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Link to="/psychology/booking" className="group bg-[#f7ead8] rounded-[28px] p-10 border border-[#C9A882] no-underline hover:shadow-xl hover:-translate-y-1 transition-all max-w-md w-full h-full flex flex-col">
+            <div className="w-16 h-16 rounded-full bg-[#a6856d] flex items-center justify-center mb-6 mx-auto">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
               </svg>
             </div>
-            <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl mb-3">Запись к психологу</h2>
-            <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-sm leading-relaxed mb-6">
+            <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-3xl mb-4 text-center">Запись к психологу</h2>
+            <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-base leading-relaxed mb-8 text-center">
               Индивидуальная консультация онлайн. Подберите свободный слот и получите ссылку на видеокомнату.
             </p>
-            <span className="inline-flex h-10 px-5 items-center bg-[#a6856d] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm group-hover:bg-[#8d6e58]">
-              Выбрать расписание
-            </span>
+            <div className="flex justify-center mt-auto">
+              <span className="inline-flex h-12 px-8 items-center bg-[#a6856d] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-base group-hover:bg-[#8d6e58]">
+                Выбрать расписание
+              </span>
+            </div>
           </Link>
 
-          <Link to="/tibetan-bowls/booking" className="group bg-[#f7ead8] rounded-[28px] p-8 border border-[#C9A882] no-underline hover:shadow-xl hover:-translate-y-1 transition-all">
-            <div className="w-14 h-14 rounded-full bg-[#a6856d] flex items-center justify-center mb-6">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <Link to="/tibetan-bowls/booking" className="group bg-[#f7ead8] rounded-[28px] p-10 border border-[#C9A882] no-underline hover:shadow-xl hover:-translate-y-1 transition-all max-w-md w-full h-full flex flex-col">
+            <div className="w-16 h-16 rounded-full bg-[#a6856d] flex items-center justify-center mb-6 mx-auto">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
               </svg>
             </div>
-            <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl mb-3">Тибетские чаши</h2>
-            <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-sm leading-relaxed mb-6">
+            <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-3xl mb-4 text-center">Тибетские чаши</h2>
+            <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-base leading-relaxed mb-8 text-center">
               Звуко-акустическая вибрационная терапия и практики глубокого расслабления.
             </p>
-            <span className="inline-flex h-10 px-5 items-center bg-[#a6856d] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm group-hover:bg-[#8d6e58]">
-              Выбрать расписание
-            </span>
+            <div className="flex justify-center mt-auto">
+              <span className="inline-flex h-12 px-8 items-center bg-[#a6856d] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-base group-hover:bg-[#8d6e58]">
+                Выбрать расписание
+              </span>
+            </div>
+          </Link>
+
+          <Link to="/diagnostics/booking" className="group bg-[#f7ead8] rounded-[28px] p-10 border border-[#C9A882] no-underline hover:shadow-xl hover:-translate-y-1 transition-all max-w-md w-full h-full flex flex-col">
+            <div className="w-16 h-16 rounded-full bg-[#a6856d] flex items-center justify-center mb-6 mx-auto">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+            </div>
+            <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-3xl mb-4 text-center">Диагностика</h2>
+            <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-base leading-relaxed mb-8 text-center">Онлайн-консультация со специалистом по диагностике. Выберите свободный слот и получите ссылку на видеокомнату.</p>
+            <div className="flex justify-center mt-auto">
+              <span className="inline-flex h-12 px-8 items-center bg-[#a6856d] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-base group-hover:bg-[#8d6e58]">
+                Выбрать расписание
+              </span>
+            </div>
           </Link>
         </div>
       </div>

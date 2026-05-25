@@ -23,6 +23,11 @@ cartRouter.get('/', requireAuth, async (req, res) => {
 cartRouter.post('/', requireAuth, async (req, res) => {
     const { productId } = req.body;
     if (!productId) return res.status(400).json({ message: 'productId обязателен' });
+    const db = getDb();
+    const product = await db.get('SELECT category, partnerUrl FROM products WHERE id = ?', productId);
+    if (product && product.category === 'bady') {
+        return res.status(400).json({ message: 'Этот товар приобретается на сайте партнёра', partnerUrl: product.partnerUrl || '' });
+    }
     await addToCart(req.userId, productId);
     const items = await getCart(req.userId);
     res.json(items);

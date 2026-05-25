@@ -36,7 +36,7 @@ import vector5 from "./vector-5.svg";
 import tsitataIcon from "./tsitata_yr2c6veqh1hi 1.svg";
 
 const navItems = [
-  "FAQ",
+  "Навигация",
   "Расписание",
   "Магазин",
   "О нас",
@@ -202,7 +202,7 @@ const specialists = [
   },
   {
     name: "Тимкина Наталья Александровна",
-    image: rectangle26,
+    image: "/natalya.png",
     imageClass: "absolute top-[2570px] left-[287px] w-60 h-[296px] object-cover rounded-[25px]",
     textClass:
       "absolute top-[2871px] left-[287px] [font-family:'Vela Sans',sans-serif] font-normal text-[#000000e6] text-base tracking-[-0.48px] leading-[normal]",
@@ -329,6 +329,41 @@ export const Frame = (): React.ReactElement => {
       className="bg-[#efdec5] w-full overflow-hidden relative"
       style={{ height: `${DESIGN_HEIGHT * homeScale}px` }}
     >
+      {/* Full-width background blocks */}
+      <div
+        className="absolute top-[94px] left-0 right-0 w-screen h-[687px] bg-[#a6856d]"
+        aria-hidden="true"
+        style={{ top: `${94 * homeScale}px`, height: `${687 * homeScale}px` }}
+      />
+      <div
+        className="absolute left-0 right-0 w-screen h-[360px] bg-[#a6856d]"
+        aria-hidden="true"
+        style={{ top: `${4344 * homeScale}px`, height: `${360 * homeScale}px` }}
+      />
+      <div
+        className="absolute top-[4636px] left-0 right-0 w-screen h-[68px] bg-[#efdec5]"
+        aria-hidden="true"
+        style={{ top: `${4636 * homeScale}px`, height: `${68 * homeScale}px` }}
+      />
+
+      {/* Full-width image */}
+      <img
+        className="absolute left-0 right-0 w-screen object-cover object-top"
+        alt="Путь к здоровью и гармонии"
+        src={rectangle21}
+        style={{ top: `${1540 * homeScale}px`, height: `${810 * homeScale}px` }}
+      />
+
+      {/* Full-width map */}
+      <iframe
+        title="Карта проезда"
+        className="absolute left-0 right-0 w-screen border-0"
+        src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(address)}&z=16`}
+        loading="lazy"
+        allow="geolocation"
+        style={{ top: `${4048 * homeScale}px`, height: `${296 * homeScale}px` }}
+      />
+
       <div
         className="relative w-[1440px] h-[4704px]"
         style={{
@@ -337,30 +372,6 @@ export const Frame = (): React.ReactElement => {
           marginLeft: `calc((100vw - ${DESIGN_WIDTH * homeScale}px) / 2)`,
         }}
       >
-      <div
-        className="absolute top-[94px] left-0 w-full h-[687px] bg-[#a6856d]"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-[4344px] left-0 w-full h-[360px] bg-[#a6856d]"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-[4636px] left-0 w-full h-[68px] bg-[#efdec5]"
-        aria-hidden="true"
-      />
-      <img
-        className="absolute top-[1540px] left-0 w-full h-[810px] object-cover object-top"
-        alt="Путь к здоровью и гармонии"
-        src={rectangle21}
-      />
-      <iframe
-        title="Карта проезда"
-        className="absolute top-[4048px] left-0 w-full h-[296px] border-0"
-        src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(address)}&z=16`}
-        loading="lazy"
-        allow="geolocation"
-      />
       <main
         className="w-[1440px] mx-auto min-h-[4680px] relative"
         data-id="frame-root"
@@ -417,8 +428,8 @@ export const Frame = (): React.ReactElement => {
                   key={item}
                   className="relative w-fit [font-family:'Vela Sans',sans-serif] font-light text-[#000000b2] text-base tracking-[-0.48px] leading-[normal]"
                 >
-                  {item === "Магазин" || item === "Расписание" ? (
-                    <Link to={item === "Магазин" ? "/shop" : "/schedule"} className="bg-transparent border-none cursor-pointer p-0 no-underline text-inherit">
+                  {item === "Магазин" || item === "Расписание" || item === "Навигация" ? (
+                    <Link to={item === "Магазин" ? "/shop" : item === "Расписание" ? "/schedule" : "/guide"} className="bg-transparent border-none cursor-pointer p-0 no-underline text-inherit">
                       {item}
                     </Link>
                   ) : (
@@ -482,6 +493,7 @@ export const Frame = (): React.ReactElement => {
           type="button"
           className="absolute top-[719px] left-[30px] w-[327px] h-[41px] text-left"
           aria-label="Пройти диагностику"
+          onClick={() => navigate('/diagnostics/booking')}
         >
           <div className="absolute top-0 left-0 w-[325px] h-[41px] bg-[#e3cbb1] rounded-[25px]" />
           <div className="absolute top-[7px] left-[29px] [font-family:'Vela Sans',sans-serif] font-light text-[#000000e6] text-xl tracking-[-0.60px] leading-[normal]">
@@ -495,9 +507,9 @@ export const Frame = (): React.ReactElement => {
             />
           </div>
         </button>
-        <button
-          type="button"
-          className="absolute top-[719px] left-[370px] w-[327px] h-[41px] text-left"
+        <Link
+          to="/schedule"
+          className="absolute top-[719px] left-[370px] w-[327px] h-[41px] text-left no-underline"
           aria-label="Записаться"
         >
           <div className="absolute top-0 left-0 w-[325px] h-[41px] bg-[#e3cbb1] rounded-[25px]" />
@@ -511,7 +523,7 @@ export const Frame = (): React.ReactElement => {
               src={arrow2}
             />
           </div>
-        </button>
+        </Link>
       </section>
       <section
         aria-labelledby="philosophy-title"
