@@ -34,18 +34,32 @@ const streamsRouter = express.Router();
 
 streamsRouter.get('/', async (req, res) => {
     const streams = await getAllStreams();
-    // Return only active streams: live OR scheduled in the future; exclude completed and past
+
+    // Check if requester is admin — if so, return all non-completed streams
+    const token = req.cookies.token;
+    let isAdmin = false;
+    if (token) {
+        const userId = await getUserIdByToken(token);
+        if (userId) {
+            const user = await getUserById(userId);
+            if (user && user.isAdmin) isAdmin = true;
+        }
+    }
+
     const now = new Date();
+    const todayStr = now.toISOString().slice(0, 10); // YYYY-MM-DD
+
     const active = streams.filter(s => {
         if (s.status === 'completed') return false;
         if (s.isLive) return true;
+        // Admin sees all planned streams regardless of date
+        if (isAdmin) return true;
+        // For regular users, show streams scheduled today or in the future
         try {
-            const [h, m] = String(s.time || '00:00').split(':').map(Number);
-            const d = new Date(String(s.date) + 'T00:00:00');
-            if (!isNaN(h) && !isNaN(m)) d.setHours(h, m, 0, 0);
-            return d.getTime() >= now.getTime();
+            const streamDate = String(s.date || '').slice(0, 10); // YYYY-MM-DD
+            return streamDate >= todayStr;
         } catch {
-            return true; // if parse fails, do not hide
+            return true;
         }
     });
     res.json(active);
