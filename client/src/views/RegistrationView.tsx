@@ -1,33 +1,43 @@
-import React, { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { FormEvent, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { API } from "../services/api";
+import SafeInput from "../components/SafeInput";
 
 const RegistrationView = () => {
   const navigate = useNavigate();
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  const location = useLocation();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [formReady, setFormReady] = useState(false);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setFormReady(true));
+    return () => cancelAnimationFrame(frame);
+  }, [location.pathname]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if (!login.trim() || !password.trim()) {
+    const fd = new FormData(e.currentTarget);
+    const login = String(fd.get("login") ?? "").trim();
+    const password = String(fd.get("password") ?? "");
+    const passwordConfirm = String(fd.get("passwordConfirm") ?? "");
+    const fullName = String(fd.get("fullName") ?? "").trim();
+    const phone = String(fd.get("phone") ?? "").trim();
+    const email = String(fd.get("email") ?? "").trim();
+
+    if (!login || !password) {
       setError("Заполните логин и пароль");
       return;
     }
-    if (!fullName.trim()) {
+    if (!fullName) {
       setError("Укажите ваше ФИО");
       return;
     }
-    if (!phone.trim()) {
+    if (!phone) {
       setError("Укажите номер телефона");
       return;
     }
@@ -42,15 +52,18 @@ const RegistrationView = () => {
 
     setSubmitting(true);
     try {
-      await API.user.register({ login: login.trim(), password, fullName: fullName.trim(), phone: phone.trim(), email: email.trim() });
+      await API.user.register({ login, password, fullName, phone, email });
       setSuccess("Аккаунт создан! Перенаправляем на страницу входа...");
       setTimeout(() => navigate("/login"), 1500);
-    } catch (e) {
-      if (e instanceof Error) setError(e.message);
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
     } finally {
       setSubmitting(false);
     }
   };
+
+  const inputClass =
+    "h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors";
 
   return (
     <div className="min-h-screen w-full bg-[#efdec5] flex items-center justify-center px-4 py-10">
@@ -70,102 +83,103 @@ const RegistrationView = () => {
           Зарегистрируйтесь, чтобы пользоваться личным кабинетом
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <label className="flex flex-col gap-2">
-            <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
-              ФИО <span className="text-red-400">*</span>
-            </span>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              autoComplete="name"
-              placeholder="Иванов Иван Иванович"
-              className="h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors"
-            />
-          </label>
-          <label className="flex flex-col gap-2">
-            <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
-              Телефон <span className="text-red-400">*</span>
-            </span>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              autoComplete="tel"
-              placeholder="+7 (999) 123-45-67"
-              className="h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors"
-            />
-          </label>
-          <label className="flex flex-col gap-2">
-            <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
-              Email
-            </span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              placeholder="example@mail.ru"
-              className="h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors"
-            />
-          </label>
-          <label className="flex flex-col gap-2">
-            <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
-              Логин <span className="text-red-400">*</span>
-            </span>
-            <input
-              type="text"
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
-              autoComplete="username"
-              className="h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors"
-            />
-          </label>
-          <label className="flex flex-col gap-2">
-            <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
-              Пароль <span className="text-red-400">*</span>
-            </span>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-              className="h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors"
-            />
-          </label>
-          <label className="flex flex-col gap-2">
-            <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
-              Подтвердите пароль <span className="text-red-400">*</span>
-            </span>
-            <input
-              type="password"
-              value={passwordConfirm}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              autoComplete="new-password"
-              className="h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors"
-            />
-          </label>
-
-          {error && (
-            <div className="[font-family:'Vela Sans',sans-serif] font-light text-red-700 text-sm bg-red-50 border border-red-200 rounded-[15px] px-4 py-2">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="[font-family:'Vela Sans',sans-serif] font-light text-green-700 text-sm bg-green-50 border border-green-200 rounded-[15px] px-4 py-2">
-              {success}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="h-[48px] mt-2 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-[25px] [font-family:'Vela Sans',sans-serif] text-lg tracking-[-0.5px] transition-colors disabled:opacity-60"
+        {formReady ? (
+          <form
+            key={location.key}
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-5"
+            autoComplete="off"
+            noValidate
           >
-            {submitting ? "Создание..." : "Зарегистрироваться"}
-          </button>
-        </form>
+            <label className="flex flex-col gap-2">
+              <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
+                ФИО <span className="text-red-400">*</span>
+              </span>
+              <SafeInput
+                name="fullName"
+                type="text"
+                autoComplete="off"
+                placeholder="Иванов Иван Иванович"
+                className={inputClass}
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
+                Телефон <span className="text-red-400">*</span>
+              </span>
+              <SafeInput
+                name="phone"
+                type="tel"
+                autoComplete="off"
+                placeholder="+7 (999) 123-45-67"
+                className={inputClass}
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
+                Email
+              </span>
+              <SafeInput
+                name="email"
+                type="email"
+                autoComplete="off"
+                placeholder="example@mail.ru"
+                className={inputClass}
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
+                Логин <span className="text-red-400">*</span>
+              </span>
+              <SafeInput name="login" type="text" autoComplete="off" className={inputClass} />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
+                Пароль <span className="text-red-400">*</span>
+              </span>
+              <SafeInput
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                className={inputClass}
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
+                Подтвердите пароль <span className="text-red-400">*</span>
+              </span>
+              <SafeInput
+                name="passwordConfirm"
+                type="password"
+                autoComplete="new-password"
+                className={inputClass}
+              />
+            </label>
+
+            {error && (
+              <div className="[font-family:'Vela Sans',sans-serif] font-light text-red-700 text-sm bg-red-50 border border-red-200 rounded-[15px] px-4 py-2">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="[font-family:'Vela Sans',sans-serif] font-light text-green-700 text-sm bg-green-50 border border-green-200 rounded-[15px] px-4 py-2">
+                {success}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="h-[48px] mt-2 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-[25px] [font-family:'Vela Sans',sans-serif] text-lg tracking-[-0.5px] transition-colors disabled:opacity-60"
+            >
+              {submitting ? "Создание..." : "Зарегистрироваться"}
+            </button>
+          </form>
+        ) : (
+          <div className="h-[420px] flex items-center justify-center [font-family:'Vela Sans',sans-serif] text-[#00000099] text-sm">
+            Загрузка формы...
+          </div>
+        )}
 
         <div className="mt-6 text-center [font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
           Уже есть аккаунт?{" "}

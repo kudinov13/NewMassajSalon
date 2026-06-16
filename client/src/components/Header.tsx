@@ -131,6 +131,17 @@ const Header: React.FC<HeaderProps> = ({ activeItem, cartCount }) => {
 
       {/* Right buttons */}
       <div className="flex items-center gap-2 sm:gap-3">
+        <a
+          href="https://vk.com/koosmo.zdrav.massag"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center w-10 h-10 rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
+          title="ВКонтакте"
+        >
+          <svg width="20" height="20" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M532.6,720.8c-227.9,0-357.9-156.2-363.3-416.2h114.2c3.8,190.8,87.9,271.7,154.6,288.3V304.6h107.5v164.6c65.8-7.1,135-82.1,158.3-164.6h107.5c-17.8,86.5-70.8,161.7-146.3,207.5C749.4,554,811.7,630,836.3,720.8H718c-22.3-79.8-90.3-138.4-172.5-148.8v148.8C545.5,720.8,532.6,720.8,532.6,720.8z" fill="#a6856d"/>
+          </svg>
+        </a>
         {isAuthenticated ? (
           <>
             <Link
@@ -299,6 +310,19 @@ const Header: React.FC<HeaderProps> = ({ activeItem, cartCount }) => {
 
           {/* Mobile bottom actions */}
           <div className="flex flex-col px-4 py-4 gap-1">
+            <a
+              href="https://vk.com/koosmo.zdrav.massag"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-[14px] border-0 cursor-pointer [font-family:'Vela_Sans',sans-serif] font-light text-[15px] text-[#6B5744] bg-transparent hover:bg-[#e3cbb1]/40 transition-all no-underline"
+            >
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#a6856d]/10">
+                <svg width="16" height="16" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M532.6,720.8c-227.9,0-357.9-156.2-363.3-416.2h114.2c3.8,190.8,87.9,271.7,154.6,288.3V304.6h107.5v164.6c65.8-7.1,135-82.1,158.3-164.6h107.5c-17.8,86.5-70.8,161.7-146.3,207.5C749.4,554,811.7,630,836.3,720.8H718c-22.3-79.8-90.3-138.4-172.5-148.8v148.8C545.5,720.8,532.6,720.8,532.6,720.8z" fill="#a6856d"/>
+                </svg>
+              </span>
+              ВКонтакте
+            </a>
             {isAuthenticated ? (
               <>
                 <button

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import {
   Route,
   Routes,
@@ -6,37 +6,52 @@ import {
 } from 'react-router-dom';
 import './App.css';
 import LoadingScreen from "./components/LoadingScreen";
-import Home from "./views/Home";
 import Layout from "./views/Layout";
-import LoginView from "./views/LoginView";
-import RegistrationView from "./views/RegistrationView";
-import ShopPage from "./views/ShopPage/ShopPage";
-import CartPage from "./views/CartPage";
-import ProfilePage from "./views/ProfilePage";
-import TibetanBowlsPage from "./views/TibetanBowlsPage";
-import DiagnosticsPage from "./views/DiagnosticsPage";
-import DiagnosticsDetailPage from "./views/DiagnosticsDetailPage";
-import AnalysesPage from "./views/AnalysesPage";
-import StreamsPage from "./views/StreamsPage";
-import AdminPage from "./views/AdminPage";
-import PsychologyPage from "./views/PsychologyPage";
-import BookingPage from "./views/BookingPage";
-import PsychologistPanel from "./views/PsychologistPanel";
-import VideoRoomPage from "./views/VideoRoomPage";
-import StreamBroadcastPage from "./views/StreamBroadcastPage";
-import StreamViewerPage from "./views/StreamViewerPage";
-import SchedulePage from "./views/SchedulePage";
-import BowlsBookingPage from "./views/BowlsBookingPage";
-import DiagnosticsSchedulePage from "./views/DiagnosticsSchedulePage";
-import DiagnosticsBookingPage from "./views/DiagnosticsBookingPage";
-import CoursesPage from "./views/CoursesPage";
-import CourseViewPage from "./views/CourseViewPage";
-import MyCoursesPage from "./views/MyCoursesPage";
-import PurchaseHistoryPage from "./views/PurchaseHistoryPage";
-import GuidePage from "./views/GuidePage";
-import BowlsMediaPage from "./views/BowlsMediaPage";
-import BowlsSpecialistPanel from "./views/BowlsSpecialistPanel";
+import Home from "./views/Home";
 import CookieConsent from "./components/CookieConsent";
+
+// Code-split: each page is loaded only when its route is visited.
+const LoginView = lazy(() => import("./views/LoginView"));
+const RegistrationView = lazy(() => import("./views/RegistrationView"));
+const ShopPage = lazy(() => import("./views/ShopPage/ShopPage"));
+const CartPage = lazy(() => import("./views/CartPage"));
+const ProfilePage = lazy(() => import("./views/ProfilePage"));
+const TibetanBowlsPage = lazy(() => import("./views/TibetanBowlsPage"));
+const DiagnosticsPage = lazy(() => import("./views/DiagnosticsPage"));
+const DiagnosticsDetailPage = lazy(() => import("./views/DiagnosticsDetailPage"));
+const AnalysesPage = lazy(() => import("./views/AnalysesPage"));
+const StreamsPage = lazy(() => import("./views/StreamsPage"));
+const AdminPage = lazy(() => import("./views/AdminPage"));
+const PsychologyPage = lazy(() => import("./views/PsychologyPage"));
+const BookingPage = lazy(() => import("./views/BookingPage"));
+const PsychologistPanel = lazy(() => import("./views/PsychologistPanel"));
+const VideoRoomPage = lazy(() => import("./views/VideoRoomPage"));
+const StreamBroadcastPage = lazy(() => import("./views/StreamBroadcastPage"));
+const StreamViewerPage = lazy(() => import("./views/StreamViewerPage"));
+const SchedulePage = lazy(() => import("./views/SchedulePage"));
+const BowlsBookingPage = lazy(() => import("./views/BowlsBookingPage"));
+const DiagnosticsSchedulePage = lazy(() => import("./views/DiagnosticsSchedulePage"));
+const DiagnosticsBookingPage = lazy(() => import("./views/DiagnosticsBookingPage"));
+const CoursesPage = lazy(() => import("./views/CoursesPage"));
+const CourseViewPage = lazy(() => import("./views/CourseViewPage"));
+const MyCoursesPage = lazy(() => import("./views/MyCoursesPage"));
+const PurchaseHistoryPage = lazy(() => import("./views/PurchaseHistoryPage"));
+const GuidePage = lazy(() => import("./views/GuidePage"));
+const BowlsMediaPage = lazy(() => import("./views/BowlsMediaPage"));
+const BowlsSpecialistPanel = lazy(() => import("./views/BowlsSpecialistPanel"));
+
+const PageFallback = () => (
+  <div className="min-h-screen bg-[#efdec5] flex items-center justify-center">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ position: 'relative', width: 56, height: 56 }}>
+        <div style={{ position: 'absolute', inset: 0, border: '3px solid #a6856d', borderRadius: '50%', animation: 'pulse 1.5s ease-in-out infinite' }} />
+        <div style={{ position: 'absolute', inset: 6, border: '3px solid #C9A882', borderRadius: '50%', animation: 'pulse 1.5s ease-in-out infinite', animationDelay: '0.2s' }} />
+        <div style={{ position: 'absolute', inset: 12, border: '3px solid #e3cbb1', borderRadius: '50%', animation: 'pulse 1.5s ease-in-out infinite', animationDelay: '0.4s' }} />
+      </div>
+      <span style={{ color: '#6B5744', fontFamily: 'sans-serif', fontSize: '0.9rem', opacity: 0.75 }}>Загрузка...</span>
+    </div>
+  </div>
+);
 
 const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -49,11 +64,17 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }, [location]);
 
   return (
-    <div className={`transition-opacity duration-300 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-      {children}
-    </div>
+    <Suspense fallback={<PageFallback />}>
+      <div className={`transition-opacity duration-300 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        {children}
+      </div>
+    </Suspense>
   );
 };
+
+const AuthPage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Suspense fallback={<PageFallback />}>{children}</Suspense>
+);
 
 function App() {
   return <>
@@ -62,8 +83,8 @@ function App() {
     <Routes>
       <Route path='/' element={<Layout/>}>
         <Route index element={<PageTransition><Home /></PageTransition>} />
-        <Route path='/login' element={<PageTransition><LoginView/></PageTransition>} />
-        <Route path='/registration' element={<PageTransition><RegistrationView/></PageTransition>} />
+        <Route path='/login' element={<AuthPage><LoginView/></AuthPage>} />
+        <Route path='/registration' element={<AuthPage><RegistrationView/></AuthPage>} />
         <Route path='/shop' element={<PageTransition><ShopPage/></PageTransition>} />
         <Route path='/cart' element={<PageTransition><CartPage/></PageTransition>} />
         <Route path='/schedule' element={<PageTransition><SchedulePage/></PageTransition>} />

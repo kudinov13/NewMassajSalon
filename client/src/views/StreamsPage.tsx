@@ -45,12 +45,13 @@ const StreamsPage: React.FC = () => {
   useEffect(() => {
     API.user.getCurrentUser()
       .then((user: any) => {
+        if (!user) return;
         setIsAuthenticated(true);
         if (user.isAdmin) setIsAdmin(true);
+        API.streamRoom.getMy().then((my: any[]) => setJoinedIds(my.map((s: any) => s.id))).catch(() => {});
       })
       .catch(() => {});
     loadStreams();
-    API.streamRoom.getMy().then((my: any[]) => setJoinedIds(my.map((s: any) => s.id))).catch(() => {});
   }, []);
 
   const loadStreams = async () => {

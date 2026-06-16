@@ -5,7 +5,7 @@ const {getUserByLogin} = require("../db/users");
 const {addToken, getUserIdByToken, deleteByToken} = require("../db/tokens");
 const { logActivity } = require("../db/activity");
 
-const COOKIE_NAME = "token";
+const { COOKIE_NAME, getCookieOptions, getClearCookieOptions } = require('../cookieOptions');
 
 authRouter.post("/", async (req, res) => {
 
@@ -24,12 +24,7 @@ authRouter.post("/", async (req, res) => {
     }
 
     const token = await addToken(user.id);
-    res.cookie(COOKIE_NAME, token, {
-        maxAge: 24 * 60 * 60 * 1000, // TODO: to const
-        httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production'
-    });
+    res.cookie(COOKIE_NAME, token, getCookieOptions(req));
 
     logActivity(user.id, user.login, user.fullName, 'Вход в систему', '');
     res.status(200).json({ok: true});
@@ -47,8 +42,7 @@ authRouter.delete("/", async (req, res) => {
     // delete token from DB
     await deleteByToken(token);
 
-    // delete cookie
-    res.clearCookie(COOKIE_NAME);
+    res.clearCookie(COOKIE_NAME, getClearCookieOptions(req));
 
     res.status(200).json({ok: true});
 });

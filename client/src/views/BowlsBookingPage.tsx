@@ -36,6 +36,7 @@ const BowlsBookingPage: React.FC = () => {
   useEffect(() => {
     API.user.getCurrentUser()
       .then((u) => {
+        if (!u) { navigate("/login"); return; }
         setFullName(u.fullName || "");
         setPhone(u.phone || "");
       })

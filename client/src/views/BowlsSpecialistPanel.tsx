@@ -71,7 +71,7 @@ const BowlsSpecialistPanel: React.FC = () => {
   useEffect(() => {
     API.user.getCurrentUser()
       .then((u) => {
-        if (!u.isBowlsSpecialist && !u.isAdmin) navigate("/");
+        if (!u || (!u.isBowlsSpecialist && !u.isAdmin)) { navigate("/"); return; }
         setUser(u);
       })
       .catch(() => navigate("/login"));

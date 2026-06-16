@@ -291,13 +291,25 @@ export const Frame = (): React.ReactElement => {
   }, []);
 
   useEffect(() => {
-    const updateScale = () => {
-      setHomeScale(Math.min(1, window.innerWidth / DESIGN_WIDTH));
+    let rafId = 0;
+    const computeScale = () => {
+      const next = Math.min(1, window.innerWidth / DESIGN_WIDTH);
+      setHomeScale((prev) => (prev === next ? prev : next));
+    };
+    const onResize = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
+        computeScale();
+      });
     };
 
-    updateScale();
-    window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
+    computeScale();
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -331,24 +343,26 @@ export const Frame = (): React.ReactElement => {
     >
       {/* Full-width background blocks */}
       <div
-        className="absolute top-[94px] left-0 right-0 w-screen h-[687px] bg-[#a6856d]"
+        className="absolute top-[94px] left-0 right-0 w-screen h-[687px] bg-[#a6856d] pointer-events-none"
         aria-hidden="true"
         style={{ top: `${94 * homeScale}px`, height: `${687 * homeScale}px` }}
       />
       <div
-        className="absolute left-0 right-0 w-screen h-[360px] bg-[#a6856d]"
+        className="absolute left-0 right-0 w-screen h-[360px] bg-[#a6856d] pointer-events-none"
         aria-hidden="true"
         style={{ top: `${4344 * homeScale}px`, height: `${360 * homeScale}px` }}
       />
       <div
-        className="absolute top-[4636px] left-0 right-0 w-screen h-[68px] bg-[#efdec5]"
+        className="absolute top-[4636px] left-0 right-0 w-screen h-[68px] bg-[#efdec5] pointer-events-none"
         aria-hidden="true"
         style={{ top: `${4636 * homeScale}px`, height: `${68 * homeScale}px` }}
       />
 
       {/* Full-width image */}
       <img
-        className="absolute left-0 right-0 w-screen object-cover object-top"
+        loading="lazy"
+        decoding="async"
+        className="absolute left-0 right-0 w-screen object-cover object-top pointer-events-none"
         alt="Путь к здоровью и гармонии"
         src={rectangle21}
         style={{ top: `${1540 * homeScale}px`, height: `${810 * homeScale}px` }}
@@ -365,7 +379,7 @@ export const Frame = (): React.ReactElement => {
       />
 
       <div
-        className="relative w-[1440px] h-[4704px]"
+        className="relative w-[1440px] h-[4704px] z-10"
         style={{
           transform: `scale(${homeScale})`,
           transformOrigin: "top left",
@@ -443,6 +457,17 @@ export const Frame = (): React.ReactElement => {
           </nav>
           {isAuthenticated ? (
             <div className="absolute top-[27px] left-[1230px] flex items-center gap-2">
+              <a
+                href="https://vk.com/koosmo.zdrav.massag"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-[34px] h-[34px] items-center justify-center rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
+                title="ВКонтакте"
+              >
+                <svg width="20" height="20" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M532.6,720.8c-227.9,0-357.9-156.2-363.3-416.2h114.2c3.8,190.8,87.9,271.7,154.6,288.3V304.6h107.5v164.6c65.8-7.1,135-82.1,158.3-164.6h107.5c-17.8,86.5-70.8,161.7-146.3,207.5C749.4,554,811.7,630,836.3,720.8H718c-22.3-79.8-90.3-138.4-172.5-148.8v148.8C545.5,720.8,532.6,720.8,532.6,720.8z" fill="#a6856d"/>
+                </svg>
+              </a>
               <Link to="/profile" className="flex w-[34px] h-[34px] items-center justify-center rounded-full bg-[#a6856d] hover:bg-[#8d6e58] transition-colors no-underline" aria-label="Профиль">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
@@ -460,15 +485,28 @@ export const Frame = (): React.ReactElement => {
               </button>
             </div>
           ) : (
-            <Link
-              to="/login"
-              className="flex w-[89px] h-[34px] items-center justify-center absolute top-[30px] left-[1321px] bg-[#a6856d] rounded-[25px] hover:bg-[#8d6e58] transition-colors no-underline"
-              aria-label="Вход"
-            >
-              <span className="[font-family:'Vela Sans',sans-serif] font-light text-white text-base tracking-[-0.48px] leading-[normal]">
-                Вход
-              </span>
-            </Link>
+            <div className="absolute top-[27px] left-[1230px] flex items-center gap-2">
+              <a
+                href="https://vk.com/koosmo.zdrav.massag"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-[34px] h-[34px] items-center justify-center rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
+                title="ВКонтакте"
+              >
+                <svg width="20" height="20" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M532.6,720.8c-227.9,0-357.9-156.2-363.3-416.2h114.2c3.8,190.8,87.9,271.7,154.6,288.3V304.6h107.5v164.6c65.8-7.1,135-82.1,158.3-164.6h107.5c-17.8,86.5-70.8,161.7-146.3,207.5C749.4,554,811.7,630,836.3,720.8H718c-22.3-79.8-90.3-138.4-172.5-148.8v148.8C545.5,720.8,532.6,720.8,532.6,720.8z" fill="#a6856d"/>
+                </svg>
+              </a>
+              <Link
+                to="/login"
+                className="flex w-[89px] h-[34px] items-center justify-center bg-[#a6856d] rounded-[25px] hover:bg-[#8d6e58] transition-colors no-underline"
+                aria-label="Вход"
+              >
+                <span className="[font-family:'Vela Sans',sans-serif] font-light text-white text-base tracking-[-0.48px] leading-[normal]">
+                  Вход
+                </span>
+              </Link>
+            </div>
           )}
           <div
             className="absolute top-[27px] left-[30px] w-[450px] h-[35px] bg-[#e3cbb1] rounded-[25px]"
@@ -577,7 +615,7 @@ export const Frame = (): React.ReactElement => {
                   <span className={service.arrowWrapClass} aria-hidden="true">
                     <img className={service.arrowClass} alt="" src={service.arrow} />
                   </span>
-                  <img className={service.imageClass} alt={service.title} src={service.image} />
+                  <img loading="lazy" decoding="async" className={service.imageClass} alt={service.title} src={service.image} />
                 </button>
                 {/* Back */}
                 <div
@@ -647,6 +685,8 @@ export const Frame = (): React.ReactElement => {
                 <img className={service.arrowClass} alt="" src={service.arrow} />
               </span>
               <img
+                loading="lazy"
+                decoding="async"
                 className={service.imageClass}
                 alt={service.title}
                 src={service.image}
@@ -683,6 +723,8 @@ export const Frame = (): React.ReactElement => {
         {specialists.map((specialist) => (
           <article key={specialist.name}>
             <img
+              loading="lazy"
+              decoding="async"
               className={specialist.imageClass}
               alt={specialist.name}
               src={specialist.image}
@@ -712,6 +754,8 @@ export const Frame = (): React.ReactElement => {
       <section aria-labelledby="space-title">
         <div className="flex w-[421px] h-[480px] items-start gap-2.5 pl-[19px] pr-[18px] pt-4 pb-5 absolute top-[3346px] left-[59px] rounded-[25px] border-2 border-solid border-[#e3cbb1]">
           <img
+            loading="lazy"
+            decoding="async"
             className="relative w-96 h-[444px] aspect-[0.86] object-cover rounded-[20px]"
             alt="Интерьер Harmony Spa"
             src={rectangle32}

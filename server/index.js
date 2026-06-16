@@ -25,6 +25,9 @@ const {initDb} = require("./db/db");
 
 const app = express();
 
+// Nginx / reverse proxy: нужно для корректного req.secure и secure-cookie
+app.set('trust proxy', 1);
+
 // чтобы парсился POST в виде JSON
 app.use(express.json());
 
@@ -95,10 +98,20 @@ app.get('/uploads/:filename', (req, res) => {
     }
 });
 
+// В production: раздаём собранный фронтенд
+if (process.env.NODE_ENV === 'production') {
+    const clientBuild = path.join(__dirname, '..', 'client', 'build');
+    app.use(express.static(clientBuild));
+    // Все остальные запросы (не API) — SPA fallback
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(clientBuild, 'index.html'));
+    });
+}
+
 const port = process.env.PORT || 3001;
 (async () => {
     await initDb();
     app.listen(port, () => {
-        console.log(`Example app listening on port ${port}!`)
+        console.log(`Server listening on port ${port} (${process.env.NODE_ENV || 'development'})`)
     });
 })();

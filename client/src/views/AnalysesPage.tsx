@@ -47,6 +47,7 @@ const AnalysesPage: React.FC = () => {
   useEffect(() => {
     API.user.getCurrentUser()
       .then((user: any) => {
+        if (!user) return;
         setIsAuthenticated(true);
         if (user.isAdmin) setIsAdmin(true);
       })

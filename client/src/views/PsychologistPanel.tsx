@@ -82,7 +82,7 @@ const PsychologistPanel: React.FC = () => {
   useEffect(() => {
     API.user.getCurrentUser()
       .then((u) => {
-        if (!u.isPsychologist) navigate("/");
+        if (!u?.isPsychologist) { navigate("/"); return; }
         setUser(u);
       })
       .catch(() => navigate("/login"));

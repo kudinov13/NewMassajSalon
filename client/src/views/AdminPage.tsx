@@ -424,7 +424,7 @@ const AdminPage: React.FC = () => {
 
   const liveStartSignaling = () => {
     const poll = async () => {
-      if (!liveMountedRef.current || !liveIsStreaming) return;
+      if (!liveMountedRef.current) return;
       try {
         const signals = await API.streamRoom.getSignals(liveSelectedStream, liveLastSignalIdRef.current);
         for (const sig of signals) {
@@ -462,7 +462,7 @@ const AdminPage: React.FC = () => {
   useEffect(() => {
     API.user.getCurrentUser()
       .then((u: any) => {
-        if (!u.isAdmin) navigate("/");
+        if (!u?.isAdmin) { navigate("/"); return; }
         setAdminLogin(u.login || "Администратор");
       })
       .catch(() => navigate("/login"));

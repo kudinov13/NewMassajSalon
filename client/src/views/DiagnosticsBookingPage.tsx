@@ -28,6 +28,7 @@ const DiagnosticsBookingPage: React.FC = () => {
   useEffect(() => {
     API.user.getCurrentUser()
       .then((u) => {
+        if (!u) { navigate("/login"); return; }
         setUser(u);
         setFullName(u.fullName || "");
         setPhone(u.phone || "");

@@ -13,7 +13,7 @@ const LoadingScreen: React.FC = () => {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-[#efdec5] flex items-center justify-center animate-fadeIn">
+    <div className="fixed inset-0 z-[9999] bg-[#efdec5] flex items-center justify-center animate-fadeIn pointer-events-none">
       <div className="text-center">
         <div className="relative w-24 h-24 mx-auto mb-8">
           <div className="absolute inset-0 border-4 border-[#a6856d] rounded-full animate-pulse"></div>

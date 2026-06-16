@@ -16,10 +16,15 @@ type RegistrationData = {
 };
 
 const errorHandler = async (response: Response) => {
-  if (response.status !== 200) {
+  if (response.ok) return;
+  let message = `Ошибка ${response.status}`;
+  try {
     const responseData = await response.json();
-    throw Error(responseData.message);
+    if (responseData?.message) message = responseData.message;
+  } catch {
+    // ответ без JSON (например, HTML от прокси)
   }
+  throw new Error(message);
 };
 
 export const API = {
@@ -59,8 +64,11 @@ export const API = {
         credentials: "include",
         method: "GET"
       });
-      await errorHandler(response);
-      return await response.json();
+      if (!response.ok) {
+        await errorHandler(response);
+      }
+      const data = await response.json();
+      return data ?? null;
     },
     updateProfile: async (data: { fullName: string; phone: string; email?: string }) => {
       const response = await fetch(`${BASE_URL}/user/profile`, {

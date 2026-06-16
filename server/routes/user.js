@@ -9,9 +9,7 @@ userRouter.get("/", async (req, res) => {
     const token = req.cookies.token;
     const userId = await getUserIdByToken(token);
     if (!userId) {
-        return res.status(401).json({
-            message: "Пользователь не авторизован"
-        });
+        return res.status(200).json(null);
     }
 
     const user = await getUserById(userId);
