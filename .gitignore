@@ -10,8 +10,9 @@ client/dist/
 # Database (will be auto-created on server start)
 server/database.db
 
-# Uploads (user-uploaded files)
-server/uploads/
+# Uploads — tracked by git to ensure images/videos deploy correctly
+# Large files that shouldn't be in git can be added here individually
+# server/uploads/
 
 # Environment
 .env

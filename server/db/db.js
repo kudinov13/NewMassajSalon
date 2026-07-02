@@ -94,6 +94,7 @@ const initDb = async () => {
     try { await db.exec(`ALTER TABLE streams ADD COLUMN streamRoomId TEXT DEFAULT ''`); } catch(e) {}
     // превью-видео у трансляции
     try { await db.exec(`ALTER TABLE streams ADD COLUMN previewUrl TEXT`); } catch(e) {}
+    try { await db.exec(`ALTER TABLE streams ADD COLUMN stoppedAt TEXT`); } catch(e) {}
 
     await db.exec(`
         CREATE TABLE IF NOT EXISTS user_streams (

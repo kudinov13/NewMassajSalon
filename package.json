@@ -9,7 +9,9 @@
     "start:client": "cd client && npm start",
     "start:server": "cd server && npm start",
     "start": "concurrently --kill-others \"npm run start:client\" \"npm run start:server\"",
-    "postinstall": "concurrently \"npm run install:client\" \"npm run install:server\""
+    "postinstall": "concurrently \"npm run install:client\" \"npm run install:server\"",
+    "build": "cd client && npm ci && npm run build",
+    "prod": "cd server && NODE_ENV=production node index.js"
   },
   "repository": {
     "type": "git",

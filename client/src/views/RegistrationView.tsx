@@ -1,6 +1,6 @@
 import React, { FormEvent, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { API } from "../services/api";
+import { API, BASE_URL } from "../services/api";
 import SafeInput from "../components/SafeInput";
 
 const RegistrationView = () => {
@@ -10,6 +10,7 @@ const RegistrationView = () => {
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formReady, setFormReady] = useState(false);
+  const [consent, setConsent] = useState(false);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setFormReady(true));
@@ -66,8 +67,8 @@ const RegistrationView = () => {
     "h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors";
 
   return (
-    <div className="min-h-screen w-full bg-[#efdec5] flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-[440px] bg-white/60 border-2 border-[#e3cbb1] rounded-[25px] p-10 shadow-lg">
+    <div className="min-h-screen w-full bg-[#efdec5] flex items-center justify-center px-3 sm:px-4 py-6 sm:py-10">
+      <div className="w-full max-w-[440px] bg-white/60 border-2 border-[#e3cbb1] rounded-[25px] p-5 sm:p-10 shadow-lg">
         <Link
           to="/"
           className="inline-flex items-center gap-2 mb-6 [font-family:'Vela Sans',sans-serif] font-light text-[#000000b2] hover:text-[#a6856d] transition-colors no-underline"
@@ -76,7 +77,7 @@ const RegistrationView = () => {
           <span className="text-xl">Коосмо</span>
         </Link>
 
-        <h1 className="[font-family:'Bergamasco',serif] text-[#000000cc] text-[40px] tracking-[-1.20px] leading-tight mb-2">
+        <h1 className="[font-family:'Bergamasco',serif] text-[#000000cc] text-[28px] sm:text-[40px] tracking-[-1.20px] leading-tight mb-2">
           Создать аккаунт
         </h1>
         <p className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base mb-8">
@@ -167,10 +168,34 @@ const RegistrationView = () => {
               </div>
             )}
 
+            <label className="flex items-start gap-2 sm:gap-3 cursor-pointer select-none mt-1">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={e => setConsent(e.target.checked)}
+                className="mt-0.5 w-5 h-5 min-w-[20px] accent-[#a6856d] rounded cursor-pointer"
+              />
+              <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-xs sm:text-sm leading-relaxed">
+                Я принимаю условия{" "}
+                <a href={`${BASE_URL}/docs/dobrovolnoe_soglasie.pdf`} target="_blank" rel="noopener noreferrer" className="text-[#a6856d] hover:underline font-normal">
+                  Добровольного согласия на исследования
+                </a>,{" "}
+                <a href={`${BASE_URL}/docs/politika_konfidentsialnosti.pdf`} target="_blank" rel="noopener noreferrer" className="text-[#a6856d] hover:underline font-normal">
+                  Политики конфиденциальности
+                </a>,{" "}
+                <a href={`${BASE_URL}/docs/oferta.pdf`} target="_blank" rel="noopener noreferrer" className="text-[#a6856d] hover:underline font-normal">
+                  Предварительной оферты на участие
+                </a>{" "}и{" "}
+                <a href={`${BASE_URL}/docs/soglasie_obrabotka_dannyh.pdf`} target="_blank" rel="noopener noreferrer" className="text-[#a6856d] hover:underline font-normal">
+                  Согласия на обработку персональных данных
+                </a>
+              </span>
+            </label>
+
             <button
               type="submit"
-              disabled={submitting}
-              className="h-[48px] mt-2 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-[25px] [font-family:'Vela Sans',sans-serif] text-lg tracking-[-0.5px] transition-colors disabled:opacity-60"
+              disabled={submitting || !consent}
+              className="h-[48px] mt-2 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-[25px] [font-family:'Vela Sans',sans-serif] text-lg tracking-[-0.5px] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {submitting ? "Создание..." : "Зарегистрироваться"}
             </button>

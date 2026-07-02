@@ -1,10 +1,15 @@
 # Инструкция по деплою на VPS (FirstVDS) с доменом koosmo.ru
 
-## 1. Подготовка локального проекта
+> **Важно:** Папка `server/uploads/` теперь отслеживается Git'ом.
+> Все фотографии товаров и видео трансляций попадают в репозиторий и корректно деплоятся.
+
+---
+
+## 1. Подготовка на локальном ПК (Windows)
 
 ### 1.1 Собрать фронтенд
 
-```bash
+```powershell
 cd client
 npm ci
 npm run build
@@ -12,13 +17,29 @@ npm run build
 
 После сборки в папке `client/build` появятся файлы для продакшена.
 
-### 1.2 Подготовить БД
+### 1.2 Закоммитить и запушить
 
-База данных SQLite находится в `server/database.db`. Скопируйте её, если хотите перенести существующие данные.
+```powershell
+cd ..
+git add -A
+git commit -m "Обновление сайта"
+git push
+```
+
+> Папка `server/uploads/` с картинками и видео **включена** в репозиторий.
+> База данных `server/database.db` **не включена** (создаётся автоматически).
+
+### 1.3 Перенести БД (первый раз или при обновлении данных)
+
+Скопируйте БД на сервер отдельно:
+
+```powershell
+scp server/database.db root@IP_ВАШЕГО_VPS:/var/www/koosmo/server/
+```
 
 ---
 
-## 2. Настройка VPS (Ubuntu 24.04)
+## 2. Настройка VPS (Ubuntu 24.04) — только первый раз
 
 ### 2.1 Подключение к серверу
 
@@ -29,8 +50,7 @@ ssh root@IP_ВАШЕГО_VPS
 ### 2.2 Обновить систему и установить ПО
 
 ```bash
-sudo apt update
-sudo apt upgrade -y
+sudo apt update && sudo apt upgrade -y
 sudo apt install -y git nodejs npm build-essential ffmpeg nginx sqlite3
 ```
 
@@ -57,46 +77,27 @@ sudo chown -R $USER:$USER /var/www/koosmo
 
 ---
 
-## 3. Загрузка проекта на сервер
-
-### Вариант A: Через Git (если есть репозиторий)
+## 3. Загрузка проекта на сервер (первый раз)
 
 ```bash
 cd /var/www/koosmo
 git clone <ВАШ_РЕПОЗИТОРИЙ> .
 ```
 
-### Вариант B: Через SCP (если нет Git)
-
-На локальной машине:
-
-```bash
-# Загрузить всё кроме node_modules и build
-scp -r --exclude=node_modules --exclude=build c:/Проекты\ WEB/Сайт\ маме/* root@IP:/var/www/koosmo/
-```
-
-### Вариант C: Через SFTP (FileZilla, WinSCP)
-
-Подключитесь к серверу по SFTP и загрузите файлы в `/var/www/koosmo`.
-
 ---
 
 ## 4. Установка зависимостей на сервере
 
-### 4.1 Серверная часть
-
 ```bash
 cd /var/www/koosmo/server
 npm ci
-mkdir -p uploads
 ```
 
-### 4.2 Копирование БД (если есть данные)
+### 4.1 Копирование БД (если есть данные)
 
 ```bash
-# Скопируйте database.db с локальной машины
-# Например через SCP:
-scp server/database.db root@IP:/var/www/koosmo/server/
+# С локальной машины (PowerShell):
+scp server/database.db root@IP_ВАШЕГО_VPS:/var/www/koosmo/server/
 ```
 
 Если БД нет — она создастся автоматически при первом запуске.
@@ -165,13 +166,15 @@ server {
     root /var/www/koosmo/client/build;
     index index.html;
 
+    client_max_body_size 500M;
+
     # SPA fallback
     location / {
         try_files $uri $uri/ /index.html;
     }
 
-    # API и uploads пробрасываем на Node
-    location ~ ^/(auth|user|settings|products|cart|labs|streams|admin|schedule|appointments|room|stream-room|bowls|bowls-schedule|diagnostics-schedule|courses|guide|bowls-media|activity|uploads) {
+    # API, uploads, docs — проксируем на Node
+    location ~ ^/(auth|user|settings|products|cart|labs|streams|admin|schedule|appointments|room|stream-room|bowls|bowls-schedule|diagnostics-schedule|courses|guide|bowls-media|activity|uploads|docs) {
         proxy_pass http://127.0.0.1:3001;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -180,6 +183,8 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
     }
 }
 ```
@@ -207,7 +212,6 @@ DNS обновится в течение 1-24 часов.
 ### 7.2 Проверка DNS
 
 ```bash
-# На локальной машине
 nslookup koosmo.ru
 # Должен показать IP вашего VPS
 ```
@@ -272,8 +276,10 @@ sudo chown -R www-data:www-data /var/www/koosmo/server/uploads
 
 1. Откройте в браузере: `https://koosmo.ru`
 2. Проверьте:
+   - Фото товаров в магазине
+   - Видео-обзоры трансляций
    - Регистрация/авторизация
-   - Магазин, корзина
+   - Корзина
    - Запись на приём
    - Видеокомнаты
    - Трансляции
@@ -281,26 +287,45 @@ sudo chown -R www-data:www-data /var/www/koosmo/server/uploads
 
 ---
 
-## 12. Обновление проекта
+## 12. Обновление проекта (каждый раз)
 
-При каждом обновлении:
+### На локальном ПК (Windows PowerShell):
+
+```powershell
+# 1. Собрать фронтенд
+cd client
+npm run build
+cd ..
+
+# 2. Закоммитить и запушить
+git add -A
+git commit -m "Обновление сайта"
+git push
+```
+
+### На сервере (SSH):
 
 ```bash
-# На сервере
+# 1. Получить обновления
 cd /var/www/koosmo
-git pull  # или загрузите новые файлы
+git pull
 
-# Собрать фронтенд (если изменился)
-cd client
-npm ci
-npm run build
+# 2. Установить зависимости (если изменились)
+cd server && npm ci && cd ..
 
-# Перезапустить сервисы
-sudo systemctl restart nginx
-cd ../server
-npm ci
+# 3. Поправить права на uploads
+sudo chown -R www-data:www-data /var/www/koosmo/server/uploads
+
+# 4. Перезапустить сервер
 sudo systemctl restart koosmo
 ```
+
+> **Если обновились данные в БД** (новые товары, пользователи):
+> ```powershell
+> # С локальной машины:
+> scp server/database.db root@IP_ВАШЕГО_VPS:/var/www/koosmo/server/
+> ```
+> Затем на сервере: `sudo systemctl restart koosmo`
 
 ---
 

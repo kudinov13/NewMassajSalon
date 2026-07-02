@@ -39,9 +39,38 @@ streamRoomRouter.post('/:id/stop', requireAdmin, async (req, res) => {
     const db = getDb();
     const stream = await db.get('SELECT * FROM streams WHERE id = ?', req.params.id);
     if (!stream) return res.status(404).json({ message: 'Трансляция не найдена' });
-    await db.run("UPDATE streams SET isLive = 0, status = 'completed' WHERE id = ?", req.params.id);
+    await db.run("UPDATE streams SET isLive = 0, status = 'completed', stoppedAt = datetime('now') WHERE id = ?", req.params.id);
     await db.run('DELETE FROM stream_signals WHERE streamRoomId = ?', stream.streamRoomId);
-    await db.run('DELETE FROM stream_viewers WHERE streamId = ?', req.params.id);
+    res.json({ ok: true });
+});
+
+// GET stream history (admin) — all completed streams with participants
+streamRoomRouter.get('/history', requireAdmin, async (req, res) => {
+    const db = getDb();
+    const streams = await db.all("SELECT * FROM streams WHERE status = 'completed' ORDER BY stoppedAt DESC, date DESC");
+    const result = [];
+    for (const s of streams) {
+        const purchasers = await db.all(
+            `SELECT u.id, u.login, u.fullName, u.email, u.phone, us.purchasedAt
+             FROM user_streams us JOIN users u ON u.id = us.userId
+             WHERE us.streamId = ? ORDER BY us.purchasedAt`, s.id
+        );
+        const viewers = await db.all(
+            `SELECT u.id, u.login, u.fullName, u.email, u.phone
+             FROM stream_viewers sv JOIN users u ON u.id = sv.userId
+             WHERE sv.streamId = ?`, s.id
+        );
+        result.push({ ...s, purchasers, viewers });
+    }
+    res.json(result);
+});
+
+// POST restore stream (admin) — make completed stream available again for its purchasers
+streamRoomRouter.post('/:id/restore', requireAdmin, async (req, res) => {
+    const db = getDb();
+    const stream = await db.get('SELECT * FROM streams WHERE id = ?', req.params.id);
+    if (!stream) return res.status(404).json({ message: 'Трансляция не найдена' });
+    await db.run("UPDATE streams SET status = 'planned', stoppedAt = NULL WHERE id = ?", req.params.id);
     res.json({ ok: true });
 });
 
@@ -105,7 +134,7 @@ streamRoomRouter.get('/:id/room', requireAuth, async (req, res) => {
 streamRoomRouter.get('/:id/viewers', requireAdmin, async (req, res) => {
     const db = getDb();
     const viewers = await db.all(
-        'SELECT sv.userId FROM stream_viewers WHERE streamId = ?', req.params.id
+        'SELECT sv.userId FROM stream_viewers sv WHERE sv.streamId = ?', req.params.id
     );
     res.json(viewers);
 });

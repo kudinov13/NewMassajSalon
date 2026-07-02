@@ -48,15 +48,24 @@ streamsRouter.get('/', async (req, res) => {
 
     const now = new Date();
     const todayStr = now.toISOString().slice(0, 10); // YYYY-MM-DD
+    const EXPIRE_MINUTES = 30;
 
     const active = streams.filter(s => {
-        if (s.status === 'completed') return false;
+        // Admin sees all non-completed streams (completed go to history)
+        if (isAdmin) {
+            return s.status !== 'completed';
+        }
+        // For regular users: hide completed streams (or those stopped > 30 min ago)
+        if (s.status === 'completed') {
+            if (!s.stoppedAt) return false;
+            const stoppedTime = new Date(s.stoppedAt + 'Z');
+            const diffMin = (now - stoppedTime) / 60000;
+            return diffMin < EXPIRE_MINUTES;
+        }
         if (s.isLive) return true;
-        // Admin sees all planned streams regardless of date
-        if (isAdmin) return true;
-        // For regular users, show streams scheduled today or in the future
+        // Show streams scheduled today or in the future
         try {
-            const streamDate = String(s.date || '').slice(0, 10); // YYYY-MM-DD
+            const streamDate = String(s.date || '').slice(0, 10);
             return streamDate >= todayStr;
         } catch {
             return true;

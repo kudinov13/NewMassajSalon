@@ -98,6 +98,9 @@ app.get('/uploads/:filename', (req, res) => {
     }
 });
 
+// Юридические документы (оферта, согласия и т.д.)
+app.use('/docs', express.static(path.join(__dirname, '..', 'Docs')));
+
 // В production: раздаём собранный фронтенд
 if (process.env.NODE_ENV === 'production') {
     const clientBuild = path.join(__dirname, '..', 'client', 'build');

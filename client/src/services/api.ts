@@ -335,6 +335,16 @@ export const API = {
       await errorHandler(response);
       return await response.json();
     },
+    restore: async (streamId: number) => {
+      const response = await fetch(`${BASE_URL}/stream-room/${streamId}/restore`, { method: "POST", credentials: "include" });
+      await errorHandler(response);
+      return await response.json();
+    },
+    getHistory: async () => {
+      const response = await fetch(`${BASE_URL}/stream-room/history`, { credentials: "include" });
+      await errorHandler(response);
+      return await response.json();
+    },
   },
   labs: {
     getAll: async () => {

@@ -14,6 +14,12 @@ interface Stream {
   status: string;
   speaker: string;
   previewUrl?: string | null;
+  stoppedAt?: string | null;
+}
+
+interface HistoryStream extends Stream {
+  purchasers: { id: number; login: string; fullName: string; email: string; phone: string; purchasedAt: string }[];
+  viewers: { id: number; login: string; fullName: string; email: string; phone: string }[];
 }
 
 
@@ -41,13 +47,19 @@ const StreamsPage: React.FC = () => {
   const [showPreview, setShowPreview] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [history, setHistory] = useState<HistoryStream[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [expandedHistory, setExpandedHistory] = useState<number | null>(null);
 
   useEffect(() => {
     API.user.getCurrentUser()
       .then((user: any) => {
         if (!user) return;
         setIsAuthenticated(true);
-        if (user.isAdmin) setIsAdmin(true);
+        if (user.isAdmin) {
+          setIsAdmin(true);
+          API.streamRoom.getHistory().then(setHistory).catch(() => {});
+        }
         API.streamRoom.getMy().then((my: any[]) => setJoinedIds(my.map((s: any) => s.id))).catch(() => {});
       })
       .catch(() => {});
@@ -225,9 +237,13 @@ const StreamsPage: React.FC = () => {
                       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 text-red-600 [font-family:'Vela_Sans',sans-serif] font-light text-xs">
                         <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> LIVE
                       </span>
+                    ) : stream.status === 'completed' ? (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-200 text-gray-600 [font-family:'Vela_Sans',sans-serif] font-light text-xs">
+                        Завершена
+                      </span>
                     ) : null}
-                    {/* Join/Watch buttons */}
-                    {isAuthenticated && !isAdmin && (
+                    {/* Join/Watch buttons — hide for completed streams */}
+                    {isAuthenticated && !isAdmin && stream.status !== 'completed' && (
                       joinedIds.includes(stream.id) ? (
                         stream.isLive ? (
                           <button onClick={() => navigate(`/stream/${stream.id}`)} className="h-9 px-4 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">
@@ -273,6 +289,103 @@ const StreamsPage: React.FC = () => {
           </div>
         )}
       </section>
+
+      {/* Admin history */}
+      {isAdmin && (
+        <section className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-10 pb-10">
+          <button
+            type="button"
+            onClick={() => setShowHistory(!showHistory)}
+            className="flex items-center gap-2 mb-4 bg-transparent border-0 cursor-pointer [font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B5744" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showHistory ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+            История трансляций ({history.length})
+          </button>
+          {showHistory && (
+            <div className="flex flex-col gap-3">
+              {history.length === 0 ? (
+                <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-sm">Завершённых трансляций нет.</p>
+              ) : history.map((hs) => (
+                <div key={hs.id} className="bg-[#f5e6d3] rounded-[16px] p-4 border border-[#C9A882]/60">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                    <div>
+                      <h4 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-base">{hs.title}</h4>
+                      <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs">
+                        {formatDate(hs.date)} {hs.time} — Завершена{hs.stoppedAt ? ` ${new Date(hs.stoppedAt + 'Z').toLocaleString('ru-RU')}` : ''}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs">
+                        Купили: {hs.purchasers.length} · Смотрели: {hs.viewers.length}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setExpandedHistory(expandedHistory === hs.id ? null : hs.id)}
+                        className="h-8 px-3 bg-transparent border border-[#C9A882] text-[#6B5744] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs cursor-pointer hover:bg-[#f5e6d3] transition-colors"
+                      >
+                        {expandedHistory === hs.id ? 'Скрыть' : 'Подробнее'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!window.confirm('Восстановить трансляцию? Она снова станет доступна для купивших пользователей.')) return;
+                          await API.streamRoom.restore(hs.id);
+                          loadStreams();
+                          const updated = await API.streamRoom.getHistory();
+                          setHistory(updated);
+                        }}
+                        className="h-8 px-3 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs border-0 cursor-pointer transition-colors"
+                      >
+                        Восстановить
+                      </button>
+                    </div>
+                  </div>
+                  {expandedHistory === hs.id && (
+                    <div className="mt-3 pt-3 border-t border-[#C9A882]/30">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <h5 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm mb-2">Купили ({hs.purchasers.length})</h5>
+                          {hs.purchasers.length === 0 ? (
+                            <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-xs">Нет покупок</p>
+                          ) : (
+                            <ul className="list-none p-0 m-0 flex flex-col gap-1">
+                              {hs.purchasers.map(u => (
+                                <li key={u.id} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs bg-white/50 rounded-lg px-3 py-2">
+                                  <span className="font-normal">{u.fullName || u.login}</span>
+                                  {u.phone && <span className="ml-2 text-[#6B5744]/60">{u.phone}</span>}
+                                  {u.email && <span className="ml-2 text-[#6B5744]/60">{u.email}</span>}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                        <div>
+                          <h5 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm mb-2">Смотрели ({hs.viewers.length})</h5>
+                          {hs.viewers.length === 0 ? (
+                            <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-xs">Нет зрителей</p>
+                          ) : (
+                            <ul className="list-none p-0 m-0 flex flex-col gap-1">
+                              {hs.viewers.map(u => (
+                                <li key={u.id} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs bg-white/50 rounded-lg px-3 py-2">
+                                  <span className="font-normal">{u.fullName || u.login}</span>
+                                  {u.phone && <span className="ml-2 text-[#6B5744]/60">{u.phone}</span>}
+                                  {u.email && <span className="ml-2 text-[#6B5744]/60">{u.email}</span>}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Modal */}
       {showModal && (

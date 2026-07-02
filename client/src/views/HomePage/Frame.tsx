@@ -255,7 +255,7 @@ const reviews = [
 
 export const Frame = (): React.ReactElement => {
   const DESIGN_WIDTH = 1440;
-  const DESIGN_HEIGHT = 4704;
+  const DESIGN_HEIGHT = 4780;
   const nameId = useId();
   const phoneId = useId();
   const commentId = useId();
@@ -456,7 +456,29 @@ export const Frame = (): React.ReactElement => {
             </ul>
           </nav>
           {isAuthenticated ? (
-            <div className="absolute top-[27px] left-[1230px] flex items-center gap-2">
+            <div className="absolute top-[27px] left-[1150px] flex items-center gap-2">
+              <a
+                href="https://t.me/koosmo_zdravmassag"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-[34px] h-[34px] items-center justify-center rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
+                title="Telegram"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#a6856d" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                </svg>
+              </a>
+              <a
+                href="https://max.ru/id2204096914_bi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-[34px] h-[34px] items-center justify-center rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
+                title="Max"
+              >
+                <svg width="18" height="18" viewBox="0 0 48 48" fill="none" stroke="#a6856d" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15.63,40.46c8.08,7.19,27.86-1.17,27.78-15.85-.05-10.07-8.31-20.02-18.54-20.11-9.54-.08-19.65,5.96-20.23,17.77-.17,3.52,0,8.86,1.23,11.73,2.33,6.7.11,8.48,2.8,9.33,2.41.6,4.73-.35,6.95-2.86Z"/>
+                </svg>
+              </a>
               <a
                 href="https://vk.com/koosmo.zdrav.massag"
                 target="_blank"
@@ -464,7 +486,7 @@ export const Frame = (): React.ReactElement => {
                 className="flex w-[34px] h-[34px] items-center justify-center rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
                 title="ВКонтакте"
               >
-                <svg width="20" height="20" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="18" height="18" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M532.6,720.8c-227.9,0-357.9-156.2-363.3-416.2h114.2c3.8,190.8,87.9,271.7,154.6,288.3V304.6h107.5v164.6c65.8-7.1,135-82.1,158.3-164.6h107.5c-17.8,86.5-70.8,161.7-146.3,207.5C749.4,554,811.7,630,836.3,720.8H718c-22.3-79.8-90.3-138.4-172.5-148.8v148.8C545.5,720.8,532.6,720.8,532.6,720.8z" fill="#a6856d"/>
                 </svg>
               </a>
@@ -485,7 +507,29 @@ export const Frame = (): React.ReactElement => {
               </button>
             </div>
           ) : (
-            <div className="absolute top-[27px] left-[1230px] flex items-center gap-2">
+            <div className="absolute top-[27px] left-[1150px] flex items-center gap-2">
+              <a
+                href="https://t.me/koosmo_zdravmassag"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-[34px] h-[34px] items-center justify-center rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
+                title="Telegram"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#a6856d" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                </svg>
+              </a>
+              <a
+                href="https://max.ru/id2204096914_bi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-[34px] h-[34px] items-center justify-center rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
+                title="Max"
+              >
+                <svg width="18" height="18" viewBox="0 0 48 48" fill="none" stroke="#a6856d" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15.63,40.46c8.08,7.19,27.86-1.17,27.78-15.85-.05-10.07-8.31-20.02-18.54-20.11-9.54-.08-19.65,5.96-20.23,17.77-.17,3.52,0,8.86,1.23,11.73,2.33,6.7.11,8.48,2.8,9.33,2.41.6,4.73-.35,6.95-2.86Z"/>
+                </svg>
+              </a>
               <a
                 href="https://vk.com/koosmo.zdrav.massag"
                 target="_blank"
@@ -493,7 +537,7 @@ export const Frame = (): React.ReactElement => {
                 className="flex w-[34px] h-[34px] items-center justify-center rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
                 title="ВКонтакте"
               >
-                <svg width="20" height="20" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="18" height="18" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M532.6,720.8c-227.9,0-357.9-156.2-363.3-416.2h114.2c3.8,190.8,87.9,271.7,154.6,288.3V304.6h107.5v164.6c65.8-7.1,135-82.1,158.3-164.6h107.5c-17.8,86.5-70.8,161.7-146.3,207.5C749.4,554,811.7,630,836.3,720.8H718c-22.3-79.8-90.3-138.4-172.5-148.8v148.8C545.5,720.8,532.6,720.8,532.6,720.8z" fill="#a6856d"/>
                 </svg>
               </a>
@@ -831,6 +875,17 @@ export const Frame = (): React.ReactElement => {
         )}
       </section>
       <section aria-labelledby="contact-title">
+        <div className="absolute top-[4393px] left-[75px] w-[600px] [font-family:'Vela Sans',sans-serif] font-normal text-[#000000cc] text-[15px] tracking-[0] leading-[1.7]">
+          <p className="mb-3">
+            Данная информация носит исключительно ознакомительный характер. Она предназначена для общего понимания темы
+            и&nbsp;не&nbsp;заменяет очной консультации врача, диагностики или назначения лечения, а&nbsp;также материал создан
+            в&nbsp;образовательных целях. Не&nbsp;используйте его для самостоятельной постановки диагноза или коррекции
+            терапии&nbsp;— для этого обязательно обратитесь к&nbsp;специалисту.
+          </p>
+          <p>
+            Мы делимся знаниями для расширения кругозора. Решения о&nbsp;здоровье принимайте только после разговора с&nbsp;врачом.
+          </p>
+        </div>
         <div className="absolute top-[4381px] left-[734px] [font-family:'Vela Sans',sans-serif] font-normal text-[#000000e6] text-[32px] tracking-[0] leading-[normal]">
           Свяжитесь с нами
         </div>
@@ -930,20 +985,23 @@ export const Frame = (): React.ReactElement => {
             Контакты
           </div>
           <a
-            href="tel:+79991234567"
+            href="tel:+79095054658"
             className="relative w-fit mt-[-1.00px] [font-family:'Vela Sans',sans-serif] font-light text-[#000000b2] text-xl tracking-[0] leading-[normal]"
           >
-            +7 (999) 123-45-67
+            +7 (909) 505-46-58
           </a>
           <a
-            href="mailto:info@massage-salon.ru"
+            href="mailto:oookoosmо@mail.ru"
             className="relative w-fit mt-[-1.00px] [font-family:'Vela Sans',sans-serif] font-light text-[#000000b2] text-xl tracking-[0] leading-[normal]"
           >
-            info@massage-salon.ru
+            oookoosmо@mail.ru
           </a>
           <div className="relative w-fit mt-[-1.00px] [font-family:'Vela Sans',sans-serif] font-light text-[#000000b2] text-xl tracking-[0] leading-[normal]">
             Ежедневно 9:00 - 21:00
           </div>
+        </div>
+        <div className="absolute top-[4700px] left-10 right-10 [font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-sm tracking-[0] leading-[1.6]">
+          ООО «КООСМО» · ИНН 2204096914 · ОГРН 1232200001406 · 659300, Алтайский край, г. Бийск, ул. Л. Толстого 149, кв. 1
         </div>
       </footer>
       <img
