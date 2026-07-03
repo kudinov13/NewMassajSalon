@@ -4,7 +4,6 @@ client/node_modules/
 server/node_modules/
 
 # Build
-client/build/
 client/dist/
 
 # Database (will be auto-created on server start)

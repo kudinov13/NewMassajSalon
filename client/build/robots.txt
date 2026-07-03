@@ -1,0 +1,19 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Приватные страницы — не индексировать
+Disallow: /admin
+Disallow: /profile
+Disallow: /cart
+Disallow: /login
+Disallow: /registration
+Disallow: /psychologist
+Disallow: /bowls-specialist
+Disallow: /room/
+Disallow: /broadcast/
+Disallow: /my-courses
+Disallow: /purchase-history
+
+# Sitemap
+Sitemap: https://koosmo.ru/sitemap.xml
