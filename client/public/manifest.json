@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "КООСМО",
+  "name": "КООСМО — Оздоровительный центр",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,8 +18,11 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#a6856d",
+  "background_color": "#efdec5",
+  "description": "Оздоровительный центр КООСМО: массаж, тибетские поющие чаши, диагностика, психологическая поддержка.",
+  "lang": "ru",
+  "categories": ["health", "lifestyle"]
 }

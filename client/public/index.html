@@ -2,49 +2,81 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/png" href="%PUBLIC_URL%/logo192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="autocomplete" content="off" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Vela+Sans:wght@200;300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    <!-- ===== Основные SEO-теги ===== -->
+    <title>КООСМО — Оздоровительный центр гармонии тела и души</title>
+    <meta name="description" content="Оздоровительный центр КООСМО: профессиональный массаж, тибетские поющие чаши, диагностика по внешним признакам, психологическая поддержка и онлайн-трансляции. Запись онлайн." />
+    <meta name="keywords" content="оздоровительный центр, массаж, тибетские поющие чаши, диагностика здоровья, психолог, онлайн занятия, КООСМО, koosmo" />
+    <meta name="author" content="КООСМО" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://koosmo.ru/" />
+
+    <!-- ===== Open Graph (ВКонтакте, Telegram, Facebook) ===== -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="КООСМО" />
+    <meta property="og:title" content="КООСМО — Оздоровительный центр гармонии тела и души" />
+    <meta property="og:description" content="Профессиональный массаж, тибетские поющие чаши, диагностика, психологическая поддержка. Запись онлайн на koosmo.ru" />
+    <meta property="og:url" content="https://koosmo.ru/" />
+    <meta property="og:image" content="https://koosmo.ru/logo512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:locale" content="ru_RU" />
+
+    <!-- ===== Twitter Card ===== -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="КООСМО — Оздоровительный центр" />
+    <meta name="twitter:description" content="Массаж, тибетские чаши, диагностика, психология. Запись онлайн." />
+    <meta name="twitter:image" content="https://koosmo.ru/logo512.png" />
+
+    <!-- ===== Schema.org JSON-LD (LocalBusiness + MedicalBusiness) ===== -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": ["LocalBusiness", "MedicalBusiness"],
+      "name": "КООСМО — Оздоровительный центр гармонии тела и души",
+      "alternateName": "КООСМО",
+      "url": "https://koosmo.ru",
+      "logo": "https://koosmo.ru/logo512.png",
+      "image": "https://koosmo.ru/logo512.png",
+      "description": "Оздоровительный центр КООСМО: профессиональный массаж, тибетские поющие чаши, диагностика по внешним признакам, психологическая поддержка и онлайн-занятия.",
+      "priceRange": "₽₽",
+      "currenciesAccepted": "RUB",
+      "paymentAccepted": "Cash, Card",
+      "sameAs": [
+        "https://vk.com/koosmo.zdrav.massag",
+        "https://t.me/koosmo_zdravmassag",
+        "https://max.ru/id2204096914_bi"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "availableLanguage": "Russian"
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Услуги центра",
+        "itemListElement": [
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Массаж"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Тибетские поющие чаши"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Диагностика здоровья"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Психологическая поддержка"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Онлайн-трансляции и курсы"}}
+        ]
+      }
+    }
+    </script>
+
+    <!-- ===== Иконки и PWA ===== -->
+    <link rel="icon" type="image/png" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <meta name="theme-color" content="#a6856d" />
+
+    <!-- Шрифты загружаются локально через @font-face в index.css -->
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>Для работы сайта необходимо включить JavaScript в браузере.</noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>

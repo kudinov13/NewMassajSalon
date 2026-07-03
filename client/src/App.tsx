@@ -9,6 +9,7 @@ import LoadingScreen from "./components/LoadingScreen";
 import Layout from "./views/Layout";
 import Home from "./views/Home";
 import CookieConsent from "./components/CookieConsent";
+import AdBlockBanner from "./components/AdBlockBanner";
 
 // Code-split: each page is loaded only when its route is visited.
 const LoginView = lazy(() => import("./views/LoginView"));
@@ -53,6 +54,28 @@ const PageFallback = () => (
   </div>
 );
 
+const PAGE_TITLES: Record<string, string> = {
+  '/': 'КООСМО — Оздоровительный центр гармонии тела и души',
+  '/shop': 'Магазин — КООСМО',
+  '/schedule': 'Запись на массаж — КООСМО',
+  '/tibetan-bowls': 'Тибетские поющие чаши — КООСМО',
+  '/tibetan-bowls/booking': 'Запись на тибетские чаши — КООСМО',
+  '/tibetan-bowls/media': 'Медиа: тибетские чаши — КООСМО',
+  '/psychology': 'Психологическая поддержка — КООСМО',
+  '/psychology/booking': 'Запись к психологу — КООСМО',
+  '/diagnostics/booking': 'Диагностика здоровья — КООСМО',
+  '/analyses': 'Анализы и исследования — КООСМО',
+  '/streams': 'Прямые трансляции — КООСМО',
+  '/courses': 'Онлайн-курсы — КООСМО',
+  '/guide': 'Путеводитель по здоровью — КООСМО',
+  '/basket': 'Корзина — КООСМО',
+  '/login': 'Вход — КООСМО',
+  '/registration': 'Регистрация — КООСМО',
+  '/profile': 'Профиль — КООСМО',
+  '/my-courses': 'Мои курсы — КООСМО',
+  '/purchase-history': 'История покупок — КООСМО',
+};
+
 const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isVisible, setIsVisible] = useState(false);
   const location = useLocation();
@@ -60,6 +83,9 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
   useEffect(() => {
     setIsVisible(false);
     const timer = setTimeout(() => setIsVisible(true), 50);
+    // Dynamic page title for SEO
+    const title = PAGE_TITLES[location.pathname] || 'КООСМО — Оздоровительный центр';
+    document.title = title;
     return () => clearTimeout(timer);
   }, [location]);
 
@@ -80,13 +106,14 @@ function App() {
   return <>
     <LoadingScreen />
     <CookieConsent />
+    <AdBlockBanner />
     <Routes>
       <Route path='/' element={<Layout/>}>
         <Route index element={<PageTransition><Home /></PageTransition>} />
         <Route path='/login' element={<AuthPage><LoginView/></AuthPage>} />
         <Route path='/registration' element={<AuthPage><RegistrationView/></AuthPage>} />
         <Route path='/shop' element={<PageTransition><ShopPage/></PageTransition>} />
-        <Route path='/cart' element={<PageTransition><CartPage/></PageTransition>} />
+        <Route path='/basket' element={<PageTransition><CartPage/></PageTransition>} />
         <Route path='/schedule' element={<PageTransition><SchedulePage/></PageTransition>} />
         <Route path='/diagnostics-schedule' element={<PageTransition><DiagnosticsSchedulePage/></PageTransition>} />
         <Route path='/diagnostics/booking' element={<PageTransition><DiagnosticsBookingPage/></PageTransition>} />
@@ -101,7 +128,7 @@ function App() {
         <Route path='/diagnostics/:type/details' element={<PageTransition><DiagnosticsDetailPage/></PageTransition>} />
         <Route path='/analyses' element={<PageTransition><AnalysesPage/></PageTransition>} />
         <Route path='/streams' element={<PageTransition><StreamsPage/></PageTransition>} />
-        <Route path='/admin' element={<PageTransition><AdminPage/></PageTransition>} />
+        <Route path='/panel' element={<PageTransition><AdminPage/></PageTransition>} />
         <Route path='/psychology' element={<PageTransition><PsychologyPage/></PageTransition>} />
         <Route path='/psychology/booking' element={<PageTransition><BookingPage/></PageTransition>} />
         <Route path='/psychologist' element={<PageTransition><PsychologistPanel/></PageTransition>} />

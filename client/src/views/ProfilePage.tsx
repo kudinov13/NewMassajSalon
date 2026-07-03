@@ -107,7 +107,7 @@ const ProfilePage = () => {
             </span>
           </Link>
           <Link
-            to="/cart"
+            to="/basket"
             className="flex items-center justify-center w-10 h-10 rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
             title="Корзина"
           >
@@ -146,7 +146,7 @@ const ProfilePage = () => {
           {/* Links */}
           <div className="flex flex-col gap-3 mb-8">
             <Link
-              to="/cart"
+              to="/basket"
               className="flex items-center gap-3 px-5 py-3 bg-[#f5efe8] rounded-[15px] no-underline hover:bg-[#ece3d5] transition-colors"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000b2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -196,7 +196,7 @@ const ProfilePage = () => {
               </span>
             </Link>
             {user?.isAdmin ? (
-              <Link to="/admin" className="flex items-center gap-3 px-5 py-3 bg-[#a6856d1a] rounded-[15px] no-underline cursor-pointer hover:bg-[#a6856d33] transition-colors">
+              <Link to="/panel" className="flex items-center gap-3 px-5 py-3 bg-[#a6856d1a] rounded-[15px] no-underline cursor-pointer hover:bg-[#a6856d33] transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a6856d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>

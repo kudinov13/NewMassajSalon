@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { API, BASE_URL } from "../services/api";
 
@@ -194,6 +194,7 @@ const AdminActivityTab: React.FC = () => {
   );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CoursesAdminTab: React.FC = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [title, setTitle] = useState("");
@@ -504,6 +505,7 @@ const AdminPage: React.FC = () => {
   };
   // Role change confirmation
   const [pendingRoleChange, setPendingRoleChange] = useState<{userId:number;login:string;oldRole:string;newRole:string}|null>(null);
+  const [pendingDeleteUser, setPendingDeleteUser] = useState<{userId:number;login:string;fullName?:string}|null>(null);
   const [userSearch, setUserSearch] = useState("");
 
   const requestRoleChange = (userId: number, login: string, oldRole: string, newRole: string) => {
@@ -516,9 +518,11 @@ const AdminPage: React.FC = () => {
     API.admin.getUsers().then(setUsers);
     setPendingRoleChange(null);
   };
-  const handleChangeRole = async (userId: number, role: string) => {
-    await API.admin.changeRole(userId, role);
+  const confirmDeleteUser = async () => {
+    if (!pendingDeleteUser) return;
+    await API.admin.deleteUser(pendingDeleteUser.userId);
     API.admin.getUsers().then(setUsers);
+    setPendingDeleteUser(null);
   };
   const deleteStream = async (id: number) => {
     if (!window.confirm("Удалить трансляцию?")) return;
@@ -1016,16 +1020,31 @@ const AdminPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <select
-                          value={currentRole}
-                          onChange={(e) => requestRoleChange(u.id, u.login, currentRole, e.target.value)}
-                          className="h-8 px-3 rounded-[8px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs outline-none cursor-pointer"
-                        >
-                          <option value="user">Пользователь</option>
-                          <option value="admin">Админ</option>
-                          <option value="psychologist">Психолог</option>
-                          <option value="bowls">Специалист по тибетским чашам</option>
-                        </select>
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={currentRole}
+                            onChange={(e) => requestRoleChange(u.id, u.login, currentRole, e.target.value)}
+                            className="h-8 px-3 rounded-[8px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs outline-none cursor-pointer"
+                          >
+                            <option value="user">Пользователь</option>
+                            <option value="admin">Админ</option>
+                            <option value="psychologist">Психолог</option>
+                            <option value="bowls">Специалист по тибетским чашам</option>
+                          </select>
+                          <button
+                            type="button"
+                            title="Удалить пользователя"
+                            onClick={() => setPendingDeleteUser({ userId: u.id, login: u.login, fullName: u.fullName })}
+                            className="flex items-center justify-center w-8 h-8 rounded-[8px] border border-red-200 bg-white hover:bg-red-50 hover:border-red-400 transition-colors cursor-pointer"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="3 6 5 6 21 6"/>
+                              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                              <path d="M10 11v6M14 11v6"/>
+                              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                     );
@@ -1295,6 +1314,37 @@ const AdminPage: React.FC = () => {
                 Подтвердить
               </button>
               <button onClick={() => setPendingRoleChange(null)} className="flex-1 h-11 bg-transparent border border-[#e3cbb1] text-[#6B5744] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm cursor-pointer hover:bg-[#f5e6d3] transition-colors">
+                Отмена
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete user confirmation modal */}
+      {pendingDeleteUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setPendingDeleteUser(null)} />
+          <div className="relative bg-[#faf6f1] rounded-[25px] p-8 w-[420px] shadow-2xl">
+            <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-xl mb-4">Удалить пользователя?</h3>
+            <div className="bg-red-50 border border-red-200 rounded-[12px] p-4 mb-6">
+              <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm mb-1">
+                Логин: <strong>{pendingDeleteUser.login}</strong>
+              </p>
+              {pendingDeleteUser.fullName && (
+                <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm mb-2">
+                  ФИО: <strong>{pendingDeleteUser.fullName}</strong>
+                </p>
+              )}
+              <p className="[font-family:'Vela_Sans',sans-serif] font-light text-red-600 text-xs mt-2">
+                Это действие необратимо. Все данные пользователя будут удалены.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={confirmDeleteUser} className="flex-1 h-11 bg-red-500 hover:bg-red-600 text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">
+                Удалить
+              </button>
+              <button onClick={() => setPendingDeleteUser(null)} className="flex-1 h-11 bg-transparent border border-[#e3cbb1] text-[#6B5744] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm cursor-pointer hover:bg-[#f5e6d3] transition-colors">
                 Отмена
               </button>
             </div>

@@ -182,7 +182,7 @@ diagnosticsScheduleRouter.get('/room-status/:appointmentId', requireAuth, async 
 });
 
 // GET my appointments
-diagnosticsScheduleRouter.get('/my-appointments', requireAuth, async (req, res) => {
+diagnosticsScheduleRouter.get('/my-bookings', requireAuth, async (req, res) => {
     const db = getDb();
     const appointments = await db.all(`
         SELECT da.*, dss.date, dss.time
@@ -195,7 +195,7 @@ diagnosticsScheduleRouter.get('/my-appointments', requireAuth, async (req, res) 
 });
 
 // GET all appointments (for admin)
-diagnosticsScheduleRouter.get('/all-appointments', requireAdmin, async (req, res) => {
+diagnosticsScheduleRouter.get('/all-bookings', requireAdmin, async (req, res) => {
     const db = getDb();
     const appointments = await db.all(`
         SELECT da.*, dss.date, dss.time

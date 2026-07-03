@@ -84,7 +84,7 @@ const StreamBroadcastPage: React.FC = () => {
     stopCapture();
     await API.streamRoom.stop(id);
     setIsLive(false);
-    navigate("/admin");
+    navigate("/panel");
   };
 
   const handleStart = async () => {
@@ -181,7 +181,7 @@ const StreamBroadcastPage: React.FC = () => {
               ◼ Завершить
             </button>
           )}
-          <button onClick={() => navigate("/admin")} className="h-9 px-4 bg-white/10 hover:bg-white/20 text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">
+          <button onClick={() => navigate("/panel")} className="h-9 px-4 bg-white/10 hover:bg-white/20 text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">
             Назад
           </button>
         </div>

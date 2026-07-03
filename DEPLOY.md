@@ -174,7 +174,7 @@ server {
     }
 
     # API, uploads, docs — проксируем на Node
-    location ~ ^/(auth|user|settings|products|cart|labs|streams|admin|schedule|appointments|room|stream-room|bowls|bowls-schedule|diagnostics-schedule|courses|guide|bowls-media|activity|uploads|docs) {
+    location ~ ^/(auth|user|settings|products|basket|labs|streams|panel|schedule|visits|room|stream-room|bowls|bowls-schedule|diagnostics-schedule|courses|guide|bowls-media|journal|uploads|docs) {
         proxy_pass http://127.0.0.1:3001;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;

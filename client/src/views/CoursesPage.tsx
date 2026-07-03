@@ -48,7 +48,7 @@ const CoursesPage: React.FC = () => {
             ← На главную
           </Link>
           {isAdmin && (
-            <Link to="/admin" className="h-9 px-4 bg-[#a6856d] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm flex items-center no-underline hover:bg-[#8d6e58]">
+            <Link to="/panel" className="h-9 px-4 bg-[#a6856d] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm flex items-center no-underline hover:bg-[#8d6e58]">
               Управление курсами
             </Link>
           )}

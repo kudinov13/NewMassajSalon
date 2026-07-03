@@ -37,6 +37,15 @@ adminRouter.put('/users/:id/role', requireAdmin, async (req, res) => {
     res.json(user);
 });
 
+// DELETE user (admin only, cannot delete self)
+adminRouter.delete('/users/:id', requireAdmin, async (req, res) => {
+    const db = getDb();
+    const userId = parseInt(req.params.id);
+    if (userId === req.user.id) return res.status(400).json({ message: 'Нельзя удалить самого себя' });
+    await db.run('DELETE FROM users WHERE id = ?', userId);
+    res.json({ ok: true });
+});
+
 // GET dashboard stats
 adminRouter.get('/stats', requireAdmin, async (req, res) => {
     const db = getDb();

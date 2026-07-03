@@ -150,12 +150,12 @@ export const API = {
   },
   cart: {
     get: async () => {
-      const response = await fetch(`${BASE_URL}/cart`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/basket`, { credentials: "include" });
       await errorHandler(response);
       return await response.json();
     },
     add: async (productId: number) => {
-      const response = await fetch(`${BASE_URL}/cart`, {
+      const response = await fetch(`${BASE_URL}/basket`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -165,7 +165,7 @@ export const API = {
       return await response.json();
     },
     updateQuantity: async (productId: number, quantity: number) => {
-      const response = await fetch(`${BASE_URL}/cart/${productId}`, {
+      const response = await fetch(`${BASE_URL}/basket/${productId}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -175,7 +175,7 @@ export const API = {
       return await response.json();
     },
     remove: async (productId: number) => {
-      const response = await fetch(`${BASE_URL}/cart/${productId}`, {
+      const response = await fetch(`${BASE_URL}/basket/${productId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -183,7 +183,7 @@ export const API = {
       return await response.json();
     },
     clear: async () => {
-      const response = await fetch(`${BASE_URL}/cart`, {
+      const response = await fetch(`${BASE_URL}/basket`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -191,7 +191,7 @@ export const API = {
       return await response.json();
     },
     checkout: async () => {
-      const response = await fetch(`${BASE_URL}/cart/checkout`, {
+      const response = await fetch(`${BASE_URL}/basket/checkout`, {
         method: "POST",
         credentials: "include",
       });
@@ -199,7 +199,7 @@ export const API = {
       return await response.json();
     },
     getOrders: async () => {
-      const response = await fetch(`${BASE_URL}/cart/orders`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/basket/orders`, { credentials: "include" });
       await errorHandler(response);
       return await response.json();
     },
@@ -263,20 +263,27 @@ export const API = {
   },
   admin: {
     getStats: async () => {
-      const response = await fetch(`${BASE_URL}/admin/stats`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/panel/stats`, { credentials: "include" });
       await errorHandler(response);
       return await response.json();
     },
     getUsers: async () => {
-      const response = await fetch(`${BASE_URL}/admin/users`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/panel/users`, { credentials: "include" });
       await errorHandler(response);
       return await response.json();
     },
     changeRole: async (userId: number, role: string) => {
-      const response = await fetch(`${BASE_URL}/admin/users/${userId}/role`, {
+      const response = await fetch(`${BASE_URL}/panel/users/${userId}/role`, {
         method: "PUT", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role }),
+      });
+      await errorHandler(response);
+      return await response.json();
+    },
+    deleteUser: async (userId: number) => {
+      const response = await fetch(`${BASE_URL}/panel/users/${userId}`, {
+        method: "DELETE", credentials: "include",
       });
       await errorHandler(response);
       return await response.json();
@@ -407,17 +414,17 @@ export const API = {
   },
   appointments: {
     getMy: async () => {
-      const response = await fetch(`${BASE_URL}/appointments/my`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/visits/my`, { credentials: "include" });
       await errorHandler(response);
       return await response.json();
     },
     get: async (id: number) => {
-      const response = await fetch(`${BASE_URL}/appointments/${id}`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/visits/${id}`, { credentials: "include" });
       await errorHandler(response);
       return await response.json();
     },
     book: async (data: { slotId: number; fullName: string; phone: string }) => {
-      const response = await fetch(`${BASE_URL}/appointments`, {
+      const response = await fetch(`${BASE_URL}/visits`, {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -426,21 +433,21 @@ export const API = {
       return await response.json();
     },
     start: async (id: number) => {
-      const response = await fetch(`${BASE_URL}/appointments/${id}/start`, {
+      const response = await fetch(`${BASE_URL}/visits/${id}/start`, {
         method: "POST", credentials: "include",
       });
       await errorHandler(response);
       return await response.json();
     },
     complete: async (id: number) => {
-      const response = await fetch(`${BASE_URL}/appointments/${id}/complete`, {
+      const response = await fetch(`${BASE_URL}/visits/${id}/complete`, {
         method: "POST", credentials: "include",
       });
       await errorHandler(response);
       return await response.json();
     },
     cancel: async (id: number) => {
-      const response = await fetch(`${BASE_URL}/appointments/${id}`, {
+      const response = await fetch(`${BASE_URL}/visits/${id}`, {
         method: "DELETE", credentials: "include",
       });
       await errorHandler(response);
@@ -589,12 +596,12 @@ export const API = {
       return response.json();
     },
     getMyAppointments: async () => {
-      const response = await fetch(`${BASE_URL}/bowls-schedule/my-appointments`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/bowls-schedule/my-bookings`, { credentials: "include" });
       await errorHandler(response);
       return response.json();
     },
     getSpecialistAppointments: async () => {
-      const response = await fetch(`${BASE_URL}/bowls-schedule/appointments`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/bowls-schedule/bookings`, { credentials: "include" });
       await errorHandler(response);
       return response.json();
     },
@@ -634,12 +641,12 @@ export const API = {
       return response.json();
     },
     getMyAppointments: async () => {
-      const response = await fetch(`${BASE_URL}/diagnostics-schedule/my-appointments`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule/my-bookings`, { credentials: "include" });
       await errorHandler(response);
       return response.json();
     },
     getAllAppointments: async () => {
-      const response = await fetch(`${BASE_URL}/diagnostics-schedule/all-appointments`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/diagnostics-schedule/all-bookings`, { credentials: "include" });
       await errorHandler(response);
       return response.json();
     },
@@ -703,7 +710,7 @@ export const API = {
   activity: {
     log: async (action: string, details?: string) => {
       try {
-        await fetch(`${BASE_URL}/activity`, {
+        await fetch(`${BASE_URL}/journal`, {
           method: "POST", credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action, details: details || '' }),
@@ -714,13 +721,13 @@ export const API = {
       const params = new URLSearchParams();
       if (search) params.set('search', search);
       if (limit) params.set('limit', String(limit));
-      const response = await fetch(`${BASE_URL}/activity?${params}`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/journal?${params}`, { credentials: "include" });
       await errorHandler(response);
       return response.json();
     },
     getUsers: async (search?: string) => {
       const params = search ? `?search=${encodeURIComponent(search)}` : '';
-      const response = await fetch(`${BASE_URL}/activity/users${params}`, { credentials: "include" });
+      const response = await fetch(`${BASE_URL}/journal/users${params}`, { credentials: "include" });
       await errorHandler(response);
       return response.json();
     },

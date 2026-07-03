@@ -103,7 +103,7 @@ bowlsScheduleRouter.post('/book', requireAuth, async (req, res) => {
 });
 
 // GET my appointments (specialist)
-bowlsScheduleRouter.get('/appointments', requireBowls, async (req, res) => {
+bowlsScheduleRouter.get('/bookings', requireBowls, async (req, res) => {
     const db = getDb();
     const appts = await db.all(
         `SELECT ba.*, u.email as userEmailFromProfile FROM bowls_appointments ba LEFT JOIN users u ON ba.userId = u.id WHERE ba.specialistId = ? ORDER BY ba.date, ba.time`,
@@ -115,7 +115,7 @@ bowlsScheduleRouter.get('/appointments', requireBowls, async (req, res) => {
 });
 
 // GET user's appointments
-bowlsScheduleRouter.get('/my-appointments', requireAuth, async (req, res) => {
+bowlsScheduleRouter.get('/my-bookings', requireAuth, async (req, res) => {
     const db = getDb();
     const appts = await db.all(
         'SELECT * FROM bowls_appointments WHERE userId = ? ORDER BY date DESC, time DESC',

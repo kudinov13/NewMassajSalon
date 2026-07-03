@@ -28,6 +28,15 @@ const app = express();
 // Nginx / reverse proxy: нужно для корректного req.secure и secure-cookie
 app.set('trust proxy', 1);
 
+// Заголовки безопасности — запрещают расширениям браузера (менеджеры паролей Edge/Яндекс)
+// сканировать DOM страницы и вызывать ошибки вида "message channel closed"
+app.use((req, res, next) => {
+    res.setHeader('Permissions-Policy', 'interest-cohort=(), browsing-topics=()');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    next();
+});
+
 // чтобы парсился POST в виде JSON
 app.use(express.json());
 
@@ -49,12 +58,12 @@ app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/settings", settingsRouter);
 app.use("/products", productsRouter);
-app.use("/cart", cartRouter);
+app.use("/basket", cartRouter);
 app.use("/labs", labsRouter);
 app.use("/streams", streamsRouter);
-app.use("/admin", adminRouter);
+app.use("/panel", adminRouter);
 app.use("/schedule", scheduleRouter);
-app.use("/appointments", appointmentsRouter);
+app.use("/visits", appointmentsRouter);
 app.use("/room", roomRouter);
 app.use("/stream-room", streamRoomRouter);
 app.use("/bowls", bowlsRouter);
@@ -63,7 +72,7 @@ app.use("/diagnostics-schedule", diagnosticsScheduleRouter);
 app.use("/courses", coursesRouter);
 app.use("/guide", guideRouter);
 app.use("/bowls-media", bowlsMediaRouter);
-app.use("/activity", activityRouter);
+app.use("/journal", activityRouter);
 // Video streaming with Range support
 const fs = require('fs');
 app.get('/uploads/:filename', (req, res) => {

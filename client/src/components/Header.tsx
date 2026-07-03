@@ -167,7 +167,7 @@ const Header: React.FC<HeaderProps> = ({ activeItem, cartCount }) => {
         {isAuthenticated ? (
           <>
             <Link
-              to="/cart"
+              to="/basket"
               className="relative flex items-center justify-center w-10 h-10 rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
               title="Корзина"
             >
@@ -386,7 +386,7 @@ const Header: React.FC<HeaderProps> = ({ activeItem, cartCount }) => {
                   Личный кабинет
                 </button>
                 <button
-                  onClick={() => { navigate("/cart"); closeMobileMenu(); }}
+                  onClick={() => { navigate("/basket"); closeMobileMenu(); }}
                   className="animate-slideDownItem w-full flex items-center gap-3 px-4 py-3.5 rounded-[14px] border-0 cursor-pointer [font-family:'Vela_Sans',sans-serif] font-light text-[15px] text-[#6B5744] bg-transparent hover:bg-[#e3cbb1]/40 transition-all"
                   style={{ animationDelay: "400ms" }}
                 >
