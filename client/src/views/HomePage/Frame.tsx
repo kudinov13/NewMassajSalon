@@ -398,43 +398,21 @@ export const Frame = (): React.ReactElement => {
       <header className="absolute top-0 left-0 w-[1440px] h-[94px] flex items-center justify-center bg-[#efdec5]">
         <div className="h-[94px] w-[1440px] relative">
           <div
-            className="absolute w-0 h-[28.69%] top-[35.11%] left-[40.35%]"
+            className="absolute w-0 h-[28.69%] top-[35.11%] left-[40.35%] hidden"
             aria-hidden="true"
           >
-            <img
-              className="absolute w-[93.45%] h-[100.00%] top-0 left-[6.55%]"
-              alt=""
-              src={vector}
-            />
-            <img
-              className="absolute w-full h-[33.87%] top-[66.13%] left-0"
-              alt=""
-              src={image}
-            />
-            <img
-              className="absolute w-[72.70%] h-[33.76%] top-[66.24%] left-[27.30%]"
-              alt=""
-              src={vector2}
-            />
-            <img
-              className="absolute w-[31.05%] h-[33.83%] top-[66.17%] left-[68.95%]"
-              alt=""
-              src={vector3}
-            />
           </div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3">
+          <div className="absolute top-1/2 left-[30px] -translate-y-1/2 z-20">
             <img
-              className="h-[100px] w-auto object-contain"
+              className="h-[80px] w-auto object-contain"
               alt="Логотип Коосмо"
               src="/logo.svg"
             />
-            <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#000000b2] text-[32px] tracking-[0] leading-[normal]">
-              Коосмо
-            </span>
           </div>
+          <div className="absolute top-[27px] left-[130px] w-[450px] h-[40px] bg-[#e3cbb1] rounded-[25px]" aria-hidden="true"></div>
           <nav
             aria-label="Основная навигация"
-            className="absolute top-[27px] left-[45px] w-[450px] h-[35px] flex items-center z-10"
+            className="absolute top-[27px] left-[130px] w-[450px] h-[40px] flex items-center justify-start pl-5 z-10"
           >
             <ul className="inline-flex w-full h-full items-center gap-[30px] list-none p-0 m-0">
               {navItems.map((item) => (
@@ -552,10 +530,6 @@ export const Frame = (): React.ReactElement => {
               </Link>
             </div>
           )}
-          <div
-            className="absolute top-[27px] left-[30px] w-[450px] h-[35px] bg-[#e3cbb1] rounded-[25px]"
-            aria-hidden="true"
-          />
         </div>
       </header>
       <section aria-labelledby="hero-title">
