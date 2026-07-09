@@ -287,45 +287,80 @@ sudo chown -R www-data:www-data /var/www/koosmo/server/uploads
 
 ---
 
-## 12. Обновление проекта (каждый раз)
+## 12. Обновление проекта через Git (каждый раз)
 
-### На локальном ПК (Windows PowerShell):
+> **Путь к проекту на сервере:** `/var/www/koosmo/NewMassajSalon`
+> После `git pull` набор команд зависит от того, **что именно изменилось**.
+
+### Шаг 1. На локальном ПК (Windows PowerShell)
 
 ```powershell
-# 1. Собрать фронтенд
+# Если менялся фронтенд — пересобрать build
 cd client
 npm run build
 cd ..
 
-# 2. Закоммитить и запушить
+# Закоммитить и запушить
 git add -A
 git commit -m "Обновление сайта"
 git push
 ```
 
-### На сервере (SSH):
+### Шаг 2. На сервере (SSH) — выбрать нужный сценарий
+
+**Сценарий A. Изменился только фронтенд (React / favicon / SEO-теги)**
+Папка `build` уже в git — достаточно подтянуть код и перечитать конфиг Nginx:
 
 ```bash
-# 1. Получить обновления
-cd /var/www/koosmo
+cd /var/www/koosmo/NewMassajSalon
 git pull
+sudo systemctl reload nginx
+```
 
-# 2. Установить зависимости (если изменились)
-cd server && npm ci && cd ..
+**Сценарий B. Изменился бэкенд (Node.js, код в `server/`)**
 
-# 3. Поправить права на uploads
-sudo chown -R www-data:www-data /var/www/koosmo/server/uploads
-
-# 4. Перезапустить сервер
+```bash
+cd /var/www/koosmo/NewMassajSalon
+git pull
 sudo systemctl restart koosmo
 ```
 
-> **Если обновились данные в БД** (новые товары, пользователи):
-> ```powershell
-> # С локальной машины:
-> scp server/database.db root@IP_ВАШЕГО_VPS:/var/www/koosmo/server/
-> ```
-> Затем на сервере: `sudo systemctl restart koosmo`
+**Сценарий C. Добавились новые зависимости (`server/package.json`)**
+
+```bash
+cd /var/www/koosmo/NewMassajSalon/server
+npm ci
+sudo systemctl restart koosmo
+```
+
+**Сценарий D. Изменился конфиг Nginx**
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+**Сценарий E. Изменились данные в БД**
+
+```bash
+# С локальной машины (PowerShell):
+scp server/database.db root@IP_ВАШЕГО_VPS:/var/www/koosmo/NewMassajSalon/server/
+# Затем на сервере:
+sudo systemctl restart koosmo
+```
+
+### Универсальный вариант (делает всё сразу)
+
+Если не хочется думать, что именно поменялось:
+
+```bash
+cd /var/www/koosmo/NewMassajSalon
+git pull
+cd server && npm ci && cd ..
+sudo chown -R www-data:www-data /var/www/koosmo/NewMassajSalon/server/uploads
+sudo systemctl restart koosmo
+sudo systemctl reload nginx
+```
 
 ---
 
