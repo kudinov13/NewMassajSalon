@@ -341,6 +341,116 @@ const initDb = async () => {
             createdAt TEXT DEFAULT (datetime('now'))
         )`);
 
+    // Обращения клиентов через форму на главной
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS contact_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId INTEGER,
+            name TEXT NOT NULL,
+            phone TEXT,
+            email TEXT,
+            message TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'new',
+            adminReply TEXT,
+            repliedAt TEXT,
+            createdAt TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY(userId) REFERENCES users(id)
+        )`);
+
+    // Диагностические тесты (вопросы, варианты ответов, результаты)
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS diagnostic_tests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            slug TEXT NOT NULL UNIQUE,
+            title TEXT NOT NULL,
+            subtitle TEXT,
+            active INTEGER NOT NULL DEFAULT 1,
+            createdAt TEXT DEFAULT (datetime('now'))
+        )`);
+
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS diagnostic_questions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            testId INTEGER NOT NULL,
+            text TEXT NOT NULL,
+            sortOrder INTEGER DEFAULT 0,
+            createdAt TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY(testId) REFERENCES diagnostic_tests(id) ON DELETE CASCADE
+        )`);
+
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS diagnostic_options (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            questionId INTEGER NOT NULL,
+            text TEXT NOT NULL,
+            score INTEGER NOT NULL DEFAULT 0,
+            sortOrder INTEGER DEFAULT 0,
+            FOREIGN KEY(questionId) REFERENCES diagnostic_questions(id) ON DELETE CASCADE
+        )`);
+
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS diagnostic_results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            testId INTEGER NOT NULL,
+            minScore INTEGER NOT NULL,
+            maxScore INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            text TEXT NOT NULL,
+            isSeriousProblem INTEGER NOT NULL DEFAULT 0,
+            buttonLabel TEXT,
+            buttonLink TEXT,
+            createdAt TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY(testId) REFERENCES diagnostic_tests(id) ON DELETE CASCADE
+        )`);
+
+    // Отзывы клиентов
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId INTEGER,
+            name TEXT NOT NULL,
+            rating INTEGER NOT NULL,
+            text TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'approved',
+            createdAt TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY(userId) REFERENCES users(id)
+        )`);
+
+    // начальные отзывы
+    const reviewsExist = await db.get(`SELECT id FROM reviews LIMIT 1`);
+    if (!reviewsExist) {
+        const initialReviews = [
+            {
+                name: 'Елена',
+                date: '2025-02-05',
+                rating: 5,
+                text: 'Пришла в студию с ощущением, что кожа потеряла тонус и сияние. Татьяна подобрала комплексный уход с ультразвуковой чисткой и плазмотерапией. Уже после первой процедуры цвет лица стал свежее, а через месяц подруги спрашивали, где я отдыхала. Очень бережные руки, внимательность к моим ощущениям и никакой боли. Теперь только к ней!'
+            },
+            {
+                name: 'Марина',
+                date: '2024-11-12',
+                rating: 5,
+                text: 'Больше 5 лет боролась с высыпаниями и жирным блеском. Перепробовала всё — от аптечных болтушек до дорогих пилингов. Татьяна посмотрела на мою кожу и сразу сказала: «Будем работать комплексно, но без фанатизма». Через 2 месяца регулярных уходов и коррекции домашнего ухода кожа наконец-то дышит, макияж держится идеально. Спасибо за терпение и настоящий результат!'
+            },
+            {
+                name: 'Анастасия',
+                date: '2024-09-20',
+                rating: 5,
+                text: 'Хочу сказать огромное спасибо Татьяне за чуткость и профессионализм! Я долго не могла понять, почему при правильном питании вес стоит на месте. Оказалось, что мои любимые творог и бананы — в списке нерекомендованных продуктов. Заменили их, добавили поддержку, и за 3 месяца ушло 8 кг без голодовок и стресса. Наконец-то я перестала бояться еды!'
+            }
+        ];
+        for (const r of initialReviews) {
+            await db.run(
+                `INSERT INTO reviews (name, rating, text, status, createdAt) VALUES (?, ?, ?, 'approved', ?)`,
+                r.name, r.rating, r.text, r.date
+            );
+        }
+    }
+
+    // начальные диагностические тесты
+    const { seedDefaultTests } = require('./diagnosticsTestsSeed');
+    await seedDefaultTests(db);
+
     // тестовая трансляция
     const streamExists = await db.get(`SELECT id FROM streams LIMIT 1`);
     if (!streamExists) {

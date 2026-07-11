@@ -28,4 +28,12 @@ module.exports = {
     getUsers: async () => await getDb().all(`SELECT * FROM ${TABLE_NAME}`),
     getUserByLogin: async (login) => await getDb().get(`SELECT * FROM ${TABLE_NAME} WHERE login = ?`, login),
     getUserById: async (id) => await getDb().get(`SELECT * FROM ${TABLE_NAME} WHERE id = ?`, id),
+    getUserByEmailOrPhone: async (value) => {
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        if (isEmail) {
+            return await getDb().get(`SELECT * FROM ${TABLE_NAME} WHERE email = ?`, value);
+        }
+        const cleanPhone = value.replace(/\D/g, '');
+        return await getDb().get(`SELECT * FROM ${TABLE_NAME} WHERE REPLACE(REPLACE(REPLACE(phone, ' ', ''), '+', ''), '-', '') LIKE ?`, `%${cleanPhone}%`);
+    },
 };

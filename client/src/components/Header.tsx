@@ -5,10 +5,12 @@ import { API } from "../services/api";
 const NAV_ITEMS = [
   { label: "Диагностика", path: "/diagnostics/nails" },
   { label: "Анализы", path: "/analyses" },
-  { label: "Самомассаж", path: "/shop?category=self-massage" },
+  { label: "Видео курсы", path: "/shop?category=self-massage" },
   { label: "Трансляции", path: "/streams" },
   { label: "Тибетские чаши", path: "/tibetan-bowls" },
   { label: "Психология", path: "/psychology" },
+  { label: "О нас", path: "/about" },
+  { label: "Отзывы", path: "/reviews" },
 ];
 
 const DIAG_OPTIONS = [
@@ -143,7 +145,7 @@ const Header: React.FC<HeaderProps> = ({ activeItem, cartCount }) => {
           </svg>
         </a>
         <a
-          href="https://max.ru/id2204096914_bi"
+          href="https://max.ru/id2204096914_biz"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center w-10 h-10 rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
@@ -300,7 +302,7 @@ const Header: React.FC<HeaderProps> = ({ activeItem, cartCount }) => {
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
                       </svg>
                     )}
-                    {item.label === "Самомассаж" && (
+                    {item.label === "Видео курсы" && (
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                       </svg>
@@ -318,6 +320,11 @@ const Header: React.FC<HeaderProps> = ({ activeItem, cartCount }) => {
                     {item.label === "Психология" && (
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                      </svg>
+                    )}
+                    {item.label === "О нас" && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
                       </svg>
                     )}
                   </span>
@@ -346,7 +353,7 @@ const Header: React.FC<HeaderProps> = ({ activeItem, cartCount }) => {
               Telegram
             </a>
             <a
-              href="https://max.ru/id2204096914_bi"
+              href="https://max.ru/id2204096914_biz"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center gap-3 px-4 py-3.5 rounded-[14px] border-0 cursor-pointer [font-family:'Vela_Sans',sans-serif] font-light text-[15px] text-[#6B5744] bg-transparent hover:bg-[#e3cbb1]/40 transition-all no-underline"

@@ -40,6 +40,8 @@ const PurchaseHistoryPage = lazy(() => import("./views/PurchaseHistoryPage"));
 const GuidePage = lazy(() => import("./views/GuidePage"));
 const BowlsMediaPage = lazy(() => import("./views/BowlsMediaPage"));
 const BowlsSpecialistPanel = lazy(() => import("./views/BowlsSpecialistPanel"));
+const AboutPage = lazy(() => import("./views/AboutPage"));
+const ReviewsPage = lazy(() => import("./views/ReviewsPage"));
 
 const PageFallback = () => (
   <div className="min-h-screen bg-[#efdec5] flex items-center justify-center">
@@ -74,6 +76,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/profile': 'Профиль — КООСМО',
   '/my-courses': 'Мои курсы — КООСМО',
   '/purchase-history': 'История покупок — КООСМО',
+  '/about': 'О нас — КООСМО',
+  '/reviews': 'Отзывы — КООСМО',
 };
 
 const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -138,6 +142,8 @@ function App() {
         <Route path='/tibetan-bowls/media' element={<PageTransition><BowlsMediaPage/></PageTransition>} />
         <Route path='/broadcast/:streamId' element={<PageTransition><StreamBroadcastPage/></PageTransition>} />
         <Route path='/stream/:streamId' element={<PageTransition><StreamViewerPage/></PageTransition>} />
+        <Route path='/about' element={<PageTransition><AboutPage/></PageTransition>} />
+        <Route path='/reviews' element={<PageTransition><ReviewsPage/></PageTransition>} />
       </Route>
     </Routes>
   </>;

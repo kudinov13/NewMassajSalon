@@ -93,14 +93,14 @@ const DiagnosticsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowTest(true)}
-            className="h-12 px-8 bg-white border border-[#C9A882] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-base cursor-pointer hover:bg-[#f5e6d3] transition-colors"
+            className="h-12 px-8 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-base border-0 cursor-pointer transition-colors"
           >
             Пройти тест
           </button>
           <button
             type="button"
             onClick={() => navigate(`/diagnostics/${current.slug}/details`)}
-            className="h-12 px-8 bg-white border border-[#C9A882] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-base cursor-pointer hover:bg-[#f5e6d3] transition-colors"
+            className="h-12 px-8 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-base border-0 cursor-pointer transition-colors"
           >
             Узнать больше
           </button>

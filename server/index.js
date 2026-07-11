@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookies = require("cookie-parser");
@@ -21,6 +22,9 @@ const coursesRouter = require("./routes/courses");
 const guideRouter = require("./routes/guide");
 const bowlsMediaRouter = require("./routes/bowls-media");
 const activityRouter = require("./routes/activity");
+const reviewsRouter = require("./routes/reviews");
+const contactRouter = require("./routes/contact");
+const diagnosticsTestsRouter = require("./routes/diagnostics-tests");
 const {initDb} = require("./db/db");
 
 const app = express();
@@ -73,6 +77,9 @@ app.use("/courses", coursesRouter);
 app.use("/guide", guideRouter);
 app.use("/bowls-media", bowlsMediaRouter);
 app.use("/journal", activityRouter);
+app.use("/reviews", reviewsRouter);
+app.use("/contact", contactRouter);
+app.use("/diagnostics-tests", diagnosticsTestsRouter);
 // Video streaming with Range support
 const fs = require('fs');
 app.get('/uploads/:filename', (req, res) => {

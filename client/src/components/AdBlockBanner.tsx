@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 
+const STORAGE_KEY = "adblockBannerClosed";
+
 const AdBlockBanner: React.FC = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // Если пользователь уже закрывал баннер в текущей сессии, не показываем
+    if (sessionStorage.getItem(STORAGE_KEY) === "1") return;
+
     let cancelled = false;
 
     const detect = async () => {
@@ -23,6 +28,11 @@ const AdBlockBanner: React.FC = () => {
     detect();
     return () => { cancelled = true; };
   }, []);
+
+  const handleClose = () => {
+    sessionStorage.setItem(STORAGE_KEY, "1");
+    setVisible(false);
+  };
 
   if (!visible) return null;
 
@@ -46,7 +56,7 @@ const AdBlockBanner: React.FC = () => {
         </div>
         <button
           type="button"
-          onClick={() => setVisible(false)}
+          onClick={handleClose}
           className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#f0e6d8] transition-colors border-0 bg-transparent cursor-pointer"
           aria-label="Закрыть"
         >

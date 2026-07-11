@@ -22,13 +22,17 @@ export default function LoginForm({onSubmit}: FormProps) {
     // очищаем ошибки
     setLoginError("");
 
-    if (!/^([a-z0-9]{6,20})$/.test(login)) {
-      setLoginError("Логин должен содержать от 6 до 20 символов латинского алфавита и цифры.");
+    const isLogin = /^[a-z0-9]{6,20}$/.test(login);
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(login);
+    const isPhone = /^[\d\-\+\(\)\s]+$/.test(login) && login.replace(/\D/g, '').length >= 6;
+
+    if (!isLogin && !isEmail && !isPhone) {
+      setLoginError("Введите логин (6-20 символов), email или номер телефона.");
       result = false;
     }
 
     if (login.length === 0) {
-      setLoginError("Логин не может быть пустым.");
+      setLoginError("Поле не может быть пустым.");
       result = false;
     }
 
@@ -54,11 +58,11 @@ export default function LoginForm({onSubmit}: FormProps) {
   };
 
   return <>
-    <h3>Логин</h3>
+    <h3>Вход</h3>
     <form onSubmit={handleSubmit}>
       <div>
-        <label>Логин:
-          <input value={login} onChange={e => setLogin(e.target.value)}/>
+        <label>Логин, email или телефон:
+          <input value={login} onChange={e => setLogin(e.target.value)} placeholder="Логин, email или телефон"/>
         </label>
         {loginError && <div className={styles.error}>
           {loginError}

@@ -1,19 +1,26 @@
 const express = require('express');
 const md5 = require('md5');
 const authRouter = express.Router();
-const {getUserByLogin} = require("../db/users");
+const {getUserByLogin, getUserByEmailOrPhone} = require("../db/users");
 const {addToken, getUserIdByToken, deleteByToken} = require("../db/tokens");
 const { logActivity } = require("../db/activity");
 
 const { COOKIE_NAME, getCookieOptions, getClearCookieOptions } = require('../cookieOptions');
 
 authRouter.post("/", async (req, res) => {
+    const { login } = req.body;
+    if (!login) {
+        return res.status(400).json({ message: "Введите логин, email или телефон" });
+    }
 
-    const user = await getUserByLogin(req.body.login);
+    let user = await getUserByLogin(login);
+    if (!user) {
+        user = await getUserByEmailOrPhone(login);
+    }
 
     if (!user) {
         return res.status(404).json({
-            message: "Такой пользователь не найден"
+            message: "Пользователь с таким логином, email или телефоном не найден"
         });
     }
 

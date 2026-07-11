@@ -66,7 +66,7 @@ const PsychologyPage: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {organs.map((o) => (
-              <div key={o.title} className="bg-white/70 rounded-[20px] p-6 flex items-start gap-4">
+              <div key={o.title} className="bg-[#f7ead8] rounded-[28px] p-6 flex items-start gap-4 border border-[#C9A882]">
                 <span className="text-3xl flex-shrink-0 mt-1">{o.emoji}</span>
                 <div>
                   <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg mb-1">{o.title}</h3>
@@ -82,7 +82,7 @@ const PsychologyPage: React.FC = () => {
           <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl mb-6">
             Что мы предлагаем
           </h2>
-          <div className="bg-white/70 rounded-[20px] p-8">
+          <div className="bg-[#f7ead8] rounded-[28px] p-8 border border-[#C9A882]">
             <div className="grid grid-cols-1 gap-4">
               {offers.map((o) => (
                 <div key={o.text} className="flex items-center gap-4">
@@ -99,7 +99,7 @@ const PsychologyPage: React.FC = () => {
           <h2 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-2xl mb-6">
             Наш психолог
           </h2>
-          <div className="bg-white/70 rounded-[20px] p-5 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-8">
+          <div className="bg-[#f7ead8] rounded-[28px] p-5 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-8 border border-[#C9A882]">
             <div className="w-24 h-24 rounded-full bg-[#a6856d] flex items-center justify-center flex-shrink-0">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
                 <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />

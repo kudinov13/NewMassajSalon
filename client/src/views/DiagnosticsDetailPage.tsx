@@ -224,7 +224,7 @@ const DiagnosticsDetailPage: React.FC = () => {
 
       {/* Healthy indicators */}
       <section className="max-w-[1100px] mx-auto px-10 py-8">
-        <div className="bg-[#e3cbb1]/50 rounded-[25px] p-8">
+        <div className="bg-[#f7ead8] rounded-[28px] p-8 border border-[#C9A882]">
           <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-xl mb-4">
             Признаки здоровья:
           </h3>
@@ -246,7 +246,7 @@ const DiagnosticsDetailPage: React.FC = () => {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {content.changes.map((item, i) => (
-            <div key={i} className="bg-white/60 rounded-[15px] p-4 border border-[#C9A882]">
+            <div key={i} className="bg-[#f7ead8] rounded-[28px] p-4 border border-[#C9A882]">
               <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm leading-relaxed">
                 {item}
               </p>

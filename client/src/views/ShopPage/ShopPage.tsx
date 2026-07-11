@@ -27,7 +27,7 @@ const CATEGORIES = [
   { key: "all", label: "Все товары" },
   { key: "aromatherapy", label: "Ароматерапия" },
   { key: "spa", label: "SPA рецепты" },
-  { key: "self-massage", label: "Курсы самомассажа" },
+  { key: "self-massage", label: "Видео курсы" },
   { key: "nutrition", label: "Рецепты питания" },
   { key: "bady", label: "БАДы" },
 ];

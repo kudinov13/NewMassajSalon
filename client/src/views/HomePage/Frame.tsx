@@ -100,8 +100,8 @@ const services = [
     arrowClass: "mt-2 w-[14.71px] h-[14.71px] ml-[7.3px]",
   },
   {
-    title: "Самомассаж",
-    description: "Техники самомассажа для домашнего применения",
+    title: "Видео курсы",
+    description: "Обучающие видео курсы для домашнего применения",
     image: rectangle18,
     arrow: arrow17,
     type: "small",
@@ -221,7 +221,7 @@ const reviews = [
   {
     name: "Елена",
     date: "05.02.2025",
-    text: "Пришла в студию с ощущением, что кожа потеряла тонус и сияние. Ксения подобрала комплексный уход с ультразвуковой чисткой и плазмотерапией. Уже после первой процедуры цвет лица стал свежее, а через месяц подруги спрашивали, где я отдыхала. Очень бережные руки, внимательность к моим ощущениям и никакой боли. Теперь только к ней!",
+    text: "Пришла в студию с ощущением, что кожа потеряла тонус и сияние. Татьяна подобрала комплексный уход с ультразвуковой чисткой и плазмотерапией. Уже после первой процедуры цвет лица стал свежее, а через месяц подруги спрашивали, где я отдыхала. Очень бережные руки, внимательность к моим ощущениям и никакой боли. Теперь только к ней!",
     cardClass:
       "absolute top-[2958px] left-[385px] w-[325px] h-[276px] rounded-[25px] border-2 border-solid border-[#e3cbb1]",
     titleClass:
@@ -232,7 +232,7 @@ const reviews = [
   {
     name: "Марина",
     date: "12.11.2024",
-    text: "Больше 5 лет боролась с высыпаниями и жирным блеском. Перепробовала всё — от аптечных болтушек до дорогих пилингов. Оксана посмотрела на мою кожу и сразу сказала: «Будем работать комплексно, но без фанатизма». Через 2 месяца регулярных уходов и коррекции домашнего ухода кожа наконец-то дышит, макияж держится идеально. Спасибо за терпение и настоящий результат!",
+    text: "Больше 5 лет боролась с высыпаниями и жирным блеском. Перепробовала всё — от аптечных болтушек до дорогих пилингов. Татьяна посмотрела на мою кожу и сразу сказала: «Будем работать комплексно, но без фанатизма». Через 2 месяца регулярных уходов и коррекции домашнего ухода кожа наконец-то дышит, макияж держится идеально. Спасибо за терпение и настоящий результат!",
     cardClass:
       "absolute top-[2958px] left-[730px] w-[325px] h-[276px] rounded-[25px] border-2 border-solid border-[#e3cbb1]",
     titleClass:
@@ -243,7 +243,7 @@ const reviews = [
   {
     name: "Анастасия",
     date: "20.09.2024",
-    text: "Хочу сказать огромное спасибо Ирине Мороз за чуткость и профессионализм! Я долго не могла понять, почему при правильном питании вес стоит на месте. Оказалось, что мои любимые творог и бананы — в списке нерекомендованных продуктов. Заменили их, добавили поддержку, и за 3 месяца ушло 8 кг без голодовок и стресса. Наконец-то я перестала бояться еды!",
+    text: "Хочу сказать огромное спасибо Татьяне за чуткость и профессионализм! Я долго не могла понять, почему при правильном питании вес стоит на месте. Оказалось, что мои любимые творог и бананы — в списке нерекомендованных продуктов. Заменили их, добавили поддержку, и за 3 месяца ушло 8 кг без голодовок и стресса. Наконец-то я перестала бояться еды!",
     cardClass:
       "absolute top-[2958px] left-[1079px] w-[325px] h-[276px] rounded-[25px] border-2 border-solid border-[#e3cbb1]",
     titleClass:
@@ -271,6 +271,9 @@ export const Frame = (): React.ReactElement => {
   const [addressDraft, setAddressDraft] = useState<string>("");
   const [diagFlipped, setDiagFlipped] = useState<boolean>(false);
   const [homeScale, setHomeScale] = useState(1);
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState("");
+  const [contactError, setContactError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -332,8 +335,35 @@ export const Frame = (): React.ReactElement => {
     }
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setContactError("");
+    setContactSuccess("");
+
+    if (!formData.name.trim()) {
+      setContactError("Укажите ваше имя");
+      return;
+    }
+
+    if (!formData.comment.trim() || formData.comment.trim().length < 5) {
+      setContactError("Сообщение слишком короткое");
+      return;
+    }
+
+    setContactLoading(true);
+    try {
+      await API.contact.send({
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        message: formData.comment.trim(),
+      });
+      setContactSuccess("Спасибо! Ваше обращение отправлено.");
+      setFormData({ name: "", phone: "", comment: "" });
+    } catch (e: any) {
+      setContactError(e.message || "Ошибка при отправке. Попробуйте позже.");
+    } finally {
+      setContactLoading(false);
+    }
   };
 
   return (
@@ -420,8 +450,8 @@ export const Frame = (): React.ReactElement => {
                   key={item}
                   className="relative w-fit [font-family:'Vela Sans',sans-serif] font-light text-[#000000b2] text-base tracking-[-0.48px] leading-[normal]"
                 >
-                  {item === "Магазин" || item === "Расписание" || item === "Навигация" ? (
-                    <Link to={item === "Магазин" ? "/shop" : item === "Расписание" ? "/schedule" : "/guide"} className="bg-transparent border-none cursor-pointer p-0 no-underline text-inherit">
+                  {item === "Магазин" || item === "Расписание" || item === "Навигация" || item === "О нас" || item === "Отзывы" ? (
+                    <Link to={item === "Магазин" ? "/shop" : item === "Расписание" ? "/schedule" : item === "О нас" ? "/about" : item === "Отзывы" ? "/reviews" : "/guide"} className="bg-transparent border-none cursor-pointer p-0 no-underline text-inherit">
                       {item}
                     </Link>
                   ) : (
@@ -447,7 +477,7 @@ export const Frame = (): React.ReactElement => {
                 </svg>
               </a>
               <a
-                href="https://max.ru/id2204096914_bi"
+                href="https://max.ru/id2204096914_biz"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex w-[34px] h-[34px] items-center justify-center rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
@@ -498,7 +528,7 @@ export const Frame = (): React.ReactElement => {
                 </svg>
               </a>
               <a
-                href="https://max.ru/id2204096914_bi"
+                href="https://max.ru/id2204096914_biz"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex w-[34px] h-[34px] items-center justify-center rounded-full border border-[#00000033] hover:border-[#a6856d] transition-colors no-underline"
@@ -677,7 +707,7 @@ export const Frame = (): React.ReactElement => {
               type="button"
               aria-label={service.title}
               onClick={() => {
-                if (service.title === "Самомассаж") navigate("/shop?category=self-massage");
+                if (service.title === "Видео курсы") navigate("/shop?category=self-massage");
                 if (service.title === "Тибетские чаши") navigate("/tibetan-bowls");
                 if (service.title === "Анализы") navigate("/analyses");
                 if (service.title === "Прямые трансляции") navigate("/streams");
@@ -936,12 +966,13 @@ export const Frame = (): React.ReactElement => {
           />
           <button
             type="submit"
-            className="absolute top-[4565px] left-[734px] w-[325px] h-[41px]"
+            disabled={contactLoading}
+            className="absolute top-[4565px] left-[734px] w-[325px] h-[41px] disabled:opacity-60"
             aria-label="Отправить"
           >
             <div className="absolute top-0 left-0 w-[325px] h-[41px] bg-[#e3cbb1] rounded-[25px]" />
             <div className="absolute top-[7px] left-[29px] [font-family:'Vela Sans',sans-serif] font-light text-[#000000e6] text-xl tracking-[-0.60px] leading-[normal]">
-              Отправить
+              {contactLoading ? "Отправка..." : "Отправить"}
             </div>
             <div className="absolute top-[5px] left-[283px] w-[30px] h-[30px] flex bg-[#a6856d] rounded-[15px]">
               <img
@@ -951,6 +982,16 @@ export const Frame = (): React.ReactElement => {
               />
             </div>
           </button>
+          {contactError && (
+            <div className="absolute top-[4610px] left-[734px] w-[440px] [font-family:'Vela Sans',sans-serif] font-light text-red-700 text-sm">
+              {contactError}
+            </div>
+          )}
+          {contactSuccess && (
+            <div className="absolute top-[4610px] left-[734px] w-[440px] [font-family:'Vela Sans',sans-serif] font-light text-green-800 text-sm">
+              {contactSuccess}
+            </div>
+          )}
         </form>
       </section>
       <footer>

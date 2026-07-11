@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { API, BASE_URL } from "../services/api";
 
-type Tab = "dashboard" | "products" | "labs" | "streams" | "live" | "users" | "diagnostics-schedule" | "activity" | "admin-guide";
+type Tab = "dashboard" | "products" | "labs" | "streams" | "live" | "users" | "diagnostics-schedule" | "diagnostics-tests" | "activity" | "admin-guide" | "contact";
 
 interface Stream {
   id: number;
@@ -137,6 +137,15 @@ const sidebarItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
     ),
   },
   {
+    key: "diagnostics-tests",
+    label: "Тесты диагностики",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+      </svg>
+    ),
+  },
+  {
     key: "activity",
     label: "Журнал действий",
     icon: (
@@ -151,6 +160,15 @@ const sidebarItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+      </svg>
+    ),
+  },
+  {
+    key: "contact",
+    label: "Обращения",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
       </svg>
     ),
   },
@@ -195,6 +213,110 @@ const AdminActivityTab: React.FC = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+const AdminContactTab: React.FC = () => {
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [replyText, setReplyText] = useState<Record<number, string>>({});
+  const [replying, setReplying] = useState<Record<number, boolean>>({});
+
+  const load = () => {
+    setLoading(true);
+    API.contact.getAll()
+      .then(setMessages)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleReply = async (id: number) => {
+    const text = replyText[id]?.trim();
+    if (!text) return;
+    setReplying((prev) => ({ ...prev, [id]: true }));
+    try {
+      await API.contact.update(id, { status: "replied", adminReply: text });
+      setReplyText((prev) => ({ ...prev, [id]: "" }));
+      load();
+    } catch (e: any) {
+      alert(e.message || "Ошибка");
+    } finally {
+      setReplying((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const handleMarkRead = async (id: number) => {
+    try {
+      await API.contact.update(id, { status: "read" });
+      load();
+    } catch (e: any) {
+      alert(e.message || "Ошибка");
+    }
+  };
+
+  return (
+    <div>
+      {loading && <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-sm mb-4">Загрузка...</p>}
+      <div className="space-y-4">
+        {messages.map((m) => (
+          <div key={m.id} className={`bg-white rounded-[20px] p-5 border ${m.status === 'new' ? 'border-[#a6856d]' : 'border-[#e3cbb1]/40'}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">{m.name}</span>
+                <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-xs ml-2">{m.createdAt?.replace('T',' ').slice(0,16)}</span>
+              </div>
+              <span className={`px-2 py-1 rounded-full text-xs [font-family:'Vela_Sans',sans-serif] font-light ${m.status === 'new' ? 'bg-[#f5e6d3] text-[#a6856d]' : m.status === 'replied' ? 'bg-[#d4edda] text-[#155724]' : 'bg-[#e3cbb1]/30 text-[#6B5744]'}`}>
+                {m.status === 'new' ? 'Новое' : m.status === 'replied' ? 'Отвечено' : 'Прочитано'}
+              </span>
+            </div>
+            <div className="mb-3 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/80 text-sm">
+              <p><b>Email:</b> {m.email || '—'}</p>
+              <p><b>Телефон:</b> {m.phone || '—'}</p>
+            </div>
+            <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm whitespace-pre-wrap mb-4">{m.message}</p>
+
+            {m.adminReply && (
+              <div className="bg-[#f5efe8] rounded-[12px] p-3 mb-3">
+                <p className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-xs mb-1">Ответ администратора ({m.repliedAt?.replace('T',' ').slice(0,16)}):</p>
+                <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm whitespace-pre-wrap">{m.adminReply}</p>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2">
+              <textarea
+                value={replyText[m.id] || ""}
+                onChange={(e) => setReplyText((prev) => ({ ...prev, [m.id]: e.target.value }))}
+                placeholder="Ответ администратора..."
+                rows={2}
+                className="w-full px-3 py-2 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d] resize-none"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleReply(m.id)}
+                  disabled={replying[m.id] || !replyText[m.id]?.trim()}
+                  className="h-9 px-4 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors disabled:opacity-40"
+                >
+                  {replying[m.id] ? "Сохранение..." : "Ответить"}
+                </button>
+                {m.status === 'new' && (
+                  <button
+                    onClick={() => handleMarkRead(m.id)}
+                    className="h-9 px-4 border border-[#e3cbb1] text-[#6B5744] rounded-full bg-transparent [font-family:'Vela_Sans',sans-serif] font-light text-sm cursor-pointer hover:bg-[#f5e6d3] transition-colors"
+                  >
+                    Отметить прочитанным
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+        {messages.length === 0 && !loading && (
+          <p className="text-center [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-sm py-8">Обращений пока нет</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const CoursesAdminTab: React.FC = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [title, setTitle] = useState("");
@@ -296,6 +418,510 @@ const CoursesAdminTab: React.FC = () => {
           </div>
         )}
       </div>
+    </div>
+  );
+};
+
+interface AdminOption {
+  id: number;
+  text: string;
+  score: number;
+  sortOrder: number;
+}
+
+interface AdminQuestion {
+  id: number;
+  text: string;
+  sortOrder: number;
+  options: AdminOption[];
+}
+
+interface AdminResult {
+  id: number;
+  testId: number;
+  minScore: number;
+  maxScore: number;
+  title: string;
+  text: string;
+  isSeriousProblem: number;
+  buttonLabel: string | null;
+  buttonLink: string | null;
+}
+
+interface AdminTest {
+  id: number;
+  slug: string;
+  title: string;
+  subtitle: string;
+  active: number;
+  questions: AdminQuestion[];
+  results: AdminResult[];
+}
+
+const AdminDiagnosticsTestsTab: React.FC = () => {
+  const [tests, setTests] = useState<AdminTest[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedTestId, setSelectedTestId] = useState<number | null>(null);
+  const [activeSubTab, setActiveSubTab] = useState<"questions" | "results">("questions");
+  const [saving, setSaving] = useState(false);
+
+  const selectedTest = tests.find((t) => t.id === selectedTestId);
+
+  const seedDefaults = async () => {
+    setLoading(true);
+    try {
+      const result = await API.diagnosticsTests.seedDefault();
+      if (result.created) {
+        alert("Стандартные тесты созданы.");
+      } else {
+        alert("Тесты уже существуют.");
+      }
+      await load();
+    } catch (e: any) {
+      alert(e.message || "Ошибка при создании тестов");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const allTests = await API.diagnosticsTests.getAll();
+      const fullTests = await Promise.all(
+        allTests.map((t: any) => API.diagnosticsTests.getFull(t.id))
+      );
+      setTests(fullTests);
+      if (!selectedTestId && fullTests.length) setSelectedTestId(fullTests[0].id);
+    } catch (e: any) {
+      alert(e.message || "Ошибка загрузки");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleQuestionChange = (qid: number, text: string) => {
+    setTests((prev) =>
+      prev.map((t) =>
+        t.id === selectedTestId
+          ? { ...t, questions: t.questions.map((q) => (q.id === qid ? { ...q, text } : q)) }
+          : t
+      )
+    );
+  };
+
+  const handleOptionChange = (qid: number, oid: number, field: "text" | "score", value: string | number) => {
+    setTests((prev) =>
+      prev.map((t) =>
+        t.id === selectedTestId
+          ? {
+              ...t,
+              questions: t.questions.map((q) =>
+                q.id === qid
+                  ? {
+                      ...q,
+                      options: q.options.map((o) =>
+                        o.id === oid ? { ...o, [field]: value } : o
+                      ),
+                    }
+                  : q
+              ),
+            }
+          : t
+      )
+    );
+  };
+
+  const saveQuestion = async (q: AdminQuestion) => {
+    setSaving(true);
+    try {
+      await API.diagnosticsTests.updateQuestion(q.id, { text: q.text, sortOrder: q.sortOrder });
+      for (const o of q.options) {
+        await API.diagnosticsTests.updateOption(o.id, { text: o.text, score: Number(o.score), sortOrder: o.sortOrder });
+      }
+      alert("Сохранено");
+    } catch (e: any) {
+      alert(e.message || "Ошибка сохранения");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const addQuestion = async () => {
+    if (!selectedTest) return;
+    const text = window.prompt("Текст нового вопроса:");
+    if (!text) return;
+    try {
+      const { id } = await API.diagnosticsTests.createQuestion(selectedTest.id, {
+        text,
+        sortOrder: selectedTest.questions.length,
+      });
+      // Добавим 2 пустых варианта ответа
+      await API.diagnosticsTests.createOption(id, { text: "Да", score: 0, sortOrder: 0 });
+      await API.diagnosticsTests.createOption(id, { text: "Нет", score: 0, sortOrder: 1 });
+      await load();
+    } catch (e: any) {
+      alert(e.message || "Ошибка");
+    }
+  };
+
+  const addOption = async (qid: number) => {
+    try {
+      const q = selectedTest?.questions.find((x) => x.id === qid);
+      await API.diagnosticsTests.createOption(qid, {
+        text: "Новый вариант",
+        score: 0,
+        sortOrder: q?.options.length || 0,
+      });
+      await load();
+    } catch (e: any) {
+      alert(e.message || "Ошибка");
+    }
+  };
+
+  const deleteOption = async (id: number) => {
+    if (!window.confirm("Удалить вариант?")) return;
+    try {
+      await API.diagnosticsTests.deleteOption(id);
+      await load();
+    } catch (e: any) {
+      alert(e.message || "Ошибка");
+    }
+  };
+
+  const deleteQuestion = async (id: number) => {
+    if (!window.confirm("Удалить вопрос и все варианты?")) return;
+    try {
+      await API.diagnosticsTests.deleteQuestion(id);
+      await load();
+    } catch (e: any) {
+      alert(e.message || "Ошибка");
+    }
+  };
+
+  const handleResultChange = (rid: number, field: keyof AdminResult, value: any) => {
+    setTests((prev) =>
+      prev.map((t) =>
+        t.id === selectedTestId
+          ? {
+              ...t,
+              results: t.results.map((r) => (r.id === rid ? { ...r, [field]: value } : r)),
+            }
+          : t
+      )
+    );
+  };
+
+  const saveResult = async (r: AdminResult) => {
+    setSaving(true);
+    try {
+      await API.diagnosticsTests.updateResult(r.id, {
+        minScore: Number(r.minScore),
+        maxScore: Number(r.maxScore),
+        title: r.title,
+        text: r.text,
+        isSeriousProblem: !!r.isSeriousProblem,
+        buttonLabel: r.buttonLabel || undefined,
+        buttonLink: r.buttonLink || undefined,
+      });
+      alert("Сохранено");
+    } catch (e: any) {
+      alert(e.message || "Ошибка сохранения");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const addResult = async () => {
+    if (!selectedTest) return;
+    try {
+      await API.diagnosticsTests.createResult(selectedTest.id, {
+        minScore: 0,
+        maxScore: 1,
+        title: "Новый результат",
+        text: "Текст результата",
+        isSeriousProblem: false,
+        buttonLabel: "Записаться на диагностику",
+        buttonLink: "/diagnostics/booking",
+      });
+      await load();
+    } catch (e: any) {
+      alert(e.message || "Ошибка");
+    }
+  };
+
+  const deleteResult = async (id: number) => {
+    if (!window.confirm("Удалить результат?")) return;
+    try {
+      await API.diagnosticsTests.deleteResult(id);
+      await load();
+    } catch (e: any) {
+      alert(e.message || "Ошибка");
+    }
+  };
+
+  const resetResults = async () => {
+    if (!selectedTest) return;
+    if (!window.confirm("Заменить все результаты этого теста на стандартные шаблонные? Ваши текущие правки результатов будут удалены.")) return;
+    setSaving(true);
+    try {
+      await API.diagnosticsTests.resetResults(selectedTest.id);
+      await load();
+      alert("Результаты обновлены");
+    } catch (e: any) {
+      alert(e.message || "Ошибка при сбросе результатов");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputClass = "w-full px-3 py-2 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]";
+  const smallInputClass = "px-2 py-1 rounded-[8px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d] w-20";
+
+  return (
+    <div>
+      {loading && <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-sm mb-4">Загрузка...</p>}
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        {tests.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => { setSelectedTestId(t.id); setActiveSubTab("questions"); }}
+            className={`h-9 px-4 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border cursor-pointer transition-colors ${
+              selectedTestId === t.id
+                ? "bg-[#a6856d] text-white border-[#a6856d]"
+                : "bg-white text-[#6B5744] border-[#e3cbb1] hover:border-[#a6856d]"
+            }`}
+          >
+            {t.title}
+          </button>
+        ))}
+      </div>
+
+      {!selectedTest && !loading && (
+        <div className="bg-white/70 rounded-[20px] p-8 text-center">
+          <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-base mb-4">
+            {tests.length === 0 ? "Диагностические тесты ещё не созданы. Нажмите кнопку ниже, чтобы создать стандартные тесты для всех разделов диагностики." : "Выберите тест"}
+          </p>
+          {tests.length === 0 && (
+            <button
+              onClick={seedDefaults}
+              disabled={loading}
+              className="h-10 px-6 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors disabled:opacity-40"
+            >
+              {loading ? "Создание..." : "Создать стандартные тесты"}
+            </button>
+          )}
+        </div>
+      )}
+
+      {selectedTest && (
+        <>
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setActiveSubTab("questions")}
+              className={`h-9 px-4 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border cursor-pointer transition-colors ${
+                activeSubTab === "questions" ? "bg-[#a6856d] text-white border-[#a6856d]" : "bg-white text-[#6B5744] border-[#e3cbb1]"
+              }`}
+            >
+              Вопросы ({selectedTest.questions.length})
+            </button>
+            <button
+              onClick={() => setActiveSubTab("results")}
+              className={`h-9 px-4 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border cursor-pointer transition-colors ${
+                activeSubTab === "results" ? "bg-[#a6856d] text-white border-[#a6856d]" : "bg-white text-[#6B5744] border-[#e3cbb1]"
+              }`}
+            >
+              Результаты ({selectedTest.results.length})
+            </button>
+          </div>
+
+          {activeSubTab === "questions" && (
+            <div className="space-y-4">
+              {selectedTest.questions.map((q, idx) => (
+                <div key={q.id} className="bg-white rounded-[20px] p-5 border border-[#e3cbb1]/40">
+                  <div className="flex items-start gap-3 mb-3">
+                    <span className="mt-2 text-sm text-[#6B5744]/60">{idx + 1}.</span>
+                    <textarea
+                      value={q.text}
+                      onChange={(e) => handleQuestionChange(q.id, e.target.value)}
+                      className={inputClass}
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="ml-6 space-y-2 mb-3">
+                    {q.options.map((o) => (
+                      <div key={o.id} className="flex items-center gap-2">
+                        <input
+                          value={o.text}
+                          onChange={(e) => handleOptionChange(q.id, o.id, "text", e.target.value)}
+                          className="flex-1 px-2 py-1 rounded-[8px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]"
+                        />
+                        <input
+                          type="number"
+                          value={o.score}
+                          onChange={(e) => handleOptionChange(q.id, o.id, "score", Number(e.target.value))}
+                          className={smallInputClass}
+                        />
+                        <button
+                          onClick={() => deleteOption(o.id)}
+                          className="w-7 h-7 rounded-full bg-red-100 text-red-500 border-0 cursor-pointer hover:bg-red-200"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => addOption(q.id)}
+                      className="text-sm text-[#a6856d] hover:text-[#8d6e58] [font-family:'Vela_Sans',sans-serif] font-light"
+                    >
+                      + Добавить вариант
+                    </button>
+                  </div>
+
+                  <div className="flex gap-2 ml-6">
+                    <button
+                      onClick={() => saveQuestion(q)}
+                      disabled={saving}
+                      className="h-8 px-4 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs border-0 cursor-pointer transition-colors disabled:opacity-40"
+                    >
+                      {saving ? "Сохранение..." : "Сохранить вопрос"}
+                    </button>
+                    <button
+                      onClick={() => deleteQuestion(q.id)}
+                      className="h-8 px-4 border border-red-300 text-red-500 rounded-full bg-transparent [font-family:'Vela_Sans',sans-serif] font-light text-xs cursor-pointer hover:bg-red-50"
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <button
+                onClick={addQuestion}
+                className="h-10 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors"
+              >
+                + Добавить вопрос
+              </button>
+            </div>
+          )}
+
+          {activeSubTab === "results" && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-sm">
+                  Для каждого диапазона баллов укажите текст результата. Если <b>проблема серьёзная</b> — будет показана кнопка записи на диагностику.
+                </p>
+                <button
+                  onClick={resetResults}
+                  disabled={saving}
+                  className="h-8 px-4 border border-[#e3cbb1] text-[#6B5744] rounded-full bg-white [font-family:'Vela_Sans',sans-serif] font-light text-xs cursor-pointer hover:border-[#a6856d] transition-colors disabled:opacity-40"
+                >
+                  Сбросить результаты до шаблонных
+                </button>
+              </div>
+              {selectedTest.results.map((r) => (
+                <div key={r.id} className="bg-white rounded-[20px] p-5 border border-[#e3cbb1]/40">
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <label className="block text-xs text-[#6B5744]/60 mb-1">От (баллов)</label>
+                      <input
+                        type="number"
+                        value={r.minScore}
+                        onChange={(e) => handleResultChange(r.id, "minScore", e.target.value)}
+                        className={inputClass}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-[#6B5744]/60 mb-1">До (баллов)</label>
+                      <input
+                        type="number"
+                        value={r.maxScore}
+                        onChange={(e) => handleResultChange(r.id, "maxScore", e.target.value)}
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+                  <div className="mb-3">
+                    <label className="block text-xs text-[#6B5744]/60 mb-1">Заголовок</label>
+                    <input
+                      value={r.title}
+                      onChange={(e) => handleResultChange(r.id, "title", e.target.value)}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="block text-xs text-[#6B5744]/60 mb-1">Текст результата</label>
+                    <textarea
+                      value={r.text}
+                      onChange={(e) => handleResultChange(r.id, "text", e.target.value)}
+                      className={inputClass}
+                      rows={3}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <input
+                      type="checkbox"
+                      id={`serious-${r.id}`}
+                      checked={!!r.isSeriousProblem}
+                      onChange={(e) => handleResultChange(r.id, "isSeriousProblem", e.target.checked ? 1 : 0)}
+                      className="w-4 h-4 accent-[#a6856d]"
+                    />
+                    <label htmlFor={`serious-${r.id}`} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm">
+                      Серьёзная проблема (показать кнопку записи)
+                    </label>
+                  </div>
+                  {r.isSeriousProblem && (
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label className="block text-xs text-[#6B5744]/60 mb-1">Текст кнопки</label>
+                        <input
+                          value={r.buttonLabel || ""}
+                          onChange={(e) => handleResultChange(r.id, "buttonLabel", e.target.value)}
+                          className={inputClass}
+                          placeholder="Записаться на диагностику"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-[#6B5744]/60 mb-1">Ссылка кнопки</label>
+                        <input
+                          value={r.buttonLink || ""}
+                          onChange={(e) => handleResultChange(r.id, "buttonLink", e.target.value)}
+                          className={inputClass}
+                          placeholder="/diagnostics/booking"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => saveResult(r)}
+                      disabled={saving}
+                      className="h-8 px-4 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs border-0 cursor-pointer transition-colors disabled:opacity-40"
+                    >
+                      {saving ? "Сохранение..." : "Сохранить результат"}
+                    </button>
+                    <button
+                      onClick={() => deleteResult(r.id)}
+                      className="h-8 px-4 border border-red-300 text-red-500 rounded-full bg-transparent [font-family:'Vela_Sans',sans-serif] font-light text-xs cursor-pointer hover:bg-red-50"
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <button
+                onClick={addResult}
+                className="h-10 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors"
+              >
+                + Добавить результат
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
@@ -1055,6 +1681,9 @@ const AdminPage: React.FC = () => {
           </div>
         )}
 
+        {/* === DIAGNOSTICS TESTS === */}
+        {tab === "diagnostics-tests" && <AdminDiagnosticsTestsTab />}
+
         {/* === DIAGNOSTICS SCHEDULE === */}
         {tab === "diagnostics-schedule" && (
           <div>
@@ -1206,6 +1835,9 @@ const AdminPage: React.FC = () => {
         )}
         {/* === ACTIVITY LOG === */}
         {tab === "activity" && <AdminActivityTab />}
+
+        {/* === CONTACT MESSAGES === */}
+        {tab === "contact" && <AdminContactTab />}
 
         {/* === ADMIN GUIDE === */}
         {tab === "admin-guide" && (

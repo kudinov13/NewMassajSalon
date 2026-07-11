@@ -759,4 +759,203 @@ export const API = {
       return response.json();
     },
   },
+  reviews: {
+    getAll: async () => {
+      const response = await fetch(`${BASE_URL}/reviews`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    create: async (data: { rating: number; text: string }) => {
+      const response = await fetch(`${BASE_URL}/reviews`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+  },
+  diagnosticsTests: {
+    getPublic: async (slug: string) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/public/${slug}`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    evaluate: async (slug: string, score: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/public/${slug}/evaluate`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score }),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    getAll: async () => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    getFull: async (id: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/${id}/full`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    seedDefault: async () => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/seed`, {
+        method: "POST",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    resetResults: async (id: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/${id}/reset-results`, {
+        method: "POST",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    create: async (data: { slug: string; title: string; subtitle?: string; active?: boolean }) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    update: async (id: number, data: { slug: string; title: string; subtitle?: string; active?: boolean }) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    delete: async (id: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    createQuestion: async (testId: number, data: { text: string; sortOrder?: number }) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/${testId}/questions`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    updateQuestion: async (id: number, data: { text: string; sortOrder?: number }) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/questions/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    deleteQuestion: async (id: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/questions/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    createOption: async (questionId: number, data: { text: string; score: number; sortOrder?: number }) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/questions/${questionId}/options`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    updateOption: async (id: number, data: { text: string; score: number; sortOrder?: number }) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/options/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    deleteOption: async (id: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/options/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    createResult: async (testId: number, data: { minScore: number; maxScore: number; title: string; text: string; isSeriousProblem?: boolean; buttonLabel?: string; buttonLink?: string }) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/${testId}/results`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    updateResult: async (id: number, data: { minScore: number; maxScore: number; title: string; text: string; isSeriousProblem?: boolean; buttonLabel?: string; buttonLink?: string }) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/results/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    deleteResult: async (id: number) => {
+      const response = await fetch(`${BASE_URL}/diagnostics-tests/results/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+  },
+  contact: {
+    send: async (data: { name: string; phone: string; message: string }) => {
+      const response = await fetch(`${BASE_URL}/contact`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    getAll: async () => {
+      const response = await fetch(`${BASE_URL}/contact`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    update: async (id: number, data: { status: string; adminReply?: string }) => {
+      const response = await fetch(`${BASE_URL}/contact/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+  },
 };

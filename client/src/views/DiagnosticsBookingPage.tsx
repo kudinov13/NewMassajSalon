@@ -85,7 +85,7 @@ const DiagnosticsBookingPage: React.FC = () => {
           </Link>
         </header>
         <div className="flex-1 flex items-center justify-center">
-          <div className="bg-white/70 rounded-[25px] p-10 text-center max-w-[500px]">
+          <div className="bg-[#f7ead8] rounded-[28px] p-10 text-center max-w-[500px] border border-[#C9A882]">
             <div className="w-16 h-16 rounded-full bg-[#a6856d] flex items-center justify-center mx-auto mb-5">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
@@ -97,7 +97,7 @@ const DiagnosticsBookingPage: React.FC = () => {
               <button onClick={() => navigate("/profile")} className="h-11 px-6 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">
                 Личный кабинет
               </button>
-              <button onClick={() => navigate("/diagnostics-schedule")} className="h-11 px-6 bg-transparent border border-[#a6856d] text-[#6B5744] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm cursor-pointer hover:bg-[#a6856d1a] transition-colors">
+              <button onClick={() => navigate("/diagnostics-schedule")} className="h-11 px-6 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">
                 Назад
               </button>
             </div>
@@ -114,7 +114,7 @@ const DiagnosticsBookingPage: React.FC = () => {
           <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
           <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">Harmony Spa</span>
         </Link>
-        <button onClick={() => navigate("/diagnostics-schedule")} className="h-9 px-5 bg-transparent border border-[#00000033] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-[#000000b2] text-sm cursor-pointer hover:border-[#a6856d] transition-colors">
+        <button onClick={() => navigate("/diagnostics-schedule")} className="h-9 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors">
           ← Назад
         </button>
       </header>
@@ -130,7 +130,7 @@ const DiagnosticsBookingPage: React.FC = () => {
         {loading ? (
           <div className="text-center py-10 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60">Загрузка...</div>
         ) : Object.keys(grouped).length === 0 ? (
-          <div className="bg-white/70 rounded-[20px] p-10 text-center">
+          <div className="bg-[#f7ead8] rounded-[28px] p-10 text-center border border-[#C9A882]">
             <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-base">Нет доступных слотов для записи</p>
           </div>
         ) : (
@@ -155,7 +155,7 @@ const DiagnosticsBookingPage: React.FC = () => {
                             selected
                               ? "bg-[#a6856d] text-white border-[#a6856d]"
                               : available
-                              ? "bg-white/70 text-[#6B5744] border-[#e3cbb1] hover:border-[#a6856d]"
+                              ? "bg-[#f7ead8] text-[#6B5744] border-[#C9A882] hover:border-[#a6856d]"
                               : "bg-[#e3cbb1]/30 text-[#6B5744]/30 border-transparent cursor-not-allowed"
                           }`}
                         >
@@ -170,7 +170,7 @@ const DiagnosticsBookingPage: React.FC = () => {
 
             {/* Booking form */}
             {selectedSlot && (
-              <div className="bg-white/70 rounded-[20px] p-8">
+              <div className="bg-[#f7ead8] rounded-[28px] p-8 border border-[#C9A882]">
                 <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg mb-4">
                   Запись: {formatDate(selectedSlot.date)} в {selectedSlot.time}
                 </h3>

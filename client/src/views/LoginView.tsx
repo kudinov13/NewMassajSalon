@@ -64,7 +64,7 @@ const LoginView = () => {
         <div className="flex flex-col gap-5">
           <label className="flex flex-col gap-2">
             <span className="[font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-base">
-              Логин
+              Логин, email или телефон
             </span>
             <input
               ref={loginRef}
@@ -72,6 +72,7 @@ const LoginView = () => {
               autoComplete="off"
               data-lpignore="true"
               data-form-type="other"
+              placeholder="Логин, email или телефон"
               onKeyDown={handleKeyDown}
               className="h-[44px] px-4 bg-white border-2 border-[#e3cbb1] rounded-[15px] [font-family:'Vela_Sans',sans-serif] text-[#000000e6] text-base focus:outline-none focus:border-[#a6856d] transition-colors"
             />
