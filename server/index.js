@@ -54,32 +54,32 @@ app.use(
     })
 );
 
-app.get("/", (req, res) => {
+app.get("/api/health", (req, res) => {
     res.status(200).json({ok: true});
 });
 
-app.use("/auth", authRouter);
-app.use("/user", userRouter);
-app.use("/settings", settingsRouter);
-app.use("/products", productsRouter);
-app.use("/basket", cartRouter);
-app.use("/labs", labsRouter);
-app.use("/streams", streamsRouter);
-app.use("/panel", adminRouter);
-app.use("/schedule", scheduleRouter);
-app.use("/visits", appointmentsRouter);
-app.use("/room", roomRouter);
-app.use("/stream-room", streamRoomRouter);
-app.use("/bowls", bowlsRouter);
-app.use("/bowls-schedule", bowlsScheduleRouter);
-app.use("/diagnostics-schedule", diagnosticsScheduleRouter);
-app.use("/courses", coursesRouter);
-app.use("/guide", guideRouter);
-app.use("/bowls-media", bowlsMediaRouter);
-app.use("/journal", activityRouter);
-app.use("/reviews", reviewsRouter);
-app.use("/contact", contactRouter);
-app.use("/diagnostics-tests", diagnosticsTestsRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
+app.use("/api/settings", settingsRouter);
+app.use("/api/products", productsRouter);
+app.use("/api/basket", cartRouter);
+app.use("/api/labs", labsRouter);
+app.use("/api/streams", streamsRouter);
+app.use("/api/panel", adminRouter);
+app.use("/api/schedule", scheduleRouter);
+app.use("/api/visits", appointmentsRouter);
+app.use("/api/room", roomRouter);
+app.use("/api/stream-room", streamRoomRouter);
+app.use("/api/bowls", bowlsRouter);
+app.use("/api/bowls-schedule", bowlsScheduleRouter);
+app.use("/api/diagnostics-schedule", diagnosticsScheduleRouter);
+app.use("/api/courses", coursesRouter);
+app.use("/api/guide", guideRouter);
+app.use("/api/bowls-media", bowlsMediaRouter);
+app.use("/api/journal", activityRouter);
+app.use("/api/reviews", reviewsRouter);
+app.use("/api/contact", contactRouter);
+app.use("/api/diagnostics-tests", diagnosticsTestsRouter);
 // Video streaming with Range support
 const fs = require('fs');
 app.get('/uploads/:filename', (req, res) => {
