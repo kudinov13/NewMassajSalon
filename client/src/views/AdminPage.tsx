@@ -1252,7 +1252,7 @@ const AdminPage: React.FC = () => {
           <div className="flex items-center justify-between mb-8 px-2">
             <a href="/" className="flex items-center gap-2 no-underline">
               <img src="/logo.svg" alt="" className="h-6 w-auto" />
-              <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">Harmony Spa</span>
+              <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">Коосмо</span>
             </a>
             <button onClick={() => setSidebarOpen(false)} className="md:hidden w-7 h-7 rounded-full bg-[#e3cbb1]/30 border-0 flex items-center justify-center cursor-pointer">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B5744" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>

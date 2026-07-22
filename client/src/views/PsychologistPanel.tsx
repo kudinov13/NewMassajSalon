@@ -157,7 +157,7 @@ const PsychologistPanel: React.FC = () => {
       <header className="w-full px-4 sm:px-6 md:px-10 py-4 md:py-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 no-underline">
           <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
-          <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">Harmony Spa</span>
+          <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">Коосмо</span>
         </Link>
         <div className="flex items-center gap-3">
           <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm">{user?.fullName || user?.login}</span>

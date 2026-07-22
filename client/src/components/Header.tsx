@@ -77,7 +77,7 @@ const Header: React.FC<HeaderProps> = ({ activeItem, cartCount }) => {
       <Link to="/" className="flex items-center gap-2 no-underline flex-shrink-0">
         <img src="/logo.svg" alt="Коосмо" className="h-7 md:h-8 w-auto" />
         <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-lg md:text-xl">
-          Harmony Spa
+          Коосмо
         </span>
       </Link>
 

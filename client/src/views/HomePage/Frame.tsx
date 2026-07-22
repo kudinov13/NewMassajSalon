@@ -805,7 +805,7 @@ export const Frame = (): React.ReactElement => {
             loading="lazy"
             decoding="async"
             className="relative w-96 h-[444px] aspect-[0.86] object-cover rounded-[20px]"
-            alt="Интерьер Harmony Spa"
+            alt="Интерьер Коосмо"
             src={rectangle32}
           />
         </div>
@@ -813,7 +813,7 @@ export const Frame = (): React.ReactElement => {
           ТЁПЛЫЕ СЛОВА
           <br />О ПРОСТРАНСТВЕ
           <br />
-          Harmony Spa
+          Коосмо
         </h2>
         <p className="absolute top-[3568px] left-[595px] w-[809px] [font-family:'Vela Sans',sans-serif] font-light text-[#000000b2] text-xl tracking-[-0.60px] leading-[normal]">
           Мягкий свет струится по стенам, дерево встречает теплом, воздух пьёт

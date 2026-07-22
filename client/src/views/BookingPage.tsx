@@ -81,7 +81,7 @@ const BookingPage: React.FC = () => {
         <header className="w-full px-4 sm:px-6 md:px-10 py-4 md:py-6">
           <Link to="/" className="flex items-center gap-2 no-underline w-fit">
             <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
-            <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">Harmony Spa</span>
+            <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">Коосмо</span>
           </Link>
         </header>
         <div className="flex-1 flex items-center justify-center">
@@ -112,7 +112,7 @@ const BookingPage: React.FC = () => {
       <header className="w-full px-4 sm:px-6 md:px-10 py-4 md:py-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 no-underline">
           <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
-          <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">Harmony Spa</span>
+          <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">Коосмо</span>
         </Link>
         <button onClick={() => navigate("/psychology")} className="h-9 px-5 bg-transparent border border-[#00000033] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-[#000000b2] text-sm cursor-pointer hover:border-[#a6856d] transition-colors">
           ← Назад

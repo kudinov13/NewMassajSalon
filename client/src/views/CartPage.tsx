@@ -78,7 +78,7 @@ const CartPage = () => {
         <Link to="/" className="flex items-center gap-2 no-underline">
           <img src="/logo.svg" alt="Коосмо" className="h-8 w-auto" />
           <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-xl">
-            Harmony Spa
+            Коосмо
           </span>
         </Link>
         <div className="flex items-center gap-3">
