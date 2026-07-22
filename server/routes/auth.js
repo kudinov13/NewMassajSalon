@@ -7,51 +7,59 @@ const { logActivity } = require("../db/activity");
 
 const { COOKIE_NAME, getCookieOptions, getClearCookieOptions } = require('../cookieOptions');
 
-authRouter.post("/", async (req, res) => {
-    const { login } = req.body;
-    if (!login) {
-        return res.status(400).json({ message: "Введите логин, email или телефон" });
+authRouter.post("/", async (req, res, next) => {
+    try {
+        const { login } = req.body;
+        if (!login) {
+            return res.status(400).json({ message: "Введите логин, email или телефон" });
+        }
+
+        let user = await getUserByLogin(login);
+        if (!user) {
+            user = await getUserByEmailOrPhone(login);
+        }
+
+        if (!user) {
+            return res.status(404).json({
+                message: "Пользователь с таким логином, email или телефоном не найден"
+            });
+        }
+
+        if (user.password !== md5(req.body.password)) { // TODO: hash
+            return res.status(400).json({
+                message: "Пароль неверный"
+            });
+        }
+
+        const token = await addToken(user.id);
+        res.cookie(COOKIE_NAME, token, getCookieOptions(req));
+
+        logActivity(user.id, user.login, user.fullName, 'Вход в систему', '');
+        res.status(200).json({ok: true});
+    } catch (err) {
+        next(err);
     }
-
-    let user = await getUserByLogin(login);
-    if (!user) {
-        user = await getUserByEmailOrPhone(login);
-    }
-
-    if (!user) {
-        return res.status(404).json({
-            message: "Пользователь с таким логином, email или телефоном не найден"
-        });
-    }
-
-    if (user.password !== md5(req.body.password)) { // TODO: hash
-        return res.status(400).json({
-            message: "Пароль неверный"
-        });
-    }
-
-    const token = await addToken(user.id);
-    res.cookie(COOKIE_NAME, token, getCookieOptions(req));
-
-    logActivity(user.id, user.login, user.fullName, 'Вход в систему', '');
-    res.status(200).json({ok: true});
 });
 
-authRouter.delete("/", async (req, res) => {
-    const token = req.cookies.token;
-    const userId = await getUserIdByToken(token);
-    if (!userId) {
-        return res.status(401).json({
-            message: "Пользователь не авторизован"
-        });
+authRouter.delete("/", async (req, res, next) => {
+    try {
+        const token = req.cookies.token;
+        const userId = await getUserIdByToken(token);
+        if (!userId) {
+            return res.status(401).json({
+                message: "Пользователь не авторизован"
+            });
+        }
+
+        // delete token from DB
+        await deleteByToken(token);
+
+        res.clearCookie(COOKIE_NAME, getClearCookieOptions(req));
+
+        res.status(200).json({ok: true});
+    } catch (err) {
+        next(err);
     }
-
-    // delete token from DB
-    await deleteByToken(token);
-
-    res.clearCookie(COOKIE_NAME, getClearCookieOptions(req));
-
-    res.status(200).json({ok: true});
 });
 
 module.exports = authRouter;
