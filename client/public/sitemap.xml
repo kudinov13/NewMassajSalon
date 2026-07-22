@@ -1,114 +1,162 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Главная страница -->
   <url>
     <loc>https://koosmo.ru/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Магазин -->
+  <url>
+    <loc>https://koosmo.ru/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://koosmo.ru/reviews</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <url>
     <loc>https://koosmo.ru/shop</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- Запись на приём (массаж) -->
   <url>
     <loc>https://koosmo.ru/schedule</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- Тибетские поющие чаши -->
   <url>
     <loc>https://koosmo.ru/tibetan-bowls</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- Запись на тибетские чаши -->
   <url>
     <loc>https://koosmo.ru/tibetan-bowls/booking</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- Медиа тибетских чаш -->
   <url>
     <loc>https://koosmo.ru/tibetan-bowls/media</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
-  <!-- Психология -->
   <url>
-    <loc>https://koosmo.ru/psychology</loc>
+    <loc>https://koosmo.ru/diagnostics</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
 
-  <!-- Запись к психологу -->
-  <url>
-    <loc>https://koosmo.ru/psychology/booking</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Диагностика -->
   <url>
     <loc>https://koosmo.ru/diagnostics/booking</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Диагностика: виды -->
   <url>
-    <loc>https://koosmo.ru/diagnostics/face</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://koosmo.ru/diagnostics-schedule</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
+
   <url>
     <loc>https://koosmo.ru/diagnostics/nails</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+
   <url>
-    <loc>https://koosmo.ru/diagnostics/skin</loc>
+    <loc>https://koosmo.ru/diagnostics/nails/details</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://koosmo.ru/diagnostics/tongue</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+
+  <url>
+    <loc>https://koosmo.ru/diagnostics/tongue/details</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
   <url>
     <loc>https://koosmo.ru/diagnostics/eyes</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- Анализы -->
+  <url>
+    <loc>https://koosmo.ru/diagnostics/eyes/details</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://koosmo.ru/diagnostics/skin</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://koosmo.ru/diagnostics/skin/details</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://koosmo.ru/diagnostics/body</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://koosmo.ru/diagnostics/body/details</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
   <url>
     <loc>https://koosmo.ru/analyses</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- Трансляции -->
+  <url>
+    <loc>https://koosmo.ru/psychology</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://koosmo.ru/psychology/booking</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <url>
     <loc>https://koosmo.ru/streams</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Курсы -->
   <url>
     <loc>https://koosmo.ru/courses</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Путеводитель -->
   <url>
     <loc>https://koosmo.ru/guide</loc>
     <changefreq>monthly</changefreq>

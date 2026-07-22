@@ -56,30 +56,6 @@ const PageFallback = () => (
   </div>
 );
 
-const PAGE_TITLES: Record<string, string> = {
-  '/': 'КООСМО — Оздоровительный центр гармонии тела и души',
-  '/shop': 'Магазин — КООСМО',
-  '/schedule': 'Запись на массаж — КООСМО',
-  '/tibetan-bowls': 'Тибетские поющие чаши — КООСМО',
-  '/tibetan-bowls/booking': 'Запись на тибетские чаши — КООСМО',
-  '/tibetan-bowls/media': 'Медиа: тибетские чаши — КООСМО',
-  '/psychology': 'Психологическая поддержка — КООСМО',
-  '/psychology/booking': 'Запись к психологу — КООСМО',
-  '/diagnostics/booking': 'Диагностика здоровья — КООСМО',
-  '/analyses': 'Анализы и исследования — КООСМО',
-  '/streams': 'Прямые трансляции — КООСМО',
-  '/courses': 'Онлайн-курсы — КООСМО',
-  '/guide': 'Путеводитель по здоровью — КООСМО',
-  '/basket': 'Корзина — КООСМО',
-  '/login': 'Вход — КООСМО',
-  '/registration': 'Регистрация — КООСМО',
-  '/profile': 'Профиль — КООСМО',
-  '/my-courses': 'Мои курсы — КООСМО',
-  '/purchase-history': 'История покупок — КООСМО',
-  '/about': 'О нас — КООСМО',
-  '/reviews': 'Отзывы — КООСМО',
-};
-
 const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isVisible, setIsVisible] = useState(false);
   const location = useLocation();
@@ -87,9 +63,8 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
   useEffect(() => {
     setIsVisible(false);
     const timer = setTimeout(() => setIsVisible(true), 50);
-    // Dynamic page title for SEO
-    const title = PAGE_TITLES[location.pathname] || 'КООСМО — Оздоровительный центр';
-    document.title = title;
+    // Прокрутка вверх при смене страницы
+    window.scrollTo(0, 0);
     return () => clearTimeout(timer);
   }, [location]);
 

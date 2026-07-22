@@ -2,7 +2,8 @@
 User-agent: *
 Allow: /
 
-# Приватные страницы — не индексировать
+# API и админ-панель — не индексировать
+Disallow: /api/
 Disallow: /admin
 Disallow: /profile
 Disallow: /cart

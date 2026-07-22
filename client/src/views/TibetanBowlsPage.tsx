@@ -46,7 +46,7 @@ const TibetanBowlsPage = () => {
       {/* Title block */}
       <section className="max-w-[900px] mx-auto text-center pt-8 sm:pt-10 pb-6 sm:pb-8 px-4">
         <div className="flex items-center justify-center gap-3 mb-1">
-          <img src="/stars_1.svg" alt="" className="w-6 h-6 sm:w-8 sm:h-8" />
+          <img src="/stars_1.svg" alt="" aria-hidden="true" className="w-6 h-6 sm:w-8 sm:h-8" />
           <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-3xl sm:text-5xl md:text-[64px] tracking-[-1px] sm:tracking-[-2px] leading-tight">
             Услышь себя
           </h1>
@@ -77,6 +77,7 @@ const TibetanBowlsPage = () => {
             <img
               src="/bowls-about.png"
               alt="Тибетские чаши в природе"
+              loading="lazy"
               className="w-full h-[200px] sm:h-[280px] md:h-[320px] object-cover rounded-[20px] sm:rounded-[25px]"
             />
           </div>
@@ -113,7 +114,7 @@ const TibetanBowlsPage = () => {
           {/* Card 1 */}
           <div className="bg-[#efdec5] rounded-[25px] p-7 text-center border-2 border-[#C9A882]">
             <div className="w-16 h-16 mx-auto mb-5 rounded-full border-2 border-[#C9A882] flex items-center justify-center">
-              <img src="/heart.svg" alt="" className="w-7 h-7" />
+              <img src="/heart.svg" alt="" aria-hidden="true" className="w-7 h-7" />
             </div>
             <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg mb-3">
               Глубокая вибрация
@@ -128,7 +129,7 @@ const TibetanBowlsPage = () => {
           {/* Card 2 */}
           <div className="bg-[#efdec5] rounded-[25px] p-7 text-center border-2 border-[#C9A882]">
             <div className="w-16 h-16 mx-auto mb-5 rounded-full border-2 border-[#C9A882] flex items-center justify-center">
-              <img src="/brain.svg" alt="" className="w-7 h-7" />
+              <img src="/brain.svg" alt="" aria-hidden="true" className="w-7 h-7" />
             </div>
             <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg mb-3">
               Эмоциональное освобождение
@@ -143,7 +144,7 @@ const TibetanBowlsPage = () => {
           {/* Card 3 */}
           <div className="bg-[#efdec5] rounded-[25px] p-7 text-center border-2 border-[#C9A882]">
             <div className="w-16 h-16 mx-auto mb-5 rounded-full border-2 border-[#C9A882] flex items-center justify-center">
-              <img src="/medicine-heart-hear.svg" alt="" className="w-7 h-7" />
+              <img src="/medicine-heart-hear.svg" alt="" aria-hidden="true" className="w-7 h-7" />
             </div>
             <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg mb-3">
               Духовное пробуждение
@@ -195,6 +196,7 @@ const TibetanBowlsPage = () => {
             <img
               src="/bowls-session.png"
               alt="Сеанс тибетских чаш"
+              loading="lazy"
               className="w-full h-[240px] sm:h-[320px] md:h-[380px] object-cover rounded-[20px] sm:rounded-[25px]"
             />
           </div>

@@ -67,6 +67,7 @@ const ProductCard = ({
                 <img
                   src={`${BASE_URL}${product.image}`}
                   alt={product.name}
+                  loading="lazy"
                   className="w-full h-full object-cover rounded-t-[20px]"
                 />
               ) : (
