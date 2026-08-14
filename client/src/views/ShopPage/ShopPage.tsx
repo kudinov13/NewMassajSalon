@@ -430,6 +430,8 @@ const ShopPage = () => {
             src="/shop-banner.png"
             alt="Баннер магазина"
             className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
               (e.target as HTMLImageElement).style.background = '#c4a882';
               (e.target as HTMLImageElement).style.display = 'block';

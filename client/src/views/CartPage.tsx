@@ -129,7 +129,7 @@ const CartPage = () => {
                   {/* Image */}
                   <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-[15px] overflow-hidden bg-[#f5efe8]">
                     {item.image ? (
-                      <img src={`${BASE_URL}${item.image}`} alt={item.name} className="w-full h-full object-contain" />
+                      <img src={`${BASE_URL}${item.image}`} alt={item.name} className="w-full h-full object-contain" loading="lazy" decoding="async" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-2xl text-[#00000033]">📦</div>
                     )}

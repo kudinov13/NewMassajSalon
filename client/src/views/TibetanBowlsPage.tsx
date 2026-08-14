@@ -40,6 +40,7 @@ const TibetanBowlsPage = () => {
           src="/bowls-hero.png"
           alt="Тибетские чаши"
           className="w-full h-full object-cover"
+          decoding="async"
         />
       </section>
 
@@ -129,7 +130,7 @@ const TibetanBowlsPage = () => {
           {/* Card 2 */}
           <div className="bg-[#efdec5] rounded-[25px] p-7 text-center border-2 border-[#C9A882]">
             <div className="w-16 h-16 mx-auto mb-5 rounded-full border-2 border-[#C9A882] flex items-center justify-center">
-              <img src="/brain.svg" alt="" aria-hidden="true" className="w-7 h-7" />
+              <img src="/brain.svg" alt="" aria-hidden="true" className="w-7 h-7" decoding="async" />
             </div>
             <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg mb-3">
               Эмоциональное освобождение
@@ -144,7 +145,7 @@ const TibetanBowlsPage = () => {
           {/* Card 3 */}
           <div className="bg-[#efdec5] rounded-[25px] p-7 text-center border-2 border-[#C9A882]">
             <div className="w-16 h-16 mx-auto mb-5 rounded-full border-2 border-[#C9A882] flex items-center justify-center">
-              <img src="/medicine-heart-hear.svg" alt="" aria-hidden="true" className="w-7 h-7" />
+              <img src="/medicine-heart-hear.svg" alt="" aria-hidden="true" className="w-7 h-7" decoding="async" />
             </div>
             <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg mb-3">
               Духовное пробуждение

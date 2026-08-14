@@ -204,11 +204,15 @@ const DiagnosticsDetailPage: React.FC = () => {
                   src="/diag-nails.png"
                   alt="Диагностика ногтей"
                   className="relative z-0 w-[320px] h-[400px] object-cover rounded-[20px] ml-auto block"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <img
                   src="/diag-nails-2.png"
                   alt="Руки"
                   className="absolute bottom-[-40px] left-[-10px] z-10 w-[180px] h-[280px] object-cover rounded-[15px] shadow-md"
+                  loading="lazy"
+                  decoding="async"
                 />
               </>
             ) : type === "tongue" ? null : (
@@ -216,6 +220,8 @@ const DiagnosticsDetailPage: React.FC = () => {
                 src={content.image}
                 alt={content.title}
                 className="w-full h-[400px] object-cover rounded-[25px]"
+                loading="lazy"
+                decoding="async"
               />
             )}
           </div>

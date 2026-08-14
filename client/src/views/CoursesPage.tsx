@@ -75,7 +75,7 @@ const CoursesPage: React.FC = () => {
                 <div key={course.id} className="bg-white/80 rounded-[22px] overflow-hidden border border-[#e3cbb1]/40 flex flex-col">
                   <div className="h-[180px] bg-[#f5efe8] flex items-center justify-center">
                     {course.image ? (
-                      <img src={`${BASE_URL}${course.image}`} alt={course.title} className="w-full h-full object-cover" />
+                      <img src={`${BASE_URL}${course.image}`} alt={course.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                     ) : (
                       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#a6856d" strokeWidth="1.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     )}

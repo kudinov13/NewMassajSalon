@@ -504,6 +504,7 @@ const StreamsPage: React.FC = () => {
                 controls
                 autoPlay
                 playsInline
+                preload="metadata"
                 className="w-full h-full object-contain"
               />
             ) : (

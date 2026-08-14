@@ -424,6 +424,8 @@ export const Frame = (): React.ReactElement => {
         className="absolute top-[109px] left-[707px] w-[703px] h-[651px] aspect-[1.08] object-cover rounded-[25px]"
         alt="Специалист центра у окна"
         src={rectangle2}
+        loading="lazy"
+        decoding="async"
       />
       <header className="absolute top-0 left-0 w-[1440px] h-[94px] flex items-center justify-center bg-[#efdec5]">
         <div className="h-[94px] w-[1440px] relative">
@@ -437,6 +439,7 @@ export const Frame = (): React.ReactElement => {
               className="h-[80px] w-auto object-contain"
               alt="Логотип Коосмо"
               src="/logo.svg"
+              decoding="async"
             />
           </div>
           <div className="absolute top-[27px] left-[130px] w-[450px] h-[40px] bg-[#e3cbb1] rounded-[25px]" aria-hidden="true"></div>
@@ -590,6 +593,7 @@ export const Frame = (): React.ReactElement => {
               className="mt-2 w-[14.71px] h-[14.71px] ml-[7.3px]"
               alt=""
               src={arrow12}
+              decoding="async"
             />
           </div>
         </button>
@@ -607,6 +611,7 @@ export const Frame = (): React.ReactElement => {
               className="mt-2 w-[14.71px] h-[14.71px] ml-[7.3px]"
               alt=""
               src={arrow2}
+              decoding="async"
             />
           </div>
         </Link>
@@ -661,7 +666,7 @@ export const Frame = (): React.ReactElement => {
                   <div className={service.titleClass}>{service.title}</div>
                   <p className={service.descriptionClass}>{service.description}</p>
                   <span className={service.arrowWrapClass} aria-hidden="true">
-                    <img className={service.arrowClass} alt="" src={service.arrow} />
+                    <img className={service.arrowClass} alt="" src={service.arrow} decoding="async" />
                   </span>
                   <img loading="lazy" decoding="async" className={service.imageClass} alt={service.title} src={service.image} />
                 </button>
@@ -730,7 +735,7 @@ export const Frame = (): React.ReactElement => {
                 <p className={service.descriptionClass}>{service.description}</p>
               )}
               <span className={service.arrowWrapClass} aria-hidden="true">
-                <img className={service.arrowClass} alt="" src={service.arrow} />
+                <img className={service.arrowClass} alt="" src={service.arrow} decoding="async" />
               </span>
               <img
                 loading="lazy"
@@ -835,6 +840,8 @@ export const Frame = (): React.ReactElement => {
           className="absolute top-[3988px] left-[15px] w-[50px] h-[50px] object-contain"
           alt="Иконка локации"
           src="/logo.svg"
+          loading="lazy"
+          decoding="async"
         />
         {editingAddress ? (
           <div className="absolute top-[3988px] left-[75px] flex items-center gap-2">
@@ -979,6 +986,7 @@ export const Frame = (): React.ReactElement => {
                 className="mt-2 w-[14.71px] h-[14.71px] ml-[7.3px]"
                 alt=""
                 src={arrow13}
+                decoding="async"
               />
             </div>
           </button>
@@ -1023,6 +1031,8 @@ export const Frame = (): React.ReactElement => {
         className="absolute top-[821px] left-[1356px] w-[63px] h-[63px]"
         alt=""
         src={tsitataIcon}
+        loading="lazy"
+        decoding="async"
         aria-hidden="true"
       />
     </main>
