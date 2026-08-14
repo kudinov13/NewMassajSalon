@@ -36,9 +36,9 @@ async function transcodeToHLS(inputFilename) {
         '-i', inputPath,
         '-filter_complex',
         '[0:v]split=3[v1][v2][v3];' +
-        '[v1]scale=w=640:h=360[v1out];' +
-        '[v2]scale=w=1280:h=720[v2out];' +
-        '[v3]scale=w=1920:h=1080[v3out]',
+        '[v1]scale=-2:360[v1out];' +
+        '[v2]scale=-2:720[v2out];' +
+        '[v3]scale=-2:1080[v3out]',
         // 360p
         '-map', '[v1out]', '-c:v:0', 'libx264', '-x264-params', 'nal-hrd=cbr:force-cfr=1',
         '-b:v:0', '800k', '-maxrate:v:0', '856k', '-bufsize:v:0', '1200k',
