@@ -18,7 +18,7 @@ const videoStorage = multer.diskStorage({
         cb(null, `video-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`);
     }
 });
-const videoUpload = multer({ storage: videoStorage, limits: { fileSize: 500 * 1024 * 1024 } });
+const videoUpload = multer({ storage: videoStorage, limits: { fileSize: 5 * 1024 * 1024 * 1024 } });
 
 const requireAuth = async (req, res, next) => {
     const token = req.cookies.token;

@@ -22,7 +22,7 @@ const videoStorage = multer.diskStorage({
         cb(null, `video-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`);
     }
 });
-const videoUpload = multer({ storage: videoStorage, limits: { fileSize: 500 * 1024 * 1024 } });
+const videoUpload = multer({ storage: videoStorage, limits: { fileSize: 5 * 1024 * 1024 * 1024 } });
 
 const convertToPng = async (fileBuffer) => {
     const filename = Date.now() + '-' + Math.round(Math.random() * 1e6) + '.png';
