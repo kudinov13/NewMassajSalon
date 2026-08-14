@@ -75,7 +75,7 @@ const Header: React.FC<HeaderProps> = ({ activeItem, cartCount }) => {
   return (
     <header className="w-full px-4 sm:px-6 md:px-10 py-4 md:py-6 flex items-center justify-between relative z-50">
       <Link to="/" className="flex items-center gap-2 no-underline flex-shrink-0">
-        <img src="/logo.svg" alt="Коосмо" className="h-10 md:h-12 w-auto" />
+        <img src="/logo.svg" alt="Коосмо" className="h-10 md:h-12 w-auto" width={40} height={40} />
         <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-lg md:text-xl">
           Коосмо
         </span>

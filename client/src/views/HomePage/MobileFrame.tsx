@@ -10,17 +10,17 @@ import arrow16 from "./arrow-1-6.svg";
 import arrow17 from "./arrow-1-7.svg";
 import arrow18 from "./arrow-1-8.svg";
 import arrow2 from "./arrow-2.svg";
-import rectangle2 from "./rectangle-2.png";
-import rectangle13 from "./Rectangle 13.png";
-import rectangle15 from "./rectangle-15.png";
-import rectangle17 from "./rectangle-17.png";
-import rectangle18 from "./rectangle-18.png";
-import rectangle19 from "./rectangle-19.png";
-import rectangle20 from "./rectangle-20.png";
-import rectangle21 from "./rectangle-21.png";
-import rectangle25 from "./rectangle-25.png";
-import rectangle27 from "./rectangle-27.png";
-import rectangle32 from "./rectangle-32.png";
+import rectangle2 from "./rectangle-2.webp";
+import rectangle13 from "./rectangle-13.webp";
+import rectangle15 from "./rectangle-15.webp";
+import rectangle17 from "./rectangle-17.webp";
+import rectangle18 from "./rectangle-18.webp";
+import rectangle19 from "./rectangle-19.webp";
+import rectangle20 from "./rectangle-20.webp";
+import rectangle21 from "./rectangle-21.webp";
+import rectangle25 from "./rectangle-25.webp";
+import rectangle27 from "./rectangle-27.webp";
+import rectangle32 from "./rectangle-32.webp";
 import tsitataIcon from "./tsitata_yr2c6veqh1hi 1.svg";
 
 const services = [
@@ -120,8 +120,10 @@ const MobileFrame: React.FC = () => {
           src={rectangle2}
           alt="Специалист центра"
           className="mt-8 w-full h-[240px] object-cover rounded-[20px]"
-          loading="lazy"
+          {...{ fetchpriority: "high" }}
           decoding="async"
+          width={380}
+          height={240}
         />
       </section>
 
@@ -244,7 +246,7 @@ const MobileFrame: React.FC = () => {
           Как нас найти
         </h2>
         <div className="flex items-start gap-3 mb-4">
-          <img src="/logo.svg" alt="" className="w-8 h-8 object-contain flex-shrink-0 mt-1" />
+          <img src="/logo.svg" alt="" className="w-8 h-8 object-contain flex-shrink-0 mt-1" width={32} height={32} />
           {editingAddress ? (
             <div className="flex flex-col gap-2 flex-1">
               <input type="text" value={addressDraft} onChange={(e) => setAddressDraft(e.target.value)} className="w-full h-9 px-3 text-[#000000e6] text-base border border-[#a6856d] rounded-md bg-white" autoFocus />
