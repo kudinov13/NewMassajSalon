@@ -25,6 +25,7 @@ const activityRouter = require("./routes/activity");
 const reviewsRouter = require("./routes/reviews");
 const contactRouter = require("./routes/contact");
 const diagnosticsTestsRouter = require("./routes/diagnostics-tests");
+const beforeAfterRouter = require("./routes/before-after");
 const {initDb} = require("./db/db");
 
 const app = express();
@@ -80,6 +81,7 @@ app.use("/api/journal", activityRouter);
 app.use("/api/reviews", reviewsRouter);
 app.use("/api/contact", contactRouter);
 app.use("/api/diagnostics-tests", diagnosticsTestsRouter);
+app.use("/api/before-after", beforeAfterRouter);
 // Video streaming with Range support
 const fs = require('fs');
 app.get('/uploads/:filename', (req, res) => {

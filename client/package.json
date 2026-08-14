@@ -27,6 +27,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "react-snap --exclude=/panel --exclude=/psychologist --exclude=/bowls-specialist --exclude=/room/:roomId --exclude=/broadcast/:streamId --exclude=/stream/:streamId",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -52,6 +53,53 @@
   "devDependencies": {
     "autoprefixer": "^10.5.0",
     "postcss": "^8.5.12",
+    "react-snap": "^1.23.4",
     "tailwindcss": "^3.4.19"
+  },
+  "reactSnap": {
+    "include": [
+      "/",
+      "/about",
+      "/reviews",
+      "/shop",
+      "/schedule",
+      "/tibetan-bowls",
+      "/tibetan-bowls/booking",
+      "/tibetan-bowls/media",
+      "/diagnostics/booking",
+      "/diagnostics-schedule",
+      "/diagnostics/nails",
+      "/diagnostics/tongue",
+      "/diagnostics/eyes",
+      "/diagnostics/skin",
+      "/diagnostics/body",
+      "/analyses",
+      "/psychology",
+      "/psychology/booking",
+      "/streams",
+      "/courses",
+      "/guide",
+      "/before-after"
+    ],
+    "exclude": [
+      "/panel",
+      "/psychologist",
+      "/bowls-specialist",
+      "/room/**",
+      "/broadcast/**",
+      "/stream/**",
+      "/login",
+      "/registration",
+      "/profile",
+      "/basket",
+      "/my-courses",
+      "/purchase-history"
+    ],
+    "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"],
+    "skipThirdPartyRequests": true,
+    "minifyHtml": {
+      "collapseWhitespace": true,
+      "removeComments": false
+    }
   }
 }

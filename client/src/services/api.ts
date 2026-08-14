@@ -991,4 +991,37 @@ export const API = {
       return response.json();
     },
   },
+  beforeAfter: {
+    getAll: async () => {
+      const response = await fetch(`${API_BASE}/before-after`, { credentials: "include" });
+      await errorHandler(response);
+      return response.json();
+    },
+    create: async (formData: FormData) => {
+      const response = await fetch(`${API_BASE}/before-after`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    update: async (id: number, formData: FormData) => {
+      const response = await fetch(`${API_BASE}/before-after/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        body: formData,
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+    delete: async (id: number) => {
+      const response = await fetch(`${API_BASE}/before-after/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      await errorHandler(response);
+      return response.json();
+    },
+  },
 };

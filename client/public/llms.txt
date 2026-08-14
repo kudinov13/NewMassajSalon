@@ -1,0 +1,26 @@
+# КООСМО — Оздоровительный центр
+
+> КООСМО — оздоровительный центр в Бийске и Новосибирске. Массаж, тибетские поющие чаши, диагностика по внешним признакам, психосоматика, онлайн-курсы.
+
+## Услуги
+
+- [Расслабляющий массаж](https://koosmo.ru/)
+- [Диагностика организма](https://koosmo.ru/diagnostics/booking)
+- [Анализы](https://koosmo.ru/analyses)
+- [Тибетские поющие чаши](https://koosmo.ru/tibetan-bowls)
+- [Психология и психосоматика](https://koosmo.ru/psychology)
+- [Прямые трансляции](https://koosmo.ru/streams)
+- [Видео-курсы](https://koosmo.ru/courses)
+
+## Информация
+
+- [О центре](https://koosmo.ru/about)
+- [Отзывы](https://koosmo.ru/reviews)
+- [Расписание](https://koosmo.ru/schedule)
+- [Руководство по массажу](https://koosmo.ru/guide)
+
+## Контакты
+
+- Телефон: +7 909 505 46 58
+- Сайт: https://koosmo.ru
+- Email: info@koosmo.ru

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { API, BASE_URL } from "../services/api";
 
-type Tab = "dashboard" | "products" | "labs" | "streams" | "live" | "users" | "diagnostics-schedule" | "diagnostics-tests" | "activity" | "admin-guide" | "contact";
+type Tab = "dashboard" | "products" | "labs" | "streams" | "live" | "users" | "diagnostics-schedule" | "diagnostics-tests" | "activity" | "admin-guide" | "contact" | "courses";
 
 interface Stream {
   id: number;
@@ -172,6 +172,15 @@ const sidebarItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
       </svg>
     ),
   },
+  {
+    key: "courses",
+    label: "Курсы",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+      </svg>
+    ),
+  },
 ];
 
 const AdminActivityTab: React.FC = () => {
@@ -330,9 +339,35 @@ const CoursesAdminTab: React.FC = () => {
   const [videoProgress, setVideoProgress] = useState(0);
   const [videoError, setVideoError] = useState("");
   const [videoSuccess, setVideoSuccess] = useState("");
+  const [expandedCourse, setExpandedCourse] = useState<number | null>(null);
+  const [courseVideos, setCourseVideos] = useState<any[]>([]);
+  const [loadingVideos, setLoadingVideos] = useState(false);
+  const [previewVideo, setPreviewVideo] = useState<any | null>(null);
 
   const load = () => API.courses.getAll().then(setCourses).catch(() => {});
   useEffect(() => { load(); }, []);
+
+  const loadVideos = async (courseId: number) => {
+    setLoadingVideos(true);
+    try {
+      const course = await API.courses.get(courseId);
+      setCourseVideos(course.videos || []);
+    } catch {
+      setCourseVideos([]);
+    } finally {
+      setLoadingVideos(false);
+    }
+  };
+
+  const toggleExpand = (courseId: number) => {
+    if (expandedCourse === courseId) {
+      setExpandedCourse(null);
+      setCourseVideos([]);
+    } else {
+      setExpandedCourse(courseId);
+      loadVideos(courseId);
+    }
+  };
 
   const handleCreate = async () => {
     if (!title.trim()) return;
@@ -349,7 +384,19 @@ const CoursesAdminTab: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!window.confirm("Удалить курс?")) return;
     await API.courses.delete(id);
+    if (expandedCourse === id) { setExpandedCourse(null); setCourseVideos([]); }
     load();
+  };
+
+  const handleDeleteVideo = async (videoId: number) => {
+    if (!expandedCourse) return;
+    if (!window.confirm("Удалить видео?")) return;
+    try {
+      await API.courses.deleteVideo(expandedCourse, videoId);
+      loadVideos(expandedCourse);
+    } catch (e: any) {
+      alert(e.message || "Ошибка");
+    }
   };
 
   const handleUploadVideo = async () => {
@@ -367,6 +414,7 @@ const CoursesAdminTab: React.FC = () => {
       setVideoSuccess("Видео успешно загружено!");
       setTimeout(() => setVideoSuccess(""), 3000);
       load();
+      if (expandedCourse) loadVideos(expandedCourse);
     } catch (e: any) {
       setVideoError(e.message || "Ошибка загрузки видео");
     } finally {
@@ -406,6 +454,11 @@ const CoursesAdminTab: React.FC = () => {
           <input placeholder="Название урока" value={videoTitle} onChange={e => setVideoTitle(e.target.value)} className="h-10 px-4 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none" />
           <input type="file" accept="video/*" onChange={e => setVideoFile(e.target.files?.[0] || null)} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm" />
         </div>
+        {videoFile && (
+          <div className="mb-4 px-4 py-2 bg-[#f5efe8] rounded-[10px] [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs">
+            Выбран файл: <strong>{videoFile.name}</strong> ({(videoFile.size / 1024 / 1024).toFixed(1)} МБ)
+          </div>
+        )}
         <button onClick={handleUploadVideo} disabled={!videoCourseId || !videoFile || videoUploading} className="h-9 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors disabled:opacity-40">
           {videoUploading ? `Загрузка ${videoProgress}%` : "Загрузить видео"}
         </button>
@@ -430,7 +483,7 @@ const CoursesAdminTab: React.FC = () => {
         )}
       </div>
 
-      {/* Course list */}
+      {/* Course list with expandable videos */}
       <div className="bg-white rounded-[20px] p-6 border border-[#e3cbb1]/40">
         <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-base mb-4">Все курсы ({courses.length})</h3>
         {courses.length === 0 ? (
@@ -438,22 +491,88 @@ const CoursesAdminTab: React.FC = () => {
         ) : (
           <div className="space-y-3">
             {courses.map(c => (
-              <div key={c.id} className="flex items-center justify-between px-4 py-3 bg-[#f5efe8] rounded-[12px]">
-                <div className="flex items-center gap-3">
-                  {c.image && <img src={`${BASE_URL}${c.image}`} alt="" className="w-10 h-10 rounded-[8px] object-cover" />}
-                  <div>
-                    <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">{c.title}</span>
-                    <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs ml-2">{c.price > 0 ? `${c.price} ₽` : "Бесплатно"}</span>
+              <div key={c.id} className="bg-[#f5efe8] rounded-[12px] overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {c.image && <img src={`${BASE_URL}${c.image}`} alt="" className="w-10 h-10 rounded-[8px] object-cover flex-shrink-0" />}
+                    <div className="min-w-0">
+                      <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">{c.title}</span>
+                      <span className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60 text-xs ml-2">{c.price > 0 ? `${c.price} ₽` : "Бесплатно"}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => toggleExpand(c.id)}
+                      className="h-8 px-3 bg-[#a6856d]/10 text-[#a6856d] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs border-0 cursor-pointer hover:bg-[#a6856d]/20 transition-colors"
+                    >
+                      {expandedCourse === c.id ? "Скрыть" : "Видео"}
+                    </button>
+                    <button onClick={() => handleDelete(c.id)} className="h-8 px-3 border border-red-300 text-red-500 rounded-full bg-transparent [font-family:'Vela_Sans',sans-serif] font-light text-xs cursor-pointer hover:bg-red-50">
+                      Удалить
+                    </button>
                   </div>
                 </div>
-                <button onClick={() => handleDelete(c.id)} className="h-8 px-3 border border-red-300 text-red-500 rounded-full bg-transparent [font-family:'Vela_Sans',sans-serif] font-light text-xs cursor-pointer hover:bg-red-50">
-                  Удалить
-                </button>
+                {expandedCourse === c.id && (
+                  <div className="px-4 pb-4 border-t border-[#e3cbb1]/30 pt-3">
+                    {loadingVideos ? (
+                      <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-sm py-2">Загрузка видео...</p>
+                    ) : courseVideos.length === 0 ? (
+                      <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/50 text-sm py-2">Видео нет. Загрузите первое видео выше.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {courseVideos.map((v, i) => (
+                          <div key={v.id} className="flex items-center gap-3 px-3 py-2 bg-white rounded-[10px] border border-[#e3cbb1]/30">
+                            <span className="w-6 h-6 rounded-full bg-[#a6856d]/10 text-[#a6856d] flex items-center justify-center [font-family:'Vela_Sans',sans-serif] font-normal text-xs flex-shrink-0">{i + 1}</span>
+                            <div className="flex-1 min-w-0">
+                              <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-sm">{v.title}</span>
+                              {v.hlsUrl && (
+                                <span className="ml-2 text-[10px] text-green-600 [font-family:'Vela_Sans',sans-serif] font-light">HLS готов</span>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => setPreviewVideo(v)}
+                              className="h-7 px-3 bg-[#a6856d]/10 text-[#a6856d] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-xs border-0 cursor-pointer hover:bg-[#a6856d]/20 transition-colors flex-shrink-0"
+                            >
+                              ▶ Превью
+                            </button>
+                            <button
+                              onClick={() => handleDeleteVideo(v.id)}
+                              className="w-7 h-7 rounded-full bg-transparent border border-red-200 text-red-400 flex items-center justify-center cursor-pointer hover:bg-red-50 transition-colors flex-shrink-0"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Video preview modal */}
+      {previewVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setPreviewVideo(null)} />
+          <div className="relative bg-[#faf6f1] rounded-[25px] p-6 w-full max-w-[700px] shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg">{previewVideo.title}</h3>
+              <button onClick={() => setPreviewVideo(null)} className="w-8 h-8 rounded-full bg-[#e3cbb1]/30 border-0 flex items-center justify-center cursor-pointer hover:bg-[#e3cbb1]">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B5744" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <video
+              src={`${BASE_URL}${previewVideo.videoUrl}`}
+              controls
+              className="w-full rounded-[16px] bg-black"
+              style={{ maxHeight: "60vh" }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1869,6 +1988,9 @@ const AdminPage: React.FC = () => {
             )}
           </div>
         )}
+        {/* === COURSES === */}
+        {tab === "courses" && <CoursesAdminTab />}
+
         {/* === ACTIVITY LOG === */}
         {tab === "activity" && <AdminActivityTab />}
 

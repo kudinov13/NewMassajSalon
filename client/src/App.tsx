@@ -42,6 +42,7 @@ const BowlsMediaPage = lazy(() => import("./views/BowlsMediaPage"));
 const BowlsSpecialistPanel = lazy(() => import("./views/BowlsSpecialistPanel"));
 const AboutPage = lazy(() => import("./views/AboutPage"));
 const ReviewsPage = lazy(() => import("./views/ReviewsPage"));
+const BeforeAfterPage = lazy(() => import("./views/BeforeAfterPage"));
 
 const PageFallback = () => (
   <div className="min-h-screen bg-[#efdec5] flex items-center justify-center">
@@ -119,6 +120,7 @@ function App() {
         <Route path='/stream/:streamId' element={<PageTransition><StreamViewerPage/></PageTransition>} />
         <Route path='/about' element={<PageTransition><AboutPage/></PageTransition>} />
         <Route path='/reviews' element={<PageTransition><ReviewsPage/></PageTransition>} />
+        <Route path='/before-after' element={<PageTransition><BeforeAfterPage/></PageTransition>} />
       </Route>
     </Routes>
   </>;

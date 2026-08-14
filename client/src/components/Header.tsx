@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { label: "Психология", path: "/psychology" },
   { label: "О нас", path: "/about" },
   { label: "Отзывы", path: "/reviews" },
+  { label: "Результаты", path: "/before-after" },
 ];
 
 const DIAG_OPTIONS = [

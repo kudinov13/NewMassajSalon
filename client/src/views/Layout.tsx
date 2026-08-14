@@ -239,6 +239,14 @@ const ROUTE_SEO: Record<string, RouteSeoConfig> = {
     ogUrl: "https://koosmo.ru/guide",
     schema: BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "Путеводитель", url: "https://koosmo.ru/guide"}]),
   },
+  "/before-after": {
+    title: "Результаты до и после — массаж, диагностика, оздоровление | КООСМО",
+    description: "Реальные результаты клиентов КООСМО до и после процедур: массаж, тибетские чаши, диагностика, психосоматика. Фото и описания работ.",
+    keywords: "результаты массажа до и после, фото до после массаж, результаты оздоровления, КООСМО результаты",
+    canonical: "https://koosmo.ru/before-after",
+    ogUrl: "https://koosmo.ru/before-after",
+    schema: BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "Результаты", url: "https://koosmo.ru/before-after"}]),
+  },
 };
 
 const DIAGNOSTIC_SEO: Record<string, Partial<RouteSeoConfig>> = {

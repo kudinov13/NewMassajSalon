@@ -425,6 +425,17 @@ const initDb = async () => {
             FOREIGN KEY(userId) REFERENCES users(id)
         )`);
 
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS before_after (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL DEFAULT '',
+            description TEXT NOT NULL DEFAULT '',
+            beforeImage TEXT NOT NULL,
+            afterImage TEXT NOT NULL,
+            createdAt TEXT DEFAULT (datetime('now')),
+            sortOrder INTEGER NOT NULL DEFAULT 0
+        )`);
+
     // начальные отзывы
     const reviewsExist = await db.get(`SELECT id FROM reviews LIMIT 1`);
     if (!reviewsExist) {
