@@ -13,7 +13,7 @@ interface RouteSeoConfig {
 
 const DEFAULT_SEO: RouteSeoConfig = {
   title: "Массаж Бийск — расслабляющий, классический, лимфодренажный | КООСМО — массаж Новосибирск, тибетские чаши, диагностика",
-  description: "КООСМО — массаж в Бийске и Новосибирске: расслабляющий, классический, лимфодренажный, массаж спины. Тибетские поющие чаши, диагностика по ногтям, языку, глазам, психосоматика. Запись онлайн.",
+  description: "КООСМО — массаж в Бийске и Новосибирске: расслабляющий, классический, лимфодренажный, массаж спины. Тибетские чаши, диагностика, психосоматика. Запись онлайн.",
   keywords: "массаж Бийск, массаж Новосибирск, расслабляющий массаж Бийск, классический массаж Бийск, массаж спины Бийск, лимфодренажный массаж, тибетские поющие чаши, виброакустический массаж, диагностика по языку, диагностика по ногтям, диагностика по глазам, спа Бийск, оздоровительный центр, психолог Бийск, психосоматика, КООСМО",
   canonical: "https://koosmo.ru",
   ogUrl: "https://koosmo.ru",
@@ -31,6 +31,7 @@ const BASE_SCHEMAS = {
     "priceRange": "₽₽",
     "currenciesAccepted": "RUB",
     "paymentAccepted": "Cash, Card",
+    "telephone": "+79095054658",
     "areaServed": [{"@type": "City", "name": "Бийск"}, {"@type": "City", "name": "Новосибирск"}],
     "address": {"@type": "PostalAddress", "addressLocality": "Бийск", "addressRegion": "Алтайский край", "addressCountry": "RU"},
     "geo": {"@type": "GeoCoordinates", "latitude": "52.5362", "longitude": "85.2148"},
@@ -52,13 +53,41 @@ const BASE_SCHEMAS = {
       "name": item.name,
       "item": item.url
     }))
+  }),
+  faq: (questions: {q: string, a: string}[]) => ({
+    "@type": "FAQPage",
+    "mainEntity": questions.map(item => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": { "@type": "Answer", "text": item.a }
+    }))
+  }),
+  person: (name: string, jobTitle: string, image?: string) => ({
+    "@type": "Person",
+    "name": name,
+    "jobTitle": jobTitle,
+    "worksFor": { "@type": "Organization", "name": "КООСМО" },
+    "image": image || "https://koosmo.ru/logo512.png",
+    "url": "https://koosmo.ru"
+  }),
+  service: (name: string, description: string) => ({
+    "@type": "Service",
+    "name": name,
+    "description": description,
+    "areaServed": [{"@type": "City", "name": "Бийск"}, {"@type": "City", "name": "Новосибирск"}],
+    "provider": { "@type": "Organization", "name": "КООСМО" }
   })
 };
 
 const ROUTE_SEO: Record<string, RouteSeoConfig> = {
   "/": {
     ...DEFAULT_SEO,
-    schema: BASE_SCHEMAS.localBusiness,
+    schema: [
+      BASE_SCHEMAS.localBusiness,
+      BASE_SCHEMAS.person("Кюльпер Татьяна Альбертовна", "Специалист по массажу и диагностике"),
+      BASE_SCHEMAS.person("Тимкина Наталья Александровна", "Специалист по массажу и оздоровлению"),
+      BASE_SCHEMAS.person("Коюшева Оксана Викторовна", "Специалист по тибетским поющим чашам"),
+    ],
   },
   "/about": {
     title: "О студии КООСМО — массаж, диагностика, оздоровление в Бийске",
@@ -66,7 +95,11 @@ const ROUTE_SEO: Record<string, RouteSeoConfig> = {
     keywords: "о студии КООСМО, массаж Бийск, массаж Новосибирск, оздоровительный центр Бийск, диагностика здоровья, тибетские чаши, КООСМО",
     canonical: "https://koosmo.ru/about",
     ogUrl: "https://koosmo.ru/about",
-    schema: BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "О студии", url: "https://koosmo.ru/about"}]),
+    schema: [BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "О студии", url: "https://koosmo.ru/about"}]), BASE_SCHEMAS.faq([
+      {q: "Где находится студия КООСМО?", a: "Студия КООСМО находится в Новосибирске, ул. Хмельницкого, 1. Точный адрес и карту проезда можно найти на странице контактов."},
+      {q: "Какие услуги предлагает КООСМО?", a: "КООСМО предлагает массаж (расслабляющий, классический, лимфодренажный), тибетские поющие чаши, диагностику по внешним признакам, психологическую поддержку и онлайн-курсы."},
+      {q: "Можно ли записаться онлайн?", a: "Да, запись на все услуги доступна онлайн через сайт koosmo.ru/schedule или по телефону +7 (909) 505-46-58."}
+    ])],
   },
   "/reviews": {
     title: "Отзывы клиентов — массаж, диагностика, тибетские чаши | КООСМО Бийск, Новосибирск",
@@ -135,7 +168,11 @@ const ROUTE_SEO: Record<string, RouteSeoConfig> = {
     keywords: "диагностика здоровья Бийск, диагностика здоровья Новосибирск, диагностика по ногтям, диагностика по языку, диагностика по глазам, диагностика по коже, диагностика по телу, КООСМО",
     canonical: "https://koosmo.ru/diagnostics",
     ogUrl: "https://koosmo.ru/diagnostics",
-    schema: BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "Диагностика", url: "https://koosmo.ru/diagnostics"}]),
+    schema: [BASE_SCHEMAS.service("Диагностика здоровья по внешним признакам", "Диагностика по ногтям, языку, глазам, коже и телу в Бийске и Новосибирске."), BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "Диагностика", url: "https://koosmo.ru/diagnostics"}]), BASE_SCHEMAS.faq([
+      {q: "Как проходит диагностика по внешним признакам?", a: "Диагностика включает оценку по ногтям, языку, глазам, коже и телу. Специалист определяет возможные дефициты и дисбалансы без анализов. Доступна онлайн и очно."},
+      {q: "Сколько стоит диагностика?", a: "Стоимость диагностики зависит от типа. Запись и уточнение цен доступны на странице записи."},
+      {q: "Нужна ли подготовка к диагностике?", a: "Специальной подготовки не требуется. Достаточно прийти без макияжа (для диагностики по коже и глазам) и иметь чистые ногти."}
+    ])],
   },
   "/diagnostics/booking": {
     title: "Запись на диагностику здоровья | КООСМО Бийск, Новосибирск",
@@ -157,6 +194,7 @@ const ROUTE_SEO: Record<string, RouteSeoConfig> = {
     keywords: "анализы Бийск, анализы Новосибирск, лабораторная диагностика, сдать анализы, КООСМО",
     canonical: "https://koosmo.ru/analyses",
     ogUrl: "https://koosmo.ru/analyses",
+    schema: [BASE_SCHEMAS.service("Анализы и лабораторная диагностика", "Лабораторные анализы и исследования в Бийске и Новосибирске через партнёров КООСМО."), BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "Анализы", url: "https://koosmo.ru/analyses"}])],
   },
   "/psychology": {
     title: "Психолог в Бийске — психосоматика и психологическая поддержка | КООСМО",
@@ -164,7 +202,11 @@ const ROUTE_SEO: Record<string, RouteSeoConfig> = {
     keywords: "психолог Бийск, психолог Новосибирск, психосоматика, психологическая поддержка, психологическая помощь Бийск, консультация психолога, КООСМО",
     canonical: "https://koosmo.ru/psychology",
     ogUrl: "https://koosmo.ru/psychology",
-    schema: BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "Психология", url: "https://koosmo.ru/psychology"}]),
+    schema: [BASE_SCHEMAS.service("Психологическая поддержка и психосоматика", "Психосоматика и психологическая помощь в Бийске и Новосибирске. Онлайн и очные консультации."), BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "Психология", url: "https://koosmo.ru/psychology"}]), BASE_SCHEMAS.faq([
+      {q: "Что такое психосоматика?", a: "Психосоматика — это направление, изучающее связь между эмоциональным состоянием и физическим здоровьем. Помогает понять, как стресс и эмоции влияют на тело."},
+      {q: "Как записаться к психологу?", a: "Запись на консультацию доступна онлайн через сайт koosmo.ru/psychology/booking или по телефону +7 (909) 505-46-58."},
+      {q: "Онлайн или очно?", a: "КООСМО предлагает как очные консультации в Бийске и Новосибирске, так и онлайн-консультации."}
+    ])],
   },
   "/psychology/booking": {
     title: "Запись к психологу | КООСМО Бийск, Новосибирск",
@@ -179,6 +221,7 @@ const ROUTE_SEO: Record<string, RouteSeoConfig> = {
     keywords: "онлайн трансляции массаж, вебинары здоровье, онлайн занятия, КООСМО",
     canonical: "https://koosmo.ru/streams",
     ogUrl: "https://koosmo.ru/streams",
+    schema: BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "Трансляции", url: "https://koosmo.ru/streams"}]),
   },
   "/courses": {
     title: "Онлайн-курсы массажа, диагностики и оздоровления | КООСМО Бийск",
@@ -194,6 +237,7 @@ const ROUTE_SEO: Record<string, RouteSeoConfig> = {
     keywords: "путеводитель по здоровью, статьи о массаже, советы по оздоровлению, КООСМО",
     canonical: "https://koosmo.ru/guide",
     ogUrl: "https://koosmo.ru/guide",
+    schema: BASE_SCHEMAS.breadcrumb([{name: "Главная", url: "https://koosmo.ru"}, {name: "Путеводитель", url: "https://koosmo.ru/guide"}]),
   },
 };
 

@@ -572,14 +572,14 @@ export const Frame = (): React.ReactElement => {
         </div>
       </header>
       <section aria-labelledby="hero-title">
-        <p
+        <h1
           id="hero-title"
           className="absolute top-[203px] left-[30px] w-[644px] whitespace-nowrap [font-family:'Vela Sans',sans-serif] font-normal text-[#000000b2] text-[55px] tracking-[-1.65px] leading-[normal]"
         >
           ОЗДОРОВИТЕЛЬНЫЙ <br />
           ЦЕНТР <br />
           ГАРМОНИИ ТЕЛА И ДУШИ
-        </p>
+        </h1>
         <p className="absolute top-[436px] left-[30px] w-[647px] [font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-xl tracking-[-1.00px] leading-[normal]">
           Профессиональная диагностика, массаж, психологическая поддержка и
           уникальные оздоровительные практики для вашего благополучия
