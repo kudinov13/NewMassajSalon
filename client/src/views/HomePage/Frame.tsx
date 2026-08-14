@@ -40,6 +40,7 @@ const navItems = [
   "Магазин",
   "О нас",
   "Отзывы",
+  "Результаты",
 ];
 
 const services = [
@@ -450,19 +451,19 @@ export const Frame = (): React.ReactElement => {
               height={100}
             />
           </div>
-          <div className="absolute top-[27px] left-[130px] w-[450px] h-[40px] bg-[#e3cbb1] rounded-[25px]" aria-hidden="true"></div>
+          <div className="absolute top-[27px] left-[130px] w-[560px] h-[40px] bg-[#e3cbb1] rounded-[25px]" aria-hidden="true"></div>
           <nav
-            aria-label="Основная навигация"
-            className="absolute top-[27px] left-[130px] w-[450px] h-[40px] flex items-center justify-start pl-5 z-10"
+            aria-label="Основая навигация"
+            className="absolute top-[27px] left-[130px] w-[560px] h-[40px] flex items-center justify-start pl-5 z-10"
           >
-            <ul className="inline-flex w-full h-full items-center gap-[30px] list-none p-0 m-0">
+            <ul className="inline-flex w-full h-full items-center gap-[25px] list-none p-0 m-0">
               {navItems.map((item) => (
                 <li
                   key={item}
                   className="relative w-fit [font-family:'Vela Sans',sans-serif] font-light text-[#000000b2] text-base tracking-[-0.48px] leading-[normal]"
                 >
-                  {item === "Магазин" || item === "Расписание" || item === "Навигация" || item === "О нас" || item === "Отзывы" ? (
-                    <Link to={item === "Магазин" ? "/shop" : item === "Расписание" ? "/schedule" : item === "О нас" ? "/about" : item === "Отзывы" ? "/reviews" : "/guide"} className="bg-transparent border-none cursor-pointer p-0 no-underline text-inherit">
+                  {item === "Магазин" || item === "Расписание" || item === "Навигация" || item === "О нас" || item === "Отзывы" || item === "Результаты" ? (
+                    <Link to={item === "Магазин" ? "/shop" : item === "Расписание" ? "/schedule" : item === "О нас" ? "/about" : item === "Отзывы" ? "/reviews" : item === "Результаты" ? "/before-after" : "/guide"} className="bg-transparent border-none cursor-pointer p-0 no-underline text-inherit">
                       {item}
                     </Link>
                   ) : (
