@@ -77,7 +77,13 @@ const HlsVideo: React.FC<HlsVideoProps> = ({
       muted={muted}
       poster={poster}
       preload="metadata"
-      style={style}
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+        display: 'block',
+        ...style,
+      }}
     />
   );
 };
