@@ -44,12 +44,12 @@ function Home() {
           }
         }}
       />
-      {/* Header - sticky on all screens */}
-      <div className="fixed top-0 left-0 right-0 z-[100] bg-[#efdec5]">
+      {/* Global Header - mobile only; desktop uses Frame's inline header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-[100] bg-[#efdec5]">
         <Header />
       </div>
-      {/* Spacer for fixed header */}
-      <div className="h-[64px] lg:h-[80px]" />
+      {/* Spacer for fixed header - mobile only */}
+      <div className="lg:hidden h-[64px]" />
       <Frame />
     </div>
   );
