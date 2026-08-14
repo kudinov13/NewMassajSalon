@@ -31,15 +31,11 @@ const HlsVideo: React.FC<HlsVideoProps> = ({
     if (!video) return;
 
     const url = hlsUrl || src;
+    const isHls = url.endsWith('.m3u8') || !!hlsUrl;
 
-    // Native HLS support (Safari, iOS)
-    if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = url;
-      return;
-    }
-
-    // HLS.js for other browsers
-    if (Hls.isSupported() && (url.endsWith('.m3u8') || hlsUrl)) {
+    // Prefer hls.js over native HLS — hls.js respects CSS object-fit,
+    // native HLS players often stretch video
+    if (isHls && Hls.isSupported()) {
       const hls = new Hls({
         enableWorker: true,
         lowLatencyMode: false,
@@ -48,7 +44,7 @@ const HlsVideo: React.FC<HlsVideoProps> = ({
         maxMaxBufferLength: 60,
         maxBufferSize: 60 * 1000 * 1000,
         maxBufferHole: 0.5,
-        startLevel: -1, // auto quality
+        startLevel: -1,
         capLevelToPlayerSize: true,
         abrEwmaDefaultEstimate: 1000000,
         abrBandWidthFactor: 0.95,
@@ -58,12 +54,26 @@ const HlsVideo: React.FC<HlsVideoProps> = ({
       hls.loadSource(url);
       hls.attachMedia(video);
 
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (data.fatal) {
+          console.error('[HLS] Fatal error, falling back to direct:', data.type);
+          hls.destroy();
+          video.src = src;
+        }
+      });
+
       return () => {
         hls.destroy();
       };
     }
 
-    // Fallback: direct video URL
+    // Native HLS support (Safari, iOS) — fallback only
+    if (isHls && video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = url;
+      return;
+    }
+
+    // Fallback: direct video URL (MP4)
     video.src = src;
   }, [hlsUrl, src]);
 
