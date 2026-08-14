@@ -15,6 +15,15 @@ if (!fs.existsSync(uploadsDir)) {
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 200 * 1024 * 1024 } });
 
+const videoStorage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadsDir),
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname || '').toLowerCase() || '.mp4';
+        cb(null, `video-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`);
+    }
+});
+const videoUpload = multer({ storage: videoStorage, limits: { fileSize: 500 * 1024 * 1024 } });
+
 const convertToPng = async (fileBuffer) => {
     const filename = Date.now() + '-' + Math.round(Math.random() * 1e6) + '.png';
     const filepath = path.join(uploadsDir, filename);
@@ -134,7 +143,7 @@ productsRouter.get('/:id/videos', requireAdmin, async (req, res) => {
 });
 
 // POST upload video to product (admin)
-productsRouter.post('/:id/videos', requireAdmin, upload.single('video'), async (req, res) => {
+productsRouter.post('/:id/videos', requireAdmin, videoUpload.single('video'), async (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'Файл не загружен' });
     const { title } = req.body;
     const db = getDb();
@@ -144,10 +153,7 @@ productsRouter.post('/:id/videos', requireAdmin, upload.single('video'), async (
     if (!courseId) {
         courseId = await ensureCourseForProduct(product.id, product.name);
     }
-    const ext = path.extname(req.file.originalname || '').toLowerCase() || '.mp4';
-    const filename = `video-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
-    fs.writeFileSync(path.join(uploadsDir, filename), req.file.buffer);
-    const videoUrl = `/uploads/${filename}`;
+    const videoUrl = `/uploads/${req.file.filename}`;
     const maxOrder = await db.get('SELECT MAX(sortOrder) as m FROM course_videos WHERE courseId = ?', courseId);
     const sortOrder = (maxOrder?.m || 0) + 1;
     const r = await db.run('INSERT INTO course_videos (courseId, title, videoUrl, sortOrder) VALUES (?, ?, ?, ?)', courseId, title || `Урок ${sortOrder}`, videoUrl, sortOrder);

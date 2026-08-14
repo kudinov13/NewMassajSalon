@@ -120,10 +120,26 @@ export const API = {
       await errorHandler(response);
       return response.json();
     },
-    uploadVideo: async (productId: number, formData: FormData) => {
-      const response = await fetch(`${API_BASE}/products/${productId}/videos`, { method: "POST", credentials: "include", body: formData });
-      await errorHandler(response);
-      return response.json();
+    uploadVideo: async (productId: number, formData: FormData, onProgress?: (pct: number) => void) => {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${API_BASE}/products/${productId}/videos`);
+        xhr.withCredentials = true;
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable && onProgress) {
+            onProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error(`Upload failed (${xhr.status})`));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Network error during upload'));
+        xhr.send(formData);
+      });
     },
     deleteVideo: async (productId: number, videoId: number) => {
       const response = await fetch(`${API_BASE}/products/${productId}/videos/${videoId}`, { method: "DELETE", credentials: "include" });
@@ -522,10 +538,26 @@ export const API = {
       await errorHandler(response);
       return response.json();
     },
-    uploadVideo: async (courseId: number, formData: FormData) => {
-      const response = await fetch(`${API_BASE}/courses/${courseId}/videos`, { method: "POST", credentials: "include", body: formData });
-      await errorHandler(response);
-      return response.json();
+    uploadVideo: async (courseId: number, formData: FormData, onProgress?: (pct: number) => void) => {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${API_BASE}/courses/${courseId}/videos`);
+        xhr.withCredentials = true;
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable && onProgress) {
+            onProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error(`Upload failed (${xhr.status})`));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Network error during upload'));
+        xhr.send(formData);
+      });
     },
     deleteVideo: async (courseId: number, videoId: number) => {
       const response = await fetch(`${API_BASE}/courses/${courseId}/videos/${videoId}`, { method: "DELETE", credentials: "include" });

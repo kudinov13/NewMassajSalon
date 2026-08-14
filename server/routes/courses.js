@@ -11,6 +11,15 @@ const uploadsDir = path.join(__dirname, '..', 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 200 * 1024 * 1024 } });
 
+const videoStorage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadsDir),
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname || '').toLowerCase() || '.mp4';
+        cb(null, `video-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`);
+    }
+});
+const videoUpload = multer({ storage: videoStorage, limits: { fileSize: 500 * 1024 * 1024 } });
+
 const requireAuth = async (req, res, next) => {
     const token = req.cookies.token;
     const userId = await getUserIdByToken(token);
@@ -87,16 +96,13 @@ coursesRouter.delete('/:id', requireAdmin, async (req, res) => {
 });
 
 // POST upload video to course (admin)
-coursesRouter.post('/:id/videos', requireAdmin, upload.single('video'), async (req, res) => {
+coursesRouter.post('/:id/videos', requireAdmin, videoUpload.single('video'), async (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'Файл не загружен' });
     const { title } = req.body;
     const db = getDb();
     const course = await db.get('SELECT * FROM courses WHERE id = ?', req.params.id);
     if (!course) return res.status(404).json({ message: 'Курс не найден' });
-    const ext = path.extname(req.file.originalname || '').toLowerCase() || '.mp4';
-    const filename = `video-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
-    fs.writeFileSync(path.join(uploadsDir, filename), req.file.buffer);
-    const videoUrl = `/uploads/${filename}`;
+    const videoUrl = `/uploads/${req.file.filename}`;
     const maxOrder = await db.get('SELECT MAX(sortOrder) as m FROM course_videos WHERE courseId = ?', course.id);
     const sortOrder = (maxOrder?.m || 0) + 1;
     const r = await db.run('INSERT INTO course_videos (courseId, title, videoUrl, sortOrder) VALUES (?, ?, ?, ?)', course.id, title || `Урок ${sortOrder}`, videoUrl, sortOrder);

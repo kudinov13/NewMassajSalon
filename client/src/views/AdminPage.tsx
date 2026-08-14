@@ -326,6 +326,10 @@ const CoursesAdminTab: React.FC = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoTitle, setVideoTitle] = useState("");
   const [videoCourseId, setVideoCourseId] = useState<number | null>(null);
+  const [videoUploading, setVideoUploading] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [videoError, setVideoError] = useState("");
+  const [videoSuccess, setVideoSuccess] = useState("");
 
   const load = () => API.courses.getAll().then(setCourses).catch(() => {});
   useEffect(() => { load(); }, []);
@@ -350,12 +354,25 @@ const CoursesAdminTab: React.FC = () => {
 
   const handleUploadVideo = async () => {
     if (!videoCourseId || !videoFile) return;
+    setVideoUploading(true);
+    setVideoProgress(0);
+    setVideoError("");
+    setVideoSuccess("");
     const fd = new FormData();
     fd.append("video", videoFile);
     fd.append("title", videoTitle || "Урок");
-    await API.courses.uploadVideo(videoCourseId, fd);
-    setVideoFile(null); setVideoTitle(""); setVideoCourseId(null);
-    load();
+    try {
+      await API.courses.uploadVideo(videoCourseId, fd, (pct) => setVideoProgress(pct));
+      setVideoFile(null); setVideoTitle(""); setVideoCourseId(null);
+      setVideoSuccess("Видео успешно загружено!");
+      setTimeout(() => setVideoSuccess(""), 3000);
+      load();
+    } catch (e: any) {
+      setVideoError(e.message || "Ошибка загрузки видео");
+    } finally {
+      setVideoUploading(false);
+      setVideoProgress(0);
+    }
   };
 
   return (
@@ -389,9 +406,28 @@ const CoursesAdminTab: React.FC = () => {
           <input placeholder="Название урока" value={videoTitle} onChange={e => setVideoTitle(e.target.value)} className="h-10 px-4 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none" />
           <input type="file" accept="video/*" onChange={e => setVideoFile(e.target.files?.[0] || null)} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm" />
         </div>
-        <button onClick={handleUploadVideo} disabled={!videoCourseId || !videoFile} className="h-9 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors disabled:opacity-40">
-          Загрузить видео
+        <button onClick={handleUploadVideo} disabled={!videoCourseId || !videoFile || videoUploading} className="h-9 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors disabled:opacity-40">
+          {videoUploading ? `Загрузка ${videoProgress}%` : "Загрузить видео"}
         </button>
+        {videoUploading && (
+          <div className="w-full mt-4">
+            <div className="h-3 bg-[#f0ebe5] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#a6856d] rounded-full transition-all duration-200"
+                style={{ width: `${videoProgress}%` }}
+              />
+            </div>
+            <div className="text-center mt-1 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs">
+              {videoProgress}%
+            </div>
+          </div>
+        )}
+        {videoError && (
+          <div className="mt-3 text-red-600 [font-family:'Vela_Sans',sans-serif] font-light text-sm">{videoError}</div>
+        )}
+        {videoSuccess && (
+          <div className="mt-3 text-green-600 [font-family:'Vela_Sans',sans-serif] font-light text-sm">{videoSuccess}</div>
+        )}
       </div>
 
       {/* Course list */}

@@ -240,6 +240,8 @@ const ShopPage = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoTitle, setVideoTitle] = useState("");
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [videoError, setVideoError] = useState("");
   const [editingVideoId, setEditingVideoId] = useState<number | null>(null);
   const [editingVideoTitle, setEditingVideoTitle] = useState("");
 
@@ -326,15 +328,19 @@ const ShopPage = () => {
   const handleUploadVideo = async () => {
     if (!videoFile || !editingProduct) return;
     setUploadingVideo(true);
+    setVideoProgress(0);
+    setVideoError("");
     try {
       const fd = new FormData();
       fd.append('video', videoFile);
       fd.append('title', videoTitle || 'Урок');
-      const newVideo = await API.products.uploadVideo(editingProduct.id, fd);
+      const newVideo = await API.products.uploadVideo(editingProduct.id, fd, (pct) => setVideoProgress(pct)) as CourseVideo;
       setCourseVideos(prev => [...prev, newVideo]);
       setVideoFile(null);
       setVideoTitle('');
-    } catch {} finally { setUploadingVideo(false); }
+    } catch (e: any) {
+      setVideoError(e.message || 'Ошибка загрузки видео');
+    } finally { setUploadingVideo(false); setVideoProgress(0); }
   };
 
   const handleDeleteVideo = async (videoId: number) => {
@@ -633,8 +639,21 @@ const ShopPage = () => {
                       disabled={!videoFile || uploadingVideo}
                       className="h-8 px-4 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] text-xs border-0 cursor-pointer transition-colors disabled:opacity-40"
                     >
-                      {uploadingVideo ? 'Загрузка...' : 'Загрузить видео'}
+                      {uploadingVideo ? `Загрузка ${videoProgress}%` : 'Загрузить видео'}
                     </button>
+                    {uploadingVideo && (
+                      <div className="w-full">
+                        <div className="h-2 bg-[#f0ebe5] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#a6856d] rounded-full transition-all duration-200"
+                            style={{ width: `${videoProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {videoError && (
+                      <div className="text-red-600 [font-family:'Vela_Sans',sans-serif] text-xs">{videoError}</div>
+                    )}
                   </div>
                 </div>
               )}
