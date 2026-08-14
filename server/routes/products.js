@@ -157,6 +157,16 @@ productsRouter.post('/:id/videos', requireAdmin, videoUpload.single('video'), as
     const maxOrder = await db.get('SELECT MAX(sortOrder) as m FROM course_videos WHERE courseId = ?', courseId);
     const sortOrder = (maxOrder?.m || 0) + 1;
     const r = await db.run('INSERT INTO course_videos (courseId, title, videoUrl, sortOrder) VALUES (?, ?, ?, ?)', courseId, title || `Урок ${sortOrder}`, videoUrl, sortOrder);
+    
+    // Async HLS transcoding (non-blocking)
+    const { transcodeToHLS } = require('../utils/transcode');
+    transcodeToHLS(req.file.filename)
+        .then(async (hlsUrl) => {
+            await db.run('UPDATE course_videos SET hlsUrl = ? WHERE id = ?', hlsUrl, r.lastID);
+            console.log(`[HLS] Transcoded video ${r.lastID}: ${hlsUrl}`);
+        })
+        .catch(err => console.error(`[HLS] Transcode failed for video ${r.lastID}:`, err.message));
+    
     res.json({ id: r.lastID, courseId, title: title || `Урок ${sortOrder}`, videoUrl, sortOrder });
 });
 

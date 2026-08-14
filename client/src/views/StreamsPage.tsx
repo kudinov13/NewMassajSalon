@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API, BASE_URL } from "../services/api";
 import Header from "../components/Header";
+import HlsVideo from "../components/HlsVideo";
 
 interface Stream {
   id: number;
@@ -499,12 +500,11 @@ const StreamsPage: React.FC = () => {
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowPreview(null)} />
           <div className="relative bg-black rounded-xl overflow-hidden w-[90vw] max-w-[900px] aspect-video shadow-2xl">
             {showPreview.endsWith('.mp4') || showPreview.includes('/uploads/') ? (
-              <video
+              <HlsVideo
                 src={showPreview.startsWith('http') ? showPreview : `${BASE_URL}${showPreview}`}
                 controls
                 autoPlay
                 playsInline
-                preload="metadata"
                 className="w-full h-full object-contain"
               />
             ) : (

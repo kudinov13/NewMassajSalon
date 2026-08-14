@@ -20,6 +20,7 @@ type CourseVideo = {
   courseId: number;
   title: string;
   videoUrl: string;
+  hlsUrl?: string | null;
   sortOrder: number;
 };
 

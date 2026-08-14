@@ -229,9 +229,18 @@ const initDb = async () => {
             courseId INTEGER NOT NULL,
             title TEXT NOT NULL,
             videoUrl TEXT NOT NULL,
+            hlsUrl TEXT,
             sortOrder INTEGER DEFAULT 0,
             FOREIGN KEY(courseId) REFERENCES courses(id) ON DELETE CASCADE
         )`);
+
+    // Migration: add hlsUrl column if missing
+    try {
+        const cols = await db.all("PRAGMA table_info(course_videos)");
+        if (!cols.find(c => c.name === 'hlsUrl')) {
+            await db.exec("ALTER TABLE course_videos ADD COLUMN hlsUrl TEXT");
+        }
+    } catch(e) {}
 
     await db.exec(`
         CREATE TABLE IF NOT EXISTS user_courses (

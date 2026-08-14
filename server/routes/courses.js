@@ -106,6 +106,16 @@ coursesRouter.post('/:id/videos', requireAdmin, videoUpload.single('video'), asy
     const maxOrder = await db.get('SELECT MAX(sortOrder) as m FROM course_videos WHERE courseId = ?', course.id);
     const sortOrder = (maxOrder?.m || 0) + 1;
     const r = await db.run('INSERT INTO course_videos (courseId, title, videoUrl, sortOrder) VALUES (?, ?, ?, ?)', course.id, title || `Урок ${sortOrder}`, videoUrl, sortOrder);
+    
+    // Async HLS transcoding (non-blocking)
+    const { transcodeToHLS } = require('../utils/transcode');
+    transcodeToHLS(req.file.filename)
+        .then(async (hlsUrl) => {
+            await db.run('UPDATE course_videos SET hlsUrl = ? WHERE id = ?', hlsUrl, r.lastID);
+            console.log(`[HLS] Transcoded video ${r.lastID}: ${hlsUrl}`);
+        })
+        .catch(err => console.error(`[HLS] Transcode failed for video ${r.lastID}:`, err.message));
+    
     res.json({ id: r.lastID, courseId: course.id, title: title || `Урок ${sortOrder}`, videoUrl, sortOrder });
 });
 
@@ -114,6 +124,27 @@ coursesRouter.delete('/:id/videos/:videoId', requireAdmin, async (req, res) => {
     const db = getDb();
     await db.run('DELETE FROM course_videos WHERE id = ? AND courseId = ?', req.params.videoId, req.params.id);
     res.json({ ok: true });
+});
+
+// POST transcode existing video to HLS (admin)
+coursesRouter.post('/:id/videos/:videoId/transcode', requireAdmin, async (req, res) => {
+    const db = getDb();
+    const video = await db.get('SELECT * FROM course_videos WHERE id = ? AND courseId = ?', req.params.videoId, req.params.id);
+    if (!video) return res.status(404).json({ message: 'Видео не найдено' });
+    if (video.hlsUrl) return res.json({ hlsUrl: video.hlsUrl, message: 'Уже транскодировано' });
+    
+    const filename = path.basename(video.videoUrl);
+    const { transcodeToHLS } = require('../utils/transcode');
+    
+    // Start transcoding async
+    transcodeToHLS(filename)
+        .then(async (hlsUrl) => {
+            await db.run('UPDATE course_videos SET hlsUrl = ? WHERE id = ?', hlsUrl, video.id);
+            console.log(`[HLS] Transcoded existing video ${video.id}: ${hlsUrl}`);
+        })
+        .catch(err => console.error(`[HLS] Transcode failed for video ${video.id}:`, err.message));
+    
+    res.json({ message: 'Транскодирование запущено' });
 });
 
 // POST purchase course

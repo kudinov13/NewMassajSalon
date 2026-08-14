@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { API, BASE_URL } from "../services/api";
+import HlsVideo from "../components/HlsVideo";
 
-type Video = { id: number; title: string; videoUrl: string; sortOrder: number };
+type Video = { id: number; title: string; videoUrl: string; hlsUrl?: string | null; sortOrder: number };
 type Course = { id: number; title: string; description: string; videos: Video[] };
 
 const CourseViewPage: React.FC = () => {
@@ -54,11 +55,11 @@ const CourseViewPage: React.FC = () => {
           <div className="flex-1 min-w-0">
             {activeVideo ? (
               <div className="bg-black rounded-[20px] overflow-hidden aspect-video">
-                <video
+                <HlsVideo
                   key={activeVideo.id}
+                  hlsUrl={activeVideo.hlsUrl ? `${BASE_URL}${activeVideo.hlsUrl}` : null}
                   src={`${BASE_URL}${activeVideo.videoUrl}`}
                   controls
-                  preload="metadata"
                   className="w-full h-full object-contain"
                   style={{ display: 'block' }}
                 />

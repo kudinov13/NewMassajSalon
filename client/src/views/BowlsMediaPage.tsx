@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { API, BASE_URL } from "../services/api";
 import Header from "../components/Header";
+import HlsVideo from "../components/HlsVideo";
 
 interface MediaItem {
   id: number;
@@ -214,12 +215,11 @@ const BowlsMediaPage: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setPlayingVideo(null)} />
           <div className="relative bg-black rounded-xl overflow-hidden w-[90vw] max-w-[900px] aspect-video shadow-2xl">
-            <video
+            <HlsVideo
               src={playingVideo.startsWith("http") ? playingVideo : `${BASE_URL}${playingVideo}`}
               controls
               autoPlay
               playsInline
-              preload="metadata"
               className="w-full h-full object-contain"
             />
             <button
