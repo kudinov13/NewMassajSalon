@@ -245,6 +245,7 @@ const ShopPage = () => {
   const [videoError, setVideoError] = useState("");
   const [editingVideoId, setEditingVideoId] = useState<number | null>(null);
   const [editingVideoTitle, setEditingVideoTitle] = useState("");
+  const [previewVideo, setPreviewVideo] = useState<CourseVideo | null>(null);
 
   useEffect(() => {
     API.user.getCurrentUser()
@@ -613,6 +614,7 @@ const ShopPage = () => {
                               {v.title}
                             </span>
                           )}
+                          <button type="button" onClick={() => setPreviewVideo(v)} title="Превью видео" className="w-6 h-6 rounded bg-white border border-[#e3cbb1] text-[#a6856d] text-xs cursor-pointer hover:bg-[#f5efe8] flex items-center justify-center">▶</button>
                           <button type="button" onClick={() => handleMoveVideo(i, -1)} disabled={i === 0} className="w-6 h-6 rounded bg-white border border-[#e3cbb1] text-[#6B5744] text-xs cursor-pointer disabled:opacity-30 flex items-center justify-center">↑</button>
                           <button type="button" onClick={() => handleMoveVideo(i, 1)} disabled={i === courseVideos.length - 1} className="w-6 h-6 rounded bg-white border border-[#e3cbb1] text-[#6B5744] text-xs cursor-pointer disabled:opacity-30 flex items-center justify-center">↓</button>
                           <button type="button" onClick={() => handleDeleteVideo(v.id)} className="w-6 h-6 rounded bg-white border border-red-300 text-red-500 text-xs cursor-pointer hover:bg-red-50 flex items-center justify-center">×</button>
@@ -693,6 +695,27 @@ const ShopPage = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Video preview modal */}
+      {previewVideo && (
+        <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0" onClick={() => setPreviewVideo(null)} />
+          <div className="relative bg-[#faf6f1] rounded-[25px] p-6 w-full max-w-[700px] shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#6B5744] text-lg">{previewVideo.title}</h3>
+              <button onClick={() => setPreviewVideo(null)} className="w-8 h-8 rounded-full bg-[#e3cbb1]/30 border-0 flex items-center justify-center cursor-pointer hover:bg-[#e3cbb1]">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B5744" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <video
+              src={`${BASE_URL}${previewVideo.videoUrl}`}
+              controls
+              autoPlay
+              className="w-full rounded-[16px] bg-black"
+              style={{ maxHeight: "60vh" }}
+            />
           </div>
         </div>
       )}
