@@ -58,22 +58,16 @@ const MobileFrame: React.FC = () => {
   const [formData, setFormData] = useState({ name: "", phone: "", comment: "" });
   const [address, setAddress] = useState("г. Новосибирск, ул. Хмельницкого, 1");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingAddress, setEditingAddress] = useState(false);
   const [addressDraft, setAddressDraft] = useState("");
   const [contactLoading, setContactLoading] = useState(false);
   const [contactSuccess, setContactSuccess] = useState("");
   const [contactError, setContactError] = useState("");
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     API.settings.get().then((s) => { if (s.address) setAddress(s.address); }).catch(() => {});
-    API.user.getCurrentUser().then((u) => { if (u) { setIsAuthenticated(true); if (u.isAdmin) setIsAdmin(true); } }).catch(() => {});
+    API.user.getCurrentUser().then((u) => { if (u && u.isAdmin) setIsAdmin(true); }).catch(() => {});
   }, []);
-
-  const handleLogout = async () => {
-    try { await API.auth.logout(); setIsAuthenticated(false); setIsAdmin(false); } catch {}
-  };
 
   const handleSaveAddress = async () => {
     try { const u = await API.settings.update({ address: addressDraft }); if (u.address) setAddress(u.address); setEditingAddress(false); } catch { alert("Не удалось сохранить адрес"); }
@@ -94,54 +88,6 @@ const MobileFrame: React.FC = () => {
 
   return (
     <div className="bg-[#efdec5] w-full min-h-screen overflow-x-hidden">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#efdec5] px-4 py-3 flex items-center justify-between border-b border-[#e3cbb1]">
-        <Link to="/" className="flex items-center gap-2 no-underline flex-shrink-0">
-          <img src="/logo.svg" alt="Коосмо" className="h-10 w-auto" />
-          <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-lg">Коосмо</span>
-        </Link>
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-[#e3cbb1] border-0"
-          aria-label="Меню"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B5744" strokeWidth="2" strokeLinecap="round">
-            {menuOpen ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></> : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>}
-          </svg>
-        </button>
-      </header>
-
-      {/* Mobile menu */}
-      {menuOpen && (
-        <nav className="sticky top-[60px] z-40 bg-[#efdec5] px-4 py-4 border-b border-[#e3cbb1] flex flex-col gap-3">
-          <Link to="/guide" onClick={() => setMenuOpen(false)} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#000000b2] text-base py-2 no-underline">Навигация</Link>
-          <Link to="/schedule" onClick={() => setMenuOpen(false)} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#000000b2] text-base py-2 no-underline">Расписание</Link>
-          <Link to="/shop" onClick={() => setMenuOpen(false)} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#000000b2] text-base py-2 no-underline">Магазин</Link>
-          <Link to="/about" onClick={() => setMenuOpen(false)} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#000000b2] text-base py-2 no-underline">О нас</Link>
-          <Link to="/reviews" onClick={() => setMenuOpen(false)} className="[font-family:'Vela_Sans',sans-serif] font-light text-[#000000b2] text-base py-2 no-underline">Отзывы</Link>
-          <div className="flex items-center gap-3 pt-2 border-t border-[#e3cbb1]">
-            <a href="https://t.me/koosmo_zdravmassag" target="_blank" rel="noopener noreferrer" className="w-9 h-9 flex items-center justify-center rounded-full border border-[#00000033] no-underline">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#a6856d"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-            </a>
-            <a href="https://vk.com/koosmo.zdrav.massag" target="_blank" rel="noopener noreferrer" className="w-9 h-9 flex items-center justify-center rounded-full border border-[#00000033] no-underline">
-              <svg width="16" height="16" viewBox="0 0 1000 1000" fill="none"><path d="M532.6,720.8c-227.9,0-357.9-156.2-363.3-416.2h114.2c3.8,190.8,87.9,271.7,154.6,288.3V304.6h107.5v164.6c65.8-7.1,135-82.1,158.3-164.6h107.5c-17.8,86.5-70.8,161.7-146.3,207.5C749.4,554,811.7,630,836.3,720.8H718c-22.3-79.8-90.3-138.4-172.5-148.8v148.8C545.5,720.8,532.6,720.8,532.6,720.8z" fill="#a6856d"/></svg>
-            </a>
-            {isAuthenticated ? (
-              <>
-                <Link to="/profile" onClick={() => setMenuOpen(false)} className="flex-1 h-9 flex items-center justify-center bg-[#a6856d] rounded-full no-underline" aria-label="Профиль">
-                  <span className="text-white text-sm [font-family:'Vela_Sans',sans-serif] font-light">Профиль</span>
-                </Link>
-                <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="h-9 px-4 border border-[#a6856d] rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm">Выход</button>
-              </>
-            ) : (
-              <Link to="/login" onClick={() => setMenuOpen(false)} className="flex-1 h-9 flex items-center justify-center bg-[#a6856d] rounded-full no-underline">
-                <span className="text-white text-sm [font-family:'Vela_Sans',sans-serif] font-light">Вход</span>
-              </Link>
-            )}
-          </div>
-        </nav>
-      )}
-
       {/* Hero */}
       <section className="px-4 pt-8 pb-10">
         <h1 className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#000000b2] text-[28px] leading-[1.15] tracking-[-0.84px]">
