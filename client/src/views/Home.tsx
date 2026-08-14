@@ -44,12 +44,12 @@ function Home() {
           }
         }}
       />
-      {/* Mobile/tablet header with burger menu - visible below lg */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-[100] bg-[#efdec5]">
+      {/* Mobile/tablet header with burger menu - visible below lg but hidden on mobile homepage */}
+      <div className="hidden lg:block fixed top-0 left-0 right-0 z-[100] bg-[#efdec5]">
         <Header />
       </div>
-      {/* Spacer for fixed header on mobile */}
-      <div className="lg:hidden h-[64px]" />
+      {/* Spacer for fixed header - only on desktop */}
+      <div className="hidden lg:block h-[64px]" />
       <Frame />
     </div>
   );
