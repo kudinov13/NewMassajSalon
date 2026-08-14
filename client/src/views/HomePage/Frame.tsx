@@ -1,6 +1,7 @@
 import React, { FormEvent, useEffect, useId, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API } from "../../services/api";
+import MobileFrame from "./MobileFrame";
 import x2026013015045511 from "./2026-01-30-15-04-55-1-1.png";
 import arrow1 from "./arrow-1.svg";
 import arrow12 from "./arrow-1-2.svg";
@@ -271,6 +272,7 @@ export const Frame = (): React.ReactElement => {
   const [addressDraft, setAddressDraft] = useState<string>("");
   const [diagFlipped, setDiagFlipped] = useState<boolean>(false);
   const [homeScale, setHomeScale] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
   const [contactSuccess, setContactSuccess] = useState("");
   const [contactError, setContactError] = useState("");
@@ -296,6 +298,8 @@ export const Frame = (): React.ReactElement => {
   useEffect(() => {
     let rafId = 0;
     const computeScale = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
       const next = Math.min(1, window.innerWidth / DESIGN_WIDTH);
       setHomeScale((prev) => (prev === next ? prev : next));
     };
@@ -365,6 +369,8 @@ export const Frame = (): React.ReactElement => {
       setContactLoading(false);
     }
   };
+
+  if (isMobile) return <MobileFrame />;
 
   return (
     <div
@@ -436,7 +442,7 @@ export const Frame = (): React.ReactElement => {
           </div>
           <div className="absolute top-1/2 left-[30px] -translate-y-1/2 z-20">
             <img
-              className="h-[80px] w-auto object-contain"
+              className="h-[100px] w-auto object-contain"
               alt="Логотип Коосмо"
               src="/logo.svg"
               decoding="async"
