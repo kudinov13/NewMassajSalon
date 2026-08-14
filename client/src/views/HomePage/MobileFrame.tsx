@@ -40,7 +40,7 @@ const benefits = [
 
 const specialists = [
   { name: "Кюльпер Татьяна Альбертовна", image: rectangle25 },
-  { name: "Тимкина Наталья Александровна", image: "/natalya.png" },
+  { name: "Тимкина Наталья Александровна", image: "/natalya.webp" },
   { name: "Коюшева Оксана Викторовна", image: rectangle27 },
 ];
 

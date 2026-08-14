@@ -16,18 +16,18 @@ import image from "./image.svg";
 import line1 from "./line-1.svg";
 import line2 from "./line-2.svg";
 import line3 from "./line-3.svg";
-import rectangle2 from "./rectangle-2.png";
-import rectangle13 from "./Rectangle 13.png";
-import rectangle15 from "./rectangle-15.png";
-import rectangle17 from "./rectangle-17.png";
-import rectangle18 from "./rectangle-18.png";
-import rectangle19 from "./rectangle-19.png";
-import rectangle20 from "./rectangle-20.png";
-import rectangle21 from "./rectangle-21.png";
-import rectangle25 from "./rectangle-25.png";
+import rectangle2 from "./rectangle-2.webp";
+import rectangle13 from "./rectangle-13.webp";
+import rectangle15 from "./rectangle-15.webp";
+import rectangle17 from "./rectangle-17.webp";
+import rectangle18 from "./rectangle-18.webp";
+import rectangle19 from "./rectangle-19.webp";
+import rectangle20 from "./rectangle-20.webp";
+import rectangle21 from "./rectangle-21.webp";
+import rectangle25 from "./rectangle-25.webp";
 import rectangle26 from "./rectangle-26.jpg";
-import rectangle27 from "./rectangle-27.png";
-import rectangle32 from "./rectangle-32.png";
+import rectangle27 from "./rectangle-27.webp";
+import rectangle32 from "./rectangle-32.webp";
 import rectangle34 from "./rectangle-34.png";
 import vector from "./vector.svg";
 import vector2 from "./vector-2.svg";
@@ -203,7 +203,7 @@ const specialists = [
   },
   {
     name: "Тимкина Наталья Александровна",
-    image: "/natalya.png",
+    image: "/natalya.webp",
     imageClass: "absolute top-[2570px] left-[287px] w-60 h-[296px] object-cover rounded-[25px]",
     textClass:
       "absolute top-[2871px] left-[287px] [font-family:'Vela Sans',sans-serif] font-normal text-[#000000e6] text-base tracking-[-0.48px] leading-[normal]",
@@ -430,8 +430,10 @@ export const Frame = (): React.ReactElement => {
         className="absolute top-[109px] left-[707px] w-[703px] h-[651px] aspect-[1.08] object-cover rounded-[25px]"
         alt="Специалист центра у окна"
         src={rectangle2}
-        loading="lazy"
+        {...{ fetchpriority: "high" }}
         decoding="async"
+        width={703}
+        height={651}
       />
       <header className="absolute top-0 left-0 w-[1440px] h-[94px] flex items-center justify-center bg-[#efdec5]">
         <div className="h-[94px] w-[1440px] relative">
@@ -446,6 +448,8 @@ export const Frame = (): React.ReactElement => {
               alt="Логотип Коосмо"
               src="/logo.svg"
               decoding="async"
+              width={100}
+              height={100}
             />
           </div>
           <div className="absolute top-[27px] left-[130px] w-[450px] h-[40px] bg-[#e3cbb1] rounded-[25px]" aria-hidden="true"></div>
@@ -848,6 +852,8 @@ export const Frame = (): React.ReactElement => {
           src="/logo.svg"
           loading="lazy"
           decoding="async"
+          width={50}
+          height={50}
         />
         {editingAddress ? (
           <div className="absolute top-[3988px] left-[75px] flex items-center gap-2">
