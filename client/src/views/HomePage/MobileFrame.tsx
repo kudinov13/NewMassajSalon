@@ -336,6 +336,9 @@ const MobileFrame: React.FC = () => {
         <div className="mt-4 [font-family:'Vela_Sans',sans-serif] font-light text-[#00000099] text-xs leading-[1.6]">
           ООО «КООСМО» ИНН 2204096914 ОГРН 1232200001406 659300, Алтайский край, г. Бийск, ул. Л. Толстого 149, кв. 1
         </div>
+        <div className="mt-2">
+          <a href="/offer.html" target="_blank" className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-xs underline">Публичная оферта</a>
+        </div>
       </footer>
     </div>
   );

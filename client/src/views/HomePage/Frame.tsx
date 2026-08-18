@@ -1037,6 +1037,9 @@ export const Frame = (): React.ReactElement => {
         <div className="absolute top-[4700px] left-10 right-10 [font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-sm tracking-[0] leading-[1.6]">
           ООО «КООСМО» · ИНН 2204096914 · ОГРН 1232200001406 · 659300, Алтайский край, г. Бийск, ул. Л. Толстого 149, кв. 1
         </div>
+        <div className="absolute top-[4730px] left-10 [font-family:'Vela Sans',sans-serif] font-light text-[#00000099] text-sm">
+          <a href="/offer.html" target="_blank" className="text-[#6B5744] hover:text-[#a6856d] underline">Публичная оферта</a>
+        </div>
       </footer>
       <img
         className="absolute top-[821px] left-[1356px] w-[63px] h-[63px]"

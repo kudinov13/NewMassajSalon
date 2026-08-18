@@ -35,7 +35,7 @@ const BASE_SCHEMAS = {
     "areaServed": [{"@type": "City", "name": "Бийск"}, {"@type": "City", "name": "Новосибирск"}],
     "address": {"@type": "PostalAddress", "addressLocality": "Бийск", "addressRegion": "Алтайский край", "addressCountry": "RU"},
     "geo": {"@type": "GeoCoordinates", "latitude": "52.5362", "longitude": "85.2148"},
-    "sameAs": ["https://vk.com/koosmo.zdrav.massag", "https://t.me/koosmo_zdravmassag"],
+    "sameAs": ["https://vk.com/koosmo.zdrav.massag", "https://t.me/koosmo_zdravmassag", "https://max.ru/id2204096914_biz"],
     "contactPoint": { "@type": "ContactPoint", "contactType": "customer service", "availableLanguage": "Russian" }
   },
   massageService: {
