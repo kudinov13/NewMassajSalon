@@ -184,7 +184,7 @@ const RegistrationView = () => {
                   Политики конфиденциальности
                 </a>,{" "}
                 <a href={`${BASE_URL}/docs/oferta.pdf`} target="_blank" rel="noopener noreferrer" className="text-[#a6856d] hover:underline font-normal">
-                  Предварительной оферты на участие
+                  Публичной оферты
                 </a>{" "}и{" "}
                 <a href={`${BASE_URL}/docs/soglasie_obrabotka_dannyh.pdf`} target="_blank" rel="noopener noreferrer" className="text-[#a6856d] hover:underline font-normal">
                   Согласия на обработку персональных данных
