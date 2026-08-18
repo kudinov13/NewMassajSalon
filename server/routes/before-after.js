@@ -43,7 +43,7 @@ beforeAfterRouter.get('/:id', async (req, res) => {
 
 beforeAfterRouter.post('/', isAdmin, upload.fields([{ name: 'beforeImage', maxCount: 1 }, { name: 'afterImage', maxCount: 1 }]), async (req, res) => {
     try {
-        const { title, description } = req.body;
+        const { title, description, category } = req.body;
         if (!req.files?.beforeImage?.[0] || !req.files?.afterImage?.[0]) {
             return res.status(400).json({ message: 'Загрузите оба изображения (до и после)' });
         }
@@ -60,8 +60,8 @@ beforeAfterRouter.post('/', isAdmin, upload.fields([{ name: 'beforeImage', maxCo
         const afterUrl = `/uploads/${afterFilename}`;
 
         const result = await getDb().run(
-            'INSERT INTO before_after (title, description, beforeImage, afterImage) VALUES (?, ?, ?, ?)',
-            title || '', description || '', beforeUrl, afterUrl
+            'INSERT INTO before_after (title, description, beforeImage, afterImage, category) VALUES (?, ?, ?, ?, ?)',
+            title || '', description || '', beforeUrl, afterUrl, category || 'Тело'
         );
         const item = await getDb().get('SELECT * FROM before_after WHERE id = ?', result.lastID);
         res.status(201).json(item);
@@ -73,7 +73,7 @@ beforeAfterRouter.post('/', isAdmin, upload.fields([{ name: 'beforeImage', maxCo
 
 beforeAfterRouter.put('/:id', isAdmin, upload.fields([{ name: 'beforeImage', maxCount: 1 }, { name: 'afterImage', maxCount: 1 }]), async (req, res) => {
     try {
-        const { title, description } = req.body;
+        const { title, description, category } = req.body;
         const existing = await getDb().get('SELECT * FROM before_after WHERE id = ?', req.params.id);
         if (!existing) return res.status(404).json({ message: 'Не найдено' });
 
@@ -97,8 +97,8 @@ beforeAfterRouter.put('/:id', isAdmin, upload.fields([{ name: 'beforeImage', max
         }
 
         await getDb().run(
-            'UPDATE before_after SET title = ?, description = ?, beforeImage = ?, afterImage = ? WHERE id = ?',
-            title || '', description || '', beforeUrl, afterUrl, req.params.id
+            'UPDATE before_after SET title = ?, description = ?, beforeImage = ?, afterImage = ?, category = ? WHERE id = ?',
+            title || '', description || '', beforeUrl, afterUrl, category || existing.category || 'Тело', req.params.id
         );
         const item = await getDb().get('SELECT * FROM before_after WHERE id = ?', req.params.id);
         res.json(item);

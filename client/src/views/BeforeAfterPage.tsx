@@ -2,12 +2,16 @@ import React, { useEffect, useState, useRef } from "react";
 import { API, BASE_URL } from "../services/api";
 import Header from "../components/Header";
 
+const CATEGORIES = ["Тело", "Ноги", "Спина", "Лицо"] as const;
+type Category = typeof CATEGORIES[number];
+
 interface BeforeAfterItem {
   id: number;
   title: string;
   description: string;
   beforeImage: string;
   afterImage: string;
+  category: string;
   createdAt: string;
 }
 
@@ -25,6 +29,8 @@ const BeforeAfterPage: React.FC = () => {
   const [afterPreview, setAfterPreview] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [activeCategory, setActiveCategory] = useState<Category>("Тело");
+  const [modalCategory, setModalCategory] = useState<string>("Тело");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -51,6 +57,7 @@ const BeforeAfterPage: React.FC = () => {
     setEditingItem(null);
     setModalTitle("");
     setModalDesc("");
+    setModalCategory(activeCategory);
     setBeforeFile(null);
     setAfterFile(null);
     setBeforePreview("");
@@ -63,6 +70,7 @@ const BeforeAfterPage: React.FC = () => {
     setEditingItem(item);
     setModalTitle(item.title);
     setModalDesc(item.description);
+    setModalCategory(item.category || "Тело");
     setBeforeFile(null);
     setAfterFile(null);
     setBeforePreview(item.beforeImage ? `${BASE_URL}${item.beforeImage}` : "");
@@ -95,6 +103,7 @@ const BeforeAfterPage: React.FC = () => {
       const fd = new FormData();
       fd.append("title", modalTitle);
       fd.append("description", modalDesc);
+      fd.append("category", modalCategory);
       if (beforeFile) fd.append("beforeImage", beforeFile);
       if (afterFile) fd.append("afterImage", afterFile);
       if (editingItem) {
@@ -135,30 +144,42 @@ const BeforeAfterPage: React.FC = () => {
           </p>
         </div>
 
-        {isAdmin && (
-          <div className="mb-8">
+        <div className="flex flex-wrap gap-2 mb-8">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={activeCategory === cat
+                ? "h-10 px-5 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border transition-colors cursor-pointer bg-[#a6856d] text-white border-[#a6856d]"
+                : "h-10 px-5 rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border transition-colors cursor-pointer bg-transparent text-[#6B5744] border-[#e3cbb1] hover:bg-[#f5e6d3]"
+              }
+            >
+              {cat}
+            </button>
+          ))}
+          {isAdmin && (
             <button
               onClick={openCreate}
-              className="h-11 px-6 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border-0 cursor-pointer transition-colors"
+              className="h-10 px-5 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] font-light text-sm border border-[#a6856d] cursor-pointer transition-colors ml-auto"
             >
               + Добавить результат
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {loading ? (
           <div className="text-center py-10 [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/60">
             Загрузка...
           </div>
-        ) : items.length === 0 ? (
+        ) : items.filter(i => i.category === activeCategory).length === 0 ? (
           <div className="bg-[#f7ead8] rounded-[28px] p-8 text-center border border-[#C9A882]">
             <p className="[font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744]/70 text-base">
-              Пока нет результатов. {isAdmin ? "Добавьте первый результат!" : ""}
+              Пока нет результатов в категории «{activeCategory}». {isAdmin ? "Добавьте первый результат!" : ""}
             </p>
           </div>
         ) : (
           <div className="space-y-8">
-            {items.map((item) => (
+            {items.filter(i => i.category === activeCategory).map((item) => (
               <div
                 key={item.id}
                 className="bg-[#f7ead8] rounded-[28px] p-6 sm:p-8 border border-[#C9A882]"
@@ -233,6 +254,18 @@ const BeforeAfterPage: React.FC = () => {
               {editingItem ? "Редактировать результат" : "Новый результат"}
             </h3>
             <div className="flex flex-col gap-4 mb-6">
+              <div>
+                <label className="block [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm mb-2">Категория</label>
+                <select
+                  value={modalCategory}
+                  onChange={(e) => setModalCategory(e.target.value)}
+                  className="h-11 px-4 rounded-[12px] border border-[#e3cbb1] bg-white [font-family:'Vela_Sans',sans-serif] font-light text-[#6B5744] text-sm outline-none focus:border-[#a6856d]"
+                >
+                  {CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
               <input
                 placeholder="Заголовок (необязательно)"
                 value={modalTitle}

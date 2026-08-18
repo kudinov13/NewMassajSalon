@@ -432,9 +432,18 @@ const initDb = async () => {
             description TEXT NOT NULL DEFAULT '',
             beforeImage TEXT NOT NULL,
             afterImage TEXT NOT NULL,
+            category TEXT NOT NULL DEFAULT 'Тело',
             createdAt TEXT DEFAULT (datetime('now')),
             sortOrder INTEGER NOT NULL DEFAULT 0
         )`);
+
+    // Migration: add category column to before_after if missing
+    try {
+        const cols = await db.all(`PRAGMA table_info(before_after)`);
+        if (cols.length && !cols.some(c => c.name === 'category')) {
+            await db.exec(`ALTER TABLE before_after ADD COLUMN category TEXT NOT NULL DEFAULT 'Тело'`);
+        }
+    } catch {}
 
     // начальные отзывы
     const reviewsExist = await db.get(`SELECT id FROM reviews LIMIT 1`);
