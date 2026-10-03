@@ -60,11 +60,13 @@ const buildPaymentUrl = ({ orderId, total, items, email, shp = {} }) => {
         Culture: 'ru',
     });
     if (email) params.set('Email', email);
-    if (receiptEncoded) params.set('Receipt', receiptEncoded);
     for (const [k, v] of Object.entries(shp)) params.set(k, String(v));
     if (isTest()) params.set('IsTest', '1');
 
-    return `${PAY_URL}?${params.toString()}`;
+    // Receipt добавляем вручную: значение уже urlencoded, URLSearchParams закодировал бы его дважды
+    let url = `${PAY_URL}?${params.toString()}`;
+    if (receiptEncoded) url += `&Receipt=${receiptEncoded}`;
+    return url;
 };
 
 // Проверка подписи ResultURL (пароль #2) и SuccessURL (пароль #1)
