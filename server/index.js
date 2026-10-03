@@ -26,6 +26,7 @@ const reviewsRouter = require("./routes/reviews");
 const contactRouter = require("./routes/contact");
 const diagnosticsTestsRouter = require("./routes/diagnostics-tests");
 const beforeAfterRouter = require("./routes/before-after");
+const paymentRouter = require("./routes/payment");
 const {initDb} = require("./db/db");
 
 const app = express();
@@ -42,8 +43,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// чтобы парсился POST в виде JSON
+// чтобы парсился POST в виде JSON и form-urlencoded (ResultURL Робокассы)
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // чтобы парсились куки
 app.use(cookies());
@@ -82,6 +84,9 @@ app.use("/api/reviews", reviewsRouter);
 app.use("/api/contact", contactRouter);
 app.use("/api/diagnostics-tests", diagnosticsTestsRouter);
 app.use("/api/before-after", beforeAfterRouter);
+// Оплата: API для фронта + колбэки Робокассы (ResultURL/SuccessURL/FailURL)
+app.use("/api/payment", paymentRouter);
+app.use("/payment", paymentRouter);
 // Video streaming with Range support
 const fs = require('fs');
 app.get('/uploads/:filename', (req, res) => {

@@ -258,9 +258,17 @@ const initDb = async () => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userId INTEGER NOT NULL,
             total REAL NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            paidAt TEXT,
             createdAt TEXT DEFAULT (datetime('now')),
             FOREIGN KEY(userId) REFERENCES users(id)
         )`);
+
+    // миграция: оплата заказов через Робокассу
+    try { await db.exec(`ALTER TABLE orders ADD COLUMN status TEXT NOT NULL DEFAULT 'pending'`); } catch(e) {}
+    try { await db.exec(`ALTER TABLE orders ADD COLUMN paidAt TEXT`); } catch(e) {}
+    // заказы, оформленные до появления оплаты, считаем выполненными
+    try { await db.exec(`UPDATE orders SET status = 'paid' WHERE status = 'pending' AND paidAt IS NULL AND createdAt < datetime('now', '-1 hour')`); } catch(e) {}
 
     await db.exec(`
         CREATE TABLE IF NOT EXISTS order_items (

@@ -18,6 +18,7 @@ const CartPage = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [paying, setPaying] = useState(false);
 
   useEffect(() => {
     loadCart();
@@ -51,13 +52,20 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-    if (!items.length) return;
+    if (!items.length || paying) return;
+    setPaying(true);
     try {
-      await API.cart.checkout();
+      const data = await API.cart.checkout();
+      if (data.paymentUrl) {
+        window.location.href = data.paymentUrl;
+        return;
+      }
       setItems([]);
       alert("Заказ оформлен! Вы можете посмотреть историю покупок в профиле.");
     } catch (e: any) {
       alert(e.message || "Ошибка оформления заказа");
+    } finally {
+      setPaying(false);
     }
   };
 
@@ -217,9 +225,10 @@ const CartPage = () => {
                 <button
                   type="button"
                   onClick={handleCheckout}
-                  className="w-full h-11 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] text-base border-0 cursor-pointer transition-colors mb-3"
+                  disabled={paying}
+                  className="w-full h-11 bg-[#a6856d] hover:bg-[#8d6e58] disabled:opacity-60 text-white rounded-full [font-family:'Vela_Sans',sans-serif] text-base border-0 cursor-pointer transition-colors mb-3"
                 >
-                  Оформить заказ
+                  {paying ? "Переход к оплате..." : "Оформить и оплатить"}
                 </button>
                 <button
                   type="button"

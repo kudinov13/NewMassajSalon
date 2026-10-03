@@ -1,36 +1,13 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
 const { getUserIdByToken } = require("../db/tokens");
 const { getUserById } = require("../db/users");
 const { addMessage, getAllMessages, getMessageById, updateStatus } = require("../db/contactMessages");
+const { sendAdminNotification } = require("../utils/mailer");
 
 const contactRouter = express.Router();
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-const SMTP_HOST = process.env.SMTP_HOST || 'smtp.yandex.ru';
-const SMTP_PORT = Number(process.env.SMTP_PORT) || 465;
-const SMTP_USER = process.env.SMTP_USER;
-const SMTP_PASS = process.env.SMTP_PASS;
-
-const transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: SMTP_PORT === 465,
-    auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS,
-    },
-});
-
-const sendAdminNotification = async ({ name, phone, email, message }) => {
-    if (!ADMIN_EMAIL || !SMTP_USER || !SMTP_PASS) {
-        console.warn('SMTP not configured, skipping email notification');
-        return;
-    }
-
-    const mailOptions = {
-        from: `"КООСМО" <${SMTP_USER}>`,
-        to: ADMIN_EMAIL,
+const notifyAdmin = async ({ name, phone, email, message }) => {
+    await sendAdminNotification({
         subject: 'Обращение в поддержку',
         text: `Email для связи: ${email || 'не указан'}
 Телефон: ${phone || 'не указан'}
@@ -44,9 +21,7 @@ ${message}
 <p><b>Текст обращения:</b></p>
 <p style="white-space:pre-wrap">${message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
 `,
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
 };
 
 contactRouter.post("/", async (req, res) => {
@@ -78,7 +53,7 @@ contactRouter.post("/", async (req, res) => {
         const messageId = await addMessage(userId, name.trim(), contactPhone, email, message.trim());
 
         try {
-            await sendAdminNotification({ name: name.trim(), phone: contactPhone, email, message: message.trim() });
+            await notifyAdmin({ name: name.trim(), phone: contactPhone, email, message: message.trim() });
         } catch (e) {
             console.error('Failed to send email notification:', e);
         }

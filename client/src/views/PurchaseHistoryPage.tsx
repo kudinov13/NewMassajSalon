@@ -5,8 +5,15 @@ import { API } from "../services/api";
 type Order = {
   id: number;
   total: number;
+  status?: string;
   createdAt: string;
   items: { name: string; price: number; quantity: number }[];
+};
+
+const statusLabel: Record<string, { text: string; className: string }> = {
+  paid: { text: "Оплачен", className: "text-[#6b8f5e]" },
+  pending: { text: "Ожидает оплаты", className: "text-[#b08a4f]" },
+  failed: { text: "Ошибка оплаты", className: "text-[#b06050]" },
 };
 
 const PurchaseHistoryPage: React.FC = () => {
@@ -83,9 +90,16 @@ const PurchaseHistoryPage: React.FC = () => {
                       })}
                     </span>
                   </div>
-                  <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#a6856d] text-lg">
-                    {order.total} ₽
-                  </span>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="[font-family:'Vela_Sans',sans-serif] font-normal text-[#a6856d] text-lg">
+                      {order.total} ₽
+                    </span>
+                    {order.status && (
+                      <span className={`[font-family:'Vela_Sans',sans-serif] font-light text-sm ${statusLabel[order.status]?.className || "text-[#00000099]"}`}>
+                        {statusLabel[order.status]?.text || order.status}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="border-t border-[#f0e8dd] pt-3 flex flex-col gap-2">
                   {order.items.map((item, i) => (
@@ -99,6 +113,22 @@ const PurchaseHistoryPage: React.FC = () => {
                     </div>
                   ))}
                 </div>
+                {order.status === "pending" && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const { paymentUrl } = await API.payment.getLink(order.id);
+                        window.location.href = paymentUrl;
+                      } catch (e: any) {
+                        alert(e.message || "Не удалось получить ссылку на оплату");
+                      }
+                    }}
+                    className="mt-4 h-10 px-6 bg-[#a6856d] hover:bg-[#8d6e58] text-white rounded-full [font-family:'Vela_Sans',sans-serif] text-sm border-0 cursor-pointer transition-colors"
+                  >
+                    Оплатить заказ
+                  </button>
+                )}
               </div>
             ))}
           </div>

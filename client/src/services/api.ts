@@ -221,6 +221,13 @@ export const API = {
       return await response.json();
     },
   },
+  payment: {
+    getLink: async (orderId: number): Promise<{ paymentUrl: string }> => {
+      const response = await fetch(`${API_BASE}/payment/link/${orderId}`, { credentials: "include" });
+      await errorHandler(response);
+      return await response.json();
+    },
+  },
   streams: {
     getAll: async () => {
       const response = await fetch(`${API_BASE}/streams`, { credentials: "include" });

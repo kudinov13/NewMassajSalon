@@ -43,6 +43,7 @@ const BowlsSpecialistPanel = lazy(() => import("./views/BowlsSpecialistPanel"));
 const AboutPage = lazy(() => import("./views/AboutPage"));
 const ReviewsPage = lazy(() => import("./views/ReviewsPage"));
 const BeforeAfterPage = lazy(() => import("./views/BeforeAfterPage"));
+const PaymentResultPage = lazy(() => import("./views/PaymentResultPage"));
 
 const PageFallback = () => (
   <div className="min-h-screen bg-[#efdec5] flex items-center justify-center">
@@ -121,6 +122,8 @@ function App() {
         <Route path='/about' element={<PageTransition><AboutPage/></PageTransition>} />
         <Route path='/reviews' element={<PageTransition><ReviewsPage/></PageTransition>} />
         <Route path='/before-after' element={<PageTransition><BeforeAfterPage/></PageTransition>} />
+        <Route path='/payment-success' element={<PageTransition><PaymentResultPage success/></PageTransition>} />
+        <Route path='/payment-fail' element={<PageTransition><PaymentResultPage success={false}/></PageTransition>} />
       </Route>
     </Routes>
   </>;

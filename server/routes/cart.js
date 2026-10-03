@@ -2,6 +2,8 @@ const express = require('express');
 const { getUserIdByToken } = require('../db/tokens');
 const { getCart, addToCart, updateCartQuantity, removeFromCart, clearCart } = require('../db/cart');
 const { getDb } = require('../db/db');
+const { createOrderFromCart } = require('../db/orders');
+const { orderPaymentUrl } = require('../utils/orderPaymentUrl');
 
 const cartRouter = express.Router();
 
@@ -54,27 +56,17 @@ cartRouter.delete('/', requireAuth, async (req, res) => {
     res.json([]);
 });
 
-// POST checkout - create order from cart
+// POST checkout - create pending order from cart and return Robokassa payment URL
 cartRouter.post('/checkout', requireAuth, async (req, res) => {
-    const items = await getCart(req.userId);
-    if (!items.length) return res.status(400).json({ message: 'Корзина пуста' });
-    const db = getDb();
-    const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
-    const r = await db.run('INSERT INTO orders (userId, total) VALUES (?, ?)', req.userId, total);
-    const orderId = r.lastID;
-    for (const item of items) {
-        await db.run(
-            'INSERT INTO order_items (orderId, productId, name, price, quantity) VALUES (?, ?, ?, ?, ?)',
-            orderId, item.productId, item.name, item.price, item.quantity
-        );
-        // Grant course access if product has courseId
-        const product = await db.get('SELECT courseId FROM products WHERE id = ?', item.productId);
-        if (product && product.courseId) {
-            await db.run('INSERT OR IGNORE INTO user_courses (userId, courseId) VALUES (?, ?)', req.userId, product.courseId);
-        }
+    try {
+        const order = await createOrderFromCart(req.userId);
+        if (!order) return res.status(400).json({ message: 'Корзина пуста' });
+        const paymentUrl = await orderPaymentUrl({ id: order.orderId, total: order.total, userId: req.userId });
+        res.json({ orderId: order.orderId, total: order.total, paymentUrl });
+    } catch (e) {
+        console.error('checkout error:', e);
+        res.status(500).json({ message: 'Не удалось оформить заказ' });
     }
-    await clearCart(req.userId);
-    res.json({ orderId, total });
 });
 
 // GET orders history
